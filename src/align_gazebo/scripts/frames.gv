@@ -1,0 +1,26 @@
+digraph G {
+"steering_front_link" -> "steering_left_front_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 50.196 Hz\nMost recent transform: 4933.073 ( 1587170107.257 sec old)\nBuffer length: 4.841 sec\n"];
+"base_body_link" -> "steering_front_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1587175040.330 sec old)\nBuffer length: 0.000 sec\n"];
+"steering_front_link" -> "steering_right_front_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 50.196 Hz\nMost recent transform: 4933.073 ( 1587170107.257 sec old)\nBuffer length: 4.841 sec\n"];
+"base_body_link" -> "wheel_left_rear_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 50.196 Hz\nMost recent transform: 4933.073 ( 1587170107.257 sec old)\nBuffer length: 4.841 sec\n"];
+"base_link" -> "base_body_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1587175040.330 sec old)\nBuffer length: 0.000 sec\n"];
+"base_body_link" -> "wheel_right_rear_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 50.196 Hz\nMost recent transform: 4933.073 ( 1587170107.257 sec old)\nBuffer length: 4.841 sec\n"];
+"base_link" -> "velodyne_base_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1587175040.330 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "velodyne"[label="Broadcaster: /base_link_to_localizer\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1587175040.330 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "camera_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1587175040.330 sec old)\nBuffer length: 0.000 sec\n"];
+"camera_link" -> "camera_optical_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1587175040.330 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "hokuyo"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1587175040.330 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "imu_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1587175040.330 sec old)\nBuffer length: 0.000 sec\n"];
+"world" -> "map"[label="Broadcaster: /world_to_map\nAverage rate: 98.925 Hz\nMost recent transform: 1587175040.335 ( -0.005 sec old)\nBuffer length: 4.973 sec\n"];
+"steering_left_front_link" -> "wheel_left_front_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 10.208 Hz\nMost recent transform: 4933.073 ( 1587170107.257 sec old)\nBuffer length: 4.800 sec\n"];
+"steering_right_front_link" -> "wheel_right_front_link"[label="Broadcaster: /autoware_gazebo/robot_state_publisher\nAverage rate: 10.208 Hz\nMost recent transform: 4933.073 ( 1587170107.257 sec old)\nBuffer length: 4.800 sec\n"];
+"map" -> "odom"[label="Broadcaster: /autoware_gazebo/map_broadcaster\nAverage rate: 10.202 Hz\nMost recent transform: 4933.117 ( 1587170107.213 sec old)\nBuffer length: 4.705 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1587175040.330"[ shape=plaintext ] ;
+ }->"base_link";
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1587175040.330"[ shape=plaintext ] ;
+ }->"world";
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="namespace" default="align"/>
+  <arg name="world_name" default="worlds/empty.world"/>
+  <arg name="cmd_timeout" default="0.5"/>
+
+  <!-- Vehicle pose -->
+  <arg name="x" default="0.0"/>
+  <arg name="y" default="0.0"/>
+  <arg name="z" default="0.3"/>
+  <arg name="roll" default="0.0"/>
+  <arg name="pitch" default="0.0"/>
+  <arg name="yaw" default="0.0"/>
+
+
+  <!--      TF broadcaster to establish the link map->odom->base_link -->
+    <node name="tf_broadcaster" pkg="align_gazebo" type="tf_broadcaster.py"/>
+
+<node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find static_model_db)/dock_table/model.sdf -sdf -x 0 -y -0 -z 0 -Y 1.5707 -model table" respawn="false" output="screen" />
+  <!-- <node name="spawn_pod" pkg="gazebo_ros" type="spawn_model" args="-file $(find align_gazebo)/models/Pod/model.sdf -sdf -x 6 -y -0 -z 0 -Y 1.5707 -model Pod" respawn="false" output="screen" /> -->
+
+  <group ns="$(arg namespace)">
+    <!-- Create the world. -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" value="$(arg world_name)"/>
+    </include>
+
+
+  </group>
+</launch>
