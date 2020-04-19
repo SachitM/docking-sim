@@ -33,7 +33,7 @@
     </include>
 
         <!-- Spawn the Pod. -->
-    <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find align_gazebo)/models/pod_tag/model.sdf -sdf -x 6 -y -0 -z 0 -Y 1.5707 -model Pod -gazebo_namespace /$(arg namespace)/gazebo " respawn="false" output="screen" />
+    <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find align_gazebo)/models/pod_tag/model.sdf -sdf -x 4 -y -0 -z 0 -Y 1.5707 -model Pod -gazebo_namespace /$(arg namespace)/gazebo " respawn="false" output="screen" />
 
   
     <!-- Spawn the vehicle. -->

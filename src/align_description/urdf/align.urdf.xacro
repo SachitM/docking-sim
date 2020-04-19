@@ -302,7 +302,7 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
 
 
   <joint name="hokuyo_joint" type="fixed">
-    <origin xyz="1.1 0.00 0.1" rpy="0 0 0" />
+    <origin xyz="1 0.00 0.1" rpy="0 0 0" />
     <parent link="base_link" />
     <child link="hokuyo" />
   </joint>
@@ -339,7 +339,7 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
 
 
  <joint name="camera_joint" type="fixed">
-    <origin xyz="1.1 0 0.2" rpy="0 0 0"/>
+    <origin xyz="1 0 0.2" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="camera_link"/>
   </joint>
@@ -349,7 +349,7 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-    <box size="0.1 0.1 0.1"/>
+    <box size="0.01 0.01 0.01"/>
       </geometry>
     </collision>
 
@@ -486,8 +486,8 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
           <horizontal>
             <samples>560</samples>
             <resolution>1</resolution>
-            <min_angle>-1.22173</min_angle>
-            <max_angle>1.22173</max_angle>
+            <min_angle>-1.221730476396</min_angle>
+            <max_angle>1.221730476396</max_angle>
           </horizontal> 
         </scan>
         <range>
@@ -606,7 +606,7 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
   </gazebo>
 
   <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
-  <VLP-16 parent = "base_link" name="/velodyne" topic="/velodyne_points" hz="10" samples="440/">
+  <VLP-16 parent = "base_link" name="/velodyne" topic="/velodyne_points" hz="1" samples="440" max_range="20">
     <origin xyz="0 0 0.5" rpy="0 0 0"/>
   </VLP-16>
 

@@ -25,7 +25,6 @@ def getBBMarker():
   marker.color.r = 0.0
   marker.color.g = 1.0
   marker.color.b = 0.0
-  nums = np.random.uniform(-0.03,0.05,1)
   pt1 = Point(x=x_lim[1] + pod_loc_pred[0], y=y_lim[1]+ pod_loc_pred[1])
   pt2 = Point(x=x_lim[0] + pod_loc_pred[0], y=y_lim[1]+ pod_loc_pred[1])
   pt3 = Point(x=x_lim[0] + pod_loc_pred[0], y=y_lim[0]+ pod_loc_pred[1])
@@ -35,7 +34,7 @@ def getBBMarker():
   marker.points.append(pt3)
   marker.points.append(pt4)
   marker.points.append(pt1)
-  marker.pose.orientation = Quaternion(*quaternion_from_euler(0, 0, nums))
+  marker.pose.orientation = Quaternion(*quaternion_from_euler(0, 0, 0))
   phz_array.markers.append(marker)
 
   marker = Marker()
