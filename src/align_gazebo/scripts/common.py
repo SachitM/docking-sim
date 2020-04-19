@@ -14,7 +14,7 @@ x_lim = [-4, 1]
 y_lim = [-2, 2]
 theta_lim = [-np.pi, np.pi]
 num_waypoints = 5
-waypoint_tol = [0.1, 0.07,0.05,0.04,0.04]
+waypoint_tol = [0.15, 0.07,0.05,0.04,0.04]
 
 retrace_waypoint_tol = 0.1
 

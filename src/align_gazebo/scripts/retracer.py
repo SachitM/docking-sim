@@ -36,7 +36,7 @@ def vehicleStateCallback(msg):
   pix_bot_velocity.linear = msg.twist.twist.linear
   pix_bot_velocity.angular = msg.twist.twist.angular
 
-def pursuitToWaypoint(waypoint, i):
+def perform_retrace(waypoint, i):
   
   print waypoint
   
@@ -110,7 +110,7 @@ if __name__ == '__main__':
   rospy.init_node('pure_pursuit')
   cmd_pub = rospy.Publisher('/align/ackermann_cmd', AckermannDriveStamped, queue_size=10)
 
-  waypoints = np.zeros((5, 3))
+  waypoints = np.zeros((num_waypoints, 3))
   
   waypoints[0,0] = 0.5
   waypoints[1,0] = 1
@@ -133,16 +133,20 @@ if __name__ == '__main__':
   rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
 
 
-  pursuitToWaypoint(waypoints[0],4)
+  goal = waypoints[-1,-1]
+  state = "verifying_pose"
+  dx = goal[0] - pix_bot_center.position.x
+  dy = goal[1] - pix_bot_center.position.y
+  target_distance = math.sqrt(dx*dx + dy*dy)
+
+  state = "retracing"
+  perform_retrace(waypoints[0],4)
 
   # for i_,w in enumerate(waypoints):
     # pursuitToWaypoint(w,i_)
 
   state = "finished"
-  
-  z= 0
-  while z < 100000:
-    z += 1
+
 
 
 

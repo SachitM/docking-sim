@@ -30,12 +30,13 @@ if __name__ == '__main__':
     w.position.y = waypoints[i, 1]
     w.orientation = Quaternion(*quaternion_from_euler(0, 0, waypoints[i, 2]))
 
-    waypoint_array.poses.append(w)
-
+    waypoint_array.poses.append(w)  
   # Publish the waypoints
   r = rospy.Rate(1)  # 10hz
   while not rospy.is_shutdown():
     waypoints_pub.publish(waypoint_array)
+    waypoints[1:5,0] += np.random.uniform(-0.2,0.2,1)
+    # print(waypoint_array)
     r.sleep()
 
 

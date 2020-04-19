@@ -29,7 +29,8 @@ ImageConverter* ic;
 //       float64 w
 
 
-#define OFFSET_CAMERA 1.1
+//TODO Move to param server
+#define OFFSET_CAMERA 1.1 //+0.95
 
 void apriltag_detection_callback(const apriltags_ros::AprilTagDetectionArray msg)
 {

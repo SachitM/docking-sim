@@ -98,8 +98,8 @@ def pursuitToWaypoint(waypoint, i):
     elif i == 3:
       MAX_VEL = 1
     elif i == 4:
-      MAX_VEL = 0.3
-      MIN_VEL = 0.05
+      MAX_VEL = 0.25
+      MIN_VEL = 0.07
 
 
     velocity = max(MIN_VEL, min(MAX_VEL , velocity))
@@ -110,6 +110,73 @@ def pursuitToWaypoint(waypoint, i):
     cmd_pub.publish(cmd)
     rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
 
+def perform_retrace(waypoint, i):
+  
+  print waypoint
+  
+  global pix_bot_center, pix_bot_theta, pix_bot_velocity, cmd_pub
+  rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
+  dx = waypoint[0] - pix_bot_center.position.x
+  dy = waypoint[1] - pix_bot_center.position.y
+  target_distance = math.sqrt(dx*dx + dy*dy)
+
+  cmd = AckermannDriveStamped()
+  cmd.header.stamp = rospy.Time.now()
+  cmd.header.frame_id = "base_link"
+  cmd.drive.speed = pix_bot_velocity.linear.x
+
+  cmd.drive.acceleration = max_acc[i]
+
+  delta_error = 0.0
+  last_error = 0.0
+
+  while target_distance > retrace_waypoint_tol:
+
+    dx = pix_bot_center.position.x - waypoint[0]
+    dy = pix_bot_center.position.y - waypoint[1]
+    lookahead_dist = np.sqrt(dx * dx + dy * dy)
+    lookahead_theta = math.atan2(abs(dy), abs(dx))
+    # lookahead_theta = waypoint[2]
+    alpha = shortest_angular_distance(lookahead_theta, pix_bot_theta)
+    
+    
+
+    cmd.header.stamp = rospy.Time.now()
+    cmd.header.frame_id = "base_link"
+    # Publishing constant speed of 1m/s
+    cmd.drive.speed = 1
+
+    # Reactive steering
+    # print(pix_bot_theta, lookahead_theta )
+    # print("ALPHA")
+    # print(alpha)
+
+    if alpha < 0:
+      st_ang = max(-max_steering_angle_ret, alpha)
+    else:
+      st_ang = min(max_steering_angle_ret, alpha)
+
+    cmd.drive.steering_angle = st_ang
+    target_distance = math.sqrt(dx * dx + dy * dy)
+
+    error_speed = target_distance
+    if last_error == 0:
+      pass
+    else:
+      delta_error = error_speed - last_error
+
+    velocity = Kp * error_speed + Kd * delta_error
+
+    MIN_VEL = 0.1
+    MAX_VEL = 0.75
+
+    velocity = max(MIN_VEL, min(MAX_VEL , velocity))
+
+    cmd.drive.speed = -velocity
+
+
+    cmd_pub.publish(cmd)
+    rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
 
 if __name__ == '__main__':
 
@@ -134,6 +201,28 @@ if __name__ == '__main__':
     pursuitToWaypoint(w,i_)
 
   state = "finished"
+  print(state)
+  rate = rospy.Rate(0.25)
+  rate.sleep()
+  state = "verifying_pose"
+  print(state)
+  goal = waypoints[-1] + 0
+  dx = goal[0] - pix_bot_center.position.x
+  dy = goal[1] - pix_bot_center.position.y
+  target_distance = math.sqrt(dx*dx + dy*dy)
+  print("Pose_Error : = %d", target_distance)
+  print(state)
+  if target_distance > 0.1:
+    state = "retracing"
+    print(state)
+    rate.sleep()
+    perform_retrace(waypoints[0],4)
+
+    # for i_,w in enumerate(waypoints):
+      # pursuitToWaypoint(w,i_)
+
+  state = "finished"
+  print(state)
   
 
 
