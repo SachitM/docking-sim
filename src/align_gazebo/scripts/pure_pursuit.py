@@ -8,6 +8,9 @@ from angles import *
 
 import tf
 
+
+state = "starting"
+
 def waypointCallback(msg):
   global waypoints
   for i in range(len(msg.poses)):
@@ -16,39 +19,51 @@ def waypointCallback(msg):
     waypoints[i, 2] = euler_from_quaternion([msg.poses[i].orientation.x, msg.poses[i].orientation.y, msg.poses[i].orientation.z, msg.poses[i].orientation.w])[2]
 
 def vehicleStateCallback(msg):
-  print("Driving")
-  global rear_axle_center, rear_axle_theta, rear_axle_velocity
-  rear_axle_center.position.x = msg.pose.pose.position.x
-  rear_axle_center.position.y = msg.pose.pose.position.y
-  rear_axle_center.orientation = msg.pose.pose.orientation
+  # print("Driving")
+  global pix_bot_center, pix_bot_theta, pix_bot_velocity, state
+  pix_bot_center.position.x = msg.pose.pose.position.x
+  pix_bot_center.position.y = msg.pose.pose.position.y
+  pix_bot_center.orientation = msg.pose.pose.orientation
 
-  rear_axle_theta = euler_from_quaternion(
-    [rear_axle_center.orientation.x, rear_axle_center.orientation.y, rear_axle_center.orientation.z,
-     rear_axle_center.orientation.w])[2]
+  pix_bot_theta = euler_from_quaternion(
+    [pix_bot_center.orientation.x, pix_bot_center.orientation.y, pix_bot_center.orientation.z,
+     pix_bot_center.orientation.w])[2]
 
-  rear_axle_velocity.linear = msg.twist.twist.linear
-  rear_axle_velocity.angular = msg.twist.twist.angular
+  if(state == "finished"):
+    print( msg.pose.pose.position.x, msg.pose.pose.position.y, pix_bot_theta)
 
-def pursuitToWaypoint(waypoint):
+
+  pix_bot_velocity.linear = msg.twist.twist.linear
+  pix_bot_velocity.angular = msg.twist.twist.angular
+
+def pursuitToWaypoint(waypoint, i):
   print waypoint
-  global rear_axle_center, rear_axle_theta, rear_axle_velocity, cmd_pub
+  global pix_bot_center, pix_bot_theta, pix_bot_velocity, cmd_pub
   rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
-  dx = waypoint[0] - rear_axle_center.position.x
-  dy = waypoint[1] - rear_axle_center.position.y
+  dx = waypoint[0] - pix_bot_center.position.x
+  dy = waypoint[1] - pix_bot_center.position.y
   target_distance = math.sqrt(dx*dx + dy*dy)
 
   cmd = AckermannDriveStamped()
   cmd.header.stamp = rospy.Time.now()
   cmd.header.frame_id = "base_link"
-  cmd.drive.speed = rear_axle_velocity.linear.x
-  cmd.drive.acceleration = max_acc
-  while target_distance > waypoint_tol:
+  cmd.drive.speed = pix_bot_velocity.linear.x
 
-    dx = waypoint[0] - rear_axle_center.position.x
-    dy = waypoint[1] - rear_axle_center.position.y
+  cmd.drive.acceleration = max_acc[i]
+
+  delta_error = 0.0
+  last_error = 0.0
+
+  while target_distance > waypoint_tol[i]:
+
+    dx = waypoint[0] - pix_bot_center.position.x
+    dy = waypoint[1] - pix_bot_center.position.y
     lookahead_dist = np.sqrt(dx * dx + dy * dy)
     lookahead_theta = math.atan2(dy, dx)
-    alpha = shortest_angular_distance(rear_axle_theta, lookahead_theta)
+    # lookahead_theta = waypoint[2]
+    alpha = shortest_angular_distance(pix_bot_theta, lookahead_theta)
+
+    
 
     cmd.header.stamp = rospy.Time.now()
     cmd.header.frame_id = "base_link"
@@ -57,21 +72,40 @@ def pursuitToWaypoint(waypoint):
 
     # Reactive steering
     if alpha < 0:
-      st_ang = max(-max_steering_angle, alpha)
+      st_ang = max(-max_steering_angle[i], alpha)
     else:
-      st_ang = min(max_steering_angle, alpha)
+      st_ang = min(max_steering_angle[i], alpha)
 
     cmd.drive.steering_angle = st_ang
 
     target_distance = math.sqrt(dx * dx + dy * dy)
-    if waypoint[0] ==  6:
-      nums = 2
+
+    error_speed = target_distance
+    if last_error == 0:
+      pass
     else:
-      nums = 1.5
-    if(target_distance <2):
-      
-      cmd.drive.speed *= target_distance/nums 
-    
+      delta_error = error_speed - last_error
+
+    velocity = Kp * error_speed + Kd * delta_error
+
+    MIN_VEL = 0.2
+    MAX_VEL = 2
+
+    if i == 1:
+      MAX_VEL = 1.5
+    elif i == 2:
+      MAX_VEL = 1
+    elif i == 3:
+      MAX_VEL = 1
+    elif i == 4:
+      MAX_VEL = 0.3
+      MIN_VEL = 0.05
+
+
+    velocity = max(MIN_VEL, min(MAX_VEL , velocity))
+
+    cmd.drive.speed = velocity
+
 
     cmd_pub.publish(cmd)
     rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
@@ -82,25 +116,25 @@ if __name__ == '__main__':
   rospy.init_node('pure_pursuit')
   cmd_pub = rospy.Publisher('/align/ackermann_cmd', AckermannDriveStamped, queue_size=10)
 
-  waypoints = np.zeros((2, 3))
+  waypoints = np.zeros((num_waypoints, 3))
   
-  waypoints[0,0] = -1
-  waypoints[1,0] = 6
-  # rospy.Subscriber("/ackermann_vehicle/waypoints",
-  #                  PoseArray,
-  #                  waypointCallback)
-  # rospy.wait_for_message("/ackermann_vehicle/waypoints", PoseArray, 5)
+  rospy.Subscriber("/waypoints_goal",
+                   PoseArray,
+                   waypointCallback)
+  rospy.wait_for_message("/waypoints_goal", PoseArray)
 
 
-  rear_axle_center = Pose()
-  rear_axle_velocity = Twist()
+  pix_bot_center = Pose()
+  pix_bot_velocity = Twist()
   rospy.Subscriber("/align/ground_truth/state",
                    Odometry, vehicleStateCallback)
-  rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
+  rospy.wait_for_message("/align/ground_truth/state", Odometry,5)
 
-  for w in waypoints:
-    pursuitToWaypoint(w)
+  for i_,w in enumerate(waypoints):
+    pursuitToWaypoint(w,i_)
 
+  state = "finished"
+  
 
 
 

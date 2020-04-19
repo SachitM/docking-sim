@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<launch>
+
+  <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="hector_trajectory_server" output="screen">
+  <param name="target_frame_name" type="string" value="april_tf" />
+  <param name="source_frame_name" type="string" value="camera" />
+  <param name="trajectory_update_rate" type="double" value="1" />
+  <param name="trajectory_publish_rate" type="double" value="1.0" />
+
+</node>
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find motion_decoder)/rviz/rviz_conf2.rviz"/>
+</launch>

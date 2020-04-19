@@ -102,10 +102,10 @@ if __name__ == '__main__':
 
   # Subscribe to the randomly generated waypoints
   waypoints = np.zeros((4, 3))
-  waypoints[0,0] = 6
-  waypoints[1,0] = 0
-  waypoints[2,0] = 6
-  waypoints[3,0] = 0
+  waypoints[0,0] = 4
+  waypoints[1,0] = 3
+  waypoints[2,0] = 2
+  waypoints[3,0] = 1
   
   waypoint_arrow_marker = getWaypointsMarker(waypoints)
   waypoints_arrow_pub = rospy.Publisher('/estimatedLoc', MarkerArray, queue_size=10)

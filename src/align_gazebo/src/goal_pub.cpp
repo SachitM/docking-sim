@@ -43,7 +43,7 @@ goal_publisher::goal_publisher(ros::NodeHandle *nodeH)
 	this->node= nodeH;
 
 	this->laser_sub = node->subscribe("/scan", 1, &goal_publisher::laser_data_cb, this);
-	this->goal_pub = node->advertise<geometry_msgs::PoseStamped>("/pod_estimate_laser", 1);
+	this->goal_pub = node->advertise<geometry_msgs::PoseStamped>("/pod_predicted_laser", 1);
 }
 
 goal_publisher::~goal_publisher()

@@ -11,7 +11,7 @@
 #define LENGTH_SHORT_SIDE			0.9
 #define ERROR_THRESHOLD_COMPARE		0.05
 #define MAX_RANGE_ALLOWED			7
-#define BASE_LINK_OFFSET_X			1.0
+#define BASE_LINK_OFFSET_X			1.1
 
 enum goal_pub_e
 {

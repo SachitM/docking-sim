@@ -12,14 +12,16 @@ if __name__ == '__main__':
 
   rospy.init_node('waypoint_publisher')
 
-  # Generate random waypoints
-  waypoints = np.random.rand(num_waypoints, 3)
-  waypoints[:, 0] = (x_lim[1] - x_lim[0]) * waypoints[:, 0] + x_lim[0]
-  waypoints[:, 1] = (y_lim[1] - y_lim[0]) * waypoints[:, 1] + y_lim[0]
-  waypoints[:, 2] = (theta_lim[1] - theta_lim[0]) * waypoints[:, 2] + theta_lim[0]
+  waypoints = np.zeros((num_waypoints, 3))
+
+  waypoints[0,0] = 0.5
+  waypoints[1,0] = 1
+  waypoints[2,0] = 2
+  waypoints[3,0] = 3
+  waypoints[4,0] = 4.0
 
   # Waypoint publisher
-  waypoints_pub = rospy.Publisher('waypoints', PoseArray, queue_size=10)
+  waypoints_pub = rospy.Publisher('/waypoints_goal', PoseArray, queue_size=10)
 
   waypoint_array = PoseArray()
   for i in range(0, num_waypoints):

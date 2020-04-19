@@ -109,7 +109,6 @@ def waypointCallback(msg):
 
 
 def vehicleStateCallback(msg):
-	print("Driving")
 	global rear_axle_center, rear_axle_theta, rear_axle_velocity
 	rear_axle_center.position.x = msg.pose.pose.position.x
 	rear_axle_center.position.y = msg.pose.pose.position.y
@@ -145,7 +144,7 @@ def mark_straight(pts ):
 	return mask
 			
 
-def _pursuitToWaypoint(waypoint , v=1 ):
+def _pursuitToWaypoint(waypoint , v , wp_cnt):
   print waypoint
   global rear_axle_center, rear_axle_theta, rear_axle_velocity, cmd_pub
   rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
@@ -157,8 +156,11 @@ def _pursuitToWaypoint(waypoint , v=1 ):
   cmd.header.stamp = rospy.Time.now()
   cmd.header.frame_id = "base_link"
   cmd.drive.speed = rear_axle_velocity.linear.x
-  cmd.drive.acceleration = max_acc
-  while target_distance > waypoint_tol:
+  cmd.drive.acceleration = max_acc[wp_cnt]
+  delta_error = 0.0
+  last_error = 0.0
+
+  while target_distance > waypoint_tol[wp_cnt]:
 
 	dx = waypoint[0] - rear_axle_center.position.x
 	dy = waypoint[1] - rear_axle_center.position.y
@@ -176,18 +178,24 @@ def _pursuitToWaypoint(waypoint , v=1 ):
 
 	cmd.drive.steering_angle = st_ang
 
-	cmd.drive.speed = v 
-
-
 	target_distance = math.sqrt(dx * dx + dy * dy)
-	if(target_distance <1.5):
-		cmd.drive.speed *= target_distance/1.2
+	error_speed = target_distance
+	if last_error == 0:
+		pass
+	else:
+		delta_error = error_speed - last_error
+
+	velocity = Kp * error_speed + Kd * delta_error
+
+	velocity = max(0.05, min(v,velocity))
+	cmd.drive.speed = velocity  
+
 	cmd_pub.publish(cmd)
 	rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
 
 
 
-def pursuitToWaypoint(waypoint):
+def pursuitToWaypoint(waypoint,wp_cnt):
 	q0 = ( rear_axle_center.position.x , rear_axle_center.position.y   ,  rear_axle_theta  )
 	q1 = ( waypoint[0] , waypoint[1] ,  waypoint[2]  )
 	turning_radius = 2.0
@@ -197,16 +205,25 @@ def pursuitToWaypoint(waypoint):
 	configurations, _ = path.sample_many(step_size)
 
 	curve_pts = mark_straight( configurations )
-
-	np.save("w.npy" , waypoints )
-	np.save("c.npy" , configurations)
-
+	
 	for i , c in enumerate(configurations):
-		if curve_pts[i] <0.5:
-			v = 1
-		else :
-			v = 3
-		_pursuitToWaypoint([c[0] , c[1]] , v )
+		
+		velocity = 2
+		MAX_VEL = 1.5
+		MIN_VEL = 0.2
+		if wp_cnt == 1:
+			MAX_VEL = 1.5
+		elif wp_cnt == 2:
+			MAX_VEL = 1
+		elif wp_cnt == 3:
+			MAX_VEL = 1
+		elif wp_cnt == 4:
+			MAX_VEL = 0.3
+			MIN_VEL = 0.05
+
+
+		velocity = max(MIN_VEL, min(MAX_VEL , velocity))
+		_pursuitToWaypoint([c[0] , c[1]] , velocity, wp_cnt )
 
 
 
@@ -217,16 +234,19 @@ if __name__ == '__main__':
 	rospy.init_node('dubins_path')
 	cmd_pub = rospy.Publisher('/align/ackermann_cmd', AckermannDriveStamped, queue_size=10)
 
-	waypoints = np.zeros((2, 3))
-	waypoints[0,0] = 0
-	waypoints[1,0] = 6
-
 	# waypoints = np.zeros((num_waypoints, 3))
 	# rospy.Subscriber("/ackermann_vehicle/waypoints",
 	# 								 PoseArray,
 	# 								 waypointCallback)
 	# rospy.wait_for_message("/ackermann_vehicle/waypoints", PoseArray, 5)
 
+	waypoints = np.zeros((5, 3))
+  
+	waypoints[0,0] = 0.5
+	waypoints[1,0] = 1
+	waypoints[2,0] = 2
+	waypoints[3,0] = 3
+	waypoints[4,0] = 4
 	print( waypoints )
 	rear_axle_center = Pose()
 	rear_axle_velocity = Twist()
@@ -234,8 +254,9 @@ if __name__ == '__main__':
 									 Odometry, vehicleStateCallback)
 	rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
 
-	for w in waypoints:
-		pursuitToWaypoint(w)
+	for i, w in enumerate(waypoints):
+		print(w)
+		pursuitToWaypoint(w,i)
 
 
 
