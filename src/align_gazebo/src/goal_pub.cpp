@@ -157,7 +157,7 @@ goal_pub_e goal_publisher::get_legs(void)
 	}
 	else if(no_of_leg_detected < 3)
 	{
-		ROS_ERROR("Only %d legs detected. ", no_of_leg_detected);
+		ROS_ERROR(" %d legs detected. ", no_of_leg_detected);
 		if(no_of_leg_detected == 2)
 		{	
 			float_t angle = this->get_table_pose_angle(leg_points[0], leg_points[1]);

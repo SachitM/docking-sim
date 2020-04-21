@@ -10,9 +10,13 @@ import tf
 
 
 state = "starting"
-ODOM_INF = "align/ground_truth/state"
+ODOM_INF = "ground_truth/state"
+last_goal = False
 def waypointCallback(msg):
-  global waypoints
+  global waypoints, last_goal
+  if last_goal == True:
+    return
+
   for i in range(len(msg.poses)):
     waypoints[i, 0] = msg.poses[i].position.x
     waypoints[i, 1] = msg.poses[i].position.y
@@ -37,8 +41,8 @@ def vehicleStateCallback(msg):
   pix_bot_velocity.angular = msg.twist.twist.angular
 
 def pursuitToWaypoint(waypoint, i):
-  print waypoint, ODOM_INF
-  global pix_bot_center, pix_bot_theta, pix_bot_velocity, cmd_pub
+  print waypoint
+  global pix_bot_center, pix_bot_theta, pix_bot_velocity, cmd_pub, ODOM_INF
   rospy.wait_for_message(ODOM_INF, Odometry, 5)
   dx = waypoint[0] - pix_bot_center.position.x
   dy = waypoint[1] - pix_bot_center.position.y
@@ -211,7 +215,10 @@ if __name__ == '__main__':
 
   if state == "pure_pursuit":
     for i_,w in enumerate(waypoints):
+      if i_ == num_waypoints-2:
+        last_goal = True
       pursuitToWaypoint(w,i_)
+
 
   state = "finished"
   print(state)
