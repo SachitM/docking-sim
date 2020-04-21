@@ -277,7 +277,7 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
 
 <link name="lift_link">
     <visual>
-      <origin rpy="0 0 1.57079633" xyz="0 0 0"/>
+      <origin rpy="0 0 1.57079633" xyz="-0.02 0 0"/>
       <geometry>
         <mesh filename="package://align_description/meshes/lift_f.dae"/>
       </geometry>

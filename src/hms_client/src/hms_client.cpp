@@ -186,7 +186,7 @@ int main(int argc, char **argv)
       {
         if(srv.response.error_code)//obstacle detected..
         {
-          ROS_ERROR("Error : [Obstacle detected], Node %s instructed to come to halt", nodes[j].c_str());
+          ROS_ERROR("Error : [Obstacle detected], [Node %s] Vehicle instructed to come to halt", nodes[j].c_str());
           geometry_msgs::Twist _msg;
           _msg.linear.x = 0;
           vel_pub.publish(_msg);
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
           geometry_msgs::Twist twist_msg;
           twist_msg.linear.x = 0;
           vel_pub.publish(twist_msg);
-          ROS_ERROR("Node %s instructed to come to halt", nodes[j].c_str());
+          ROS_ERROR("[Node %s] Vehicle instructed to come to halt", nodes[j].c_str());
         }
       }
     }

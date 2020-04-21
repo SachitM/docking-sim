@@ -26,7 +26,7 @@ def waypointCallback(msg):
     return
 
   for i in range(len(msg.poses)):
-    waypoints[i, 0] = msg.poses[i].position.x - 0.01
+    waypoints[i, 0] = msg.poses[i].position.x
     waypoints[i, 1] = msg.poses[i].position.y
     waypoints[i, 2] = euler_from_quaternion([msg.poses[i].orientation.x, msg.poses[i].orientation.y, msg.poses[i].orientation.z, msg.poses[i].orientation.w])[2]
 

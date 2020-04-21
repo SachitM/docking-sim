@@ -11,7 +11,7 @@
 #define LENGTH_SHORT_SIDE			0.9
 #define ERROR_THRESHOLD_COMPARE		0.05
 #define MAX_RANGE_ALLOWED			8
-#define SAMPLES_SKIPPED				50 //Corresponds to 10degrees
+#define SAMPLES_SKIPPED				20 //Corresponds to 10degrees
 
 //TODO Move to param server
 #define BASE_LINK_OFFSET_X			1.1 //+0.95
