@@ -101,11 +101,12 @@ if __name__ == '__main__':
   rospy.init_node('marker_viz_node')
 
   # Subscribe to the randomly generated waypoints
-  waypoints = np.zeros((4, 3))
-  waypoints[0,0] = 4
-  waypoints[1,0] = 3
-  waypoints[2,0] = 2
-  waypoints[3,0] = 1
+  waypoints = np.zeros((num_waypoints, 3))
+  
+  rospy.Subscriber("/waypoints_goal",
+                   PoseArray,
+                   waypointCallback)
+  rospy.wait_for_message("/waypoints_goal", PoseArray)
   
   waypoint_arrow_marker = getWaypointsMarker(waypoints)
   waypoints_arrow_pub = rospy.Publisher('/estimatedLoc', MarkerArray, queue_size=10)

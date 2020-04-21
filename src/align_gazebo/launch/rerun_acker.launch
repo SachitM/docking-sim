@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="namespace" default="align"/>
+  
+  <group ns="$(arg namespace)">
+  <node name="ackermann_controller" pkg="align_gazebo"
+          type="ackermann_controller.py">
+  </group>
+</launch>

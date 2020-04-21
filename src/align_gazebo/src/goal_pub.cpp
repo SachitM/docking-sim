@@ -44,6 +44,17 @@ goal_publisher::goal_publisher(ros::NodeHandle *nodeH)
 
 	this->laser_sub = node->subscribe("/scan", 1, &goal_publisher::laser_data_cb, this);
 	this->goal_pub = node->advertise<geometry_msgs::PoseStamped>("/pod_predicted_laser", 1);
+
+	if (ros::param::has("/align/lidar_offset")) 
+	{
+		ros::param::get("/align/lidar_offset", this->lidar_offset);
+	}
+	else
+	{
+		this->lidar_offset = BASE_LINK_OFFSET_X;
+	}
+	
+
 }
 
 goal_publisher::~goal_publisher()
@@ -98,7 +109,9 @@ goal_pub_e goal_publisher::get_legs(void)
 	int32_t same_leg_count = 0;
 	int8_t no_of_leg_detected = 0;
 
-	for(i = 0; i < NO_OF_SAMPLES_LASER; i++)
+	//First 40 samples on each side are ignored as the error will not be very high (10 degrees)
+
+	for(i = SAMPLES_SKIPPED; i < (NO_OF_SAMPLES_LASER-SAMPLES_SKIPPED); i++)
 	{
 		// ROS_INFO("MAX RG = %f", this->laser_data.range_max );
 		if((this->laser_data.ranges[i] < MAX_RANGE_ALLOWED) && (this->laser_data.ranges[i] > this->laser_data.range_min))
@@ -155,7 +168,7 @@ goal_pub_e goal_publisher::get_legs(void)
 			this->goal_pose.pose.position.y = (this->leg_points[0].y + this->leg_points[1].y ) / 2.0;
 
 			//Shifting Back for interpolation
-			this->goal_pose.pose.position.x += (BASE_LINK_OFFSET_X - LENGTH_SHORT_SIDE/2);
+			this->goal_pose.pose.position.x += (this->lidar_offset - LENGTH_SHORT_SIDE/2);
 
 			this->goal_pose.header.frame_id = "/base_link";
 			this->goal_pose.header.stamp = ros::Time(0);
@@ -222,7 +235,7 @@ goal_pub_e goal_publisher::compute_goal_pose(void)
 		this->goal_pose.pose.position.y = (this->leg_points[0].y + this->leg_points[1].y + this->leg_points[2].y + this->leg_points[3].y) / 4.0;
 
 // HARDCODING LiDar Offset TODO Move to param
-		this->goal_pose.pose.position.x += BASE_LINK_OFFSET_X;
+		this->goal_pose.pose.position.x += this->lidar_offset;
 		this->goal_pose.pose.position.y += 0.0;
 		ROS_DEBUG("Before TF X:%f, Y:%f, Theta %lf", this->goal_pose.pose.position.x, this->goal_pose.pose.position.y, angle * 180 / M_PI);
 

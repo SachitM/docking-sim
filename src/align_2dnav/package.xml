@@ -2,8 +2,8 @@
 <package>
   <name>align_2dnav</name>
   <version>0.0.0</version>
-  <description>The golfcart_2dnav package</description>
-  <maintainer email="ya.sagitov@gmail.com">Artur Sagitov</maintainer>
+  <description>The pixbot package</description>
+  <maintainer email="sachit@cmu.edu">Sachit Mahajan</maintainer>
   <license>MIT</license>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>move_base</build_depend>

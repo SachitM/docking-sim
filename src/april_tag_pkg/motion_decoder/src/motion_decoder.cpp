@@ -31,6 +31,7 @@ ImageConverter* ic;
 
 //TODO Move to param server
 #define OFFSET_CAMERA 1.1 //+0.95
+float_t base_offset;
 
 void apriltag_detection_callback(const apriltags_ros::AprilTagDetectionArray msg)
 {
@@ -99,7 +100,7 @@ void apriltag_detection_callback(const apriltags_ros::AprilTagDetectionArray msg
        if(msg.detections[i].id == 1)
        { 
           br.sendTransform(tf::StampedTransform(tag_tf, tag_tf.stamp_, "camera_link", "april_tf_1"));
-          goal_pose_1.pose.position.x = tag_tf.getOrigin().x() + OFFSET_CAMERA;
+          goal_pose_1.pose.position.x = tag_tf.getOrigin().x() + base_offset;
           goal_pose_1.pose.position.y = tag_tf.getOrigin().y();
           goal_pose_1.pose.position.z = 0;
 
@@ -132,7 +133,7 @@ void apriltag_detection_callback(const apriltags_ros::AprilTagDetectionArray msg
       else
       {   
         br.sendTransform(tf::StampedTransform(tag_tf, tag_tf.stamp_, "camera_link", "april_tf_2"));
-        goal_pose_2.pose.position.x = tag_tf.getOrigin().x() + OFFSET_CAMERA;
+        goal_pose_2.pose.position.x = tag_tf.getOrigin().x() + base_offset;
         goal_pose_2.pose.position.y = tag_tf.getOrigin().y();
         goal_pose_2.pose.position.z = 0;
         float_t angle = M_PI/2 +  tf::getYaw(tag_tf.getRotation());
@@ -183,6 +184,15 @@ int main(int argc, char** argv)
   //TODO: Add a subscriber to get the AprilTag detections The callback function skelton is given.
 
   ros::Subscriber sub = n.subscribe("/tag_detections", 1000, apriltag_detection_callback);
+
+  if (ros::param::has("/align/camera_offset")) 
+	{
+		ros::param::get("/align/camera_offset", base_offset);
+	}
+	else
+	{
+		base_offset = OFFSET_CAMERA;
+	}
 
   ImageConverter converter;
   ic = &converter;

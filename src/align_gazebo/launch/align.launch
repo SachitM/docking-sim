@@ -70,5 +70,7 @@
       <param name="cmd_timeout" value="$(arg cmd_timeout)"/>
       <rosparam file="$(find align_gazebo)/config/ctrlr_params.yaml" command="load"/>
     </node>
+    <rosparam file="$(find align_gazebo)/config/pod_locations.yaml" />
+    <rosparam file="$(find align_gazebo)/config/config_off.yaml" />
   </group>
 </launch>

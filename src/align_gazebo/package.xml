@@ -2,10 +2,10 @@
 <package>
   <name>align_gazebo</name>
   <version>0.1.0</version>
-  <description>Golfcart is used within Gazebo to simulate a vehicle with Ackermann steering.</description>
-  <maintainer email="ya.sagitov@gmail.com">Sagitov Artur</maintainer>
+  <description>Ackermann steering vehicle for Pix Chassis</description>
+  <maintainer email="sachit@cmu.edu">Sachit Mahajan</maintainer>
   <license>MIT</license>
-  <author email="ya.sagitov@gmail.com">Artur</author>
+  <author email="sachit@cmu.edu">Sachit</author>
   <buildtool_depend>catkin</buildtool_depend>
   <run_depend>ackermann_msgs</run_depend>
   <run_depend>ackermann_vehicle_description</run_depend>

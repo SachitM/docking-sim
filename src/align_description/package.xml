@@ -2,10 +2,10 @@
 <package>
   <name>align_description</name>
   <version>0.1.0</version>
-  <description>Golfcart model with ackermann steering</description>
-  <maintainer email="ya.sagitov@gmail.com">Sagitov Artur</maintainer>
+  <description>Simuation for pixbot ackermann steering</description>
+  <maintainer email="sachit@cmu.edu">Sachit Mahajan</maintainer>
   <license>MIT</license>
-  <author email="ya.sagitov@gmail.com">Artur</author>
+  <author email="sachit@cmu.edu">Sachit</author>
   <buildtool_depend>catkin</buildtool_depend>
   <run_depend>joint_state_publisher</run_depend>
   <run_depend>robot_state_publisher</run_depend>

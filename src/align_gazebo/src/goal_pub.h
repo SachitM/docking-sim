@@ -11,6 +11,7 @@
 #define LENGTH_SHORT_SIDE			0.9
 #define ERROR_THRESHOLD_COMPARE		0.05
 #define MAX_RANGE_ALLOWED			7
+#define SAMPLES_SKIPPED				50 //Corresponds to 10degrees
 
 //TODO Move to param server
 #define BASE_LINK_OFFSET_X			1.1 //+0.95
@@ -44,6 +45,8 @@ class goal_publisher
 
 		float_t get_table_pose_angle(geometry_msgs::Point point_1, geometry_msgs::Point point_2);
 		void extrapolate_the_fourth_point(void);
+
+		float_t lidar_offset;
 
 	public:
 

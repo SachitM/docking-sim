@@ -14,11 +14,16 @@ if __name__ == '__main__':
 
   waypoints = np.zeros((num_waypoints, 3))
 
-  waypoints[0,0] = 0.5
-  waypoints[1,0] = 1
-  waypoints[2,0] = 2
-  waypoints[3,0] = 3
-  waypoints[4,0] = 4.0
+  waypoints[0,0] = 33.0
+  waypoints[0,1] = 33.5
+  waypoints[1,0] = 33.0
+  waypoints[1,1] = 34.0
+  waypoints[2,0] = 33.0
+  waypoints[2,1] = 35.0
+  waypoints[3,0] = 33.0
+  waypoints[3,1] = 36.0
+  waypoints[4,0] = 33.0
+  waypoints[4,1] = 37.0
 
   # Waypoint publisher
   waypoints_pub = rospy.Publisher('/waypoints_goal', PoseArray, queue_size=10)

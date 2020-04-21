@@ -10,7 +10,7 @@ import tf
 
 
 state = "starting"
-
+ODOM_INF = "align/ground_truth/state"
 def waypointCallback(msg):
   global waypoints
   for i in range(len(msg.poses)):
@@ -29,17 +29,17 @@ def vehicleStateCallback(msg):
     [pix_bot_center.orientation.x, pix_bot_center.orientation.y, pix_bot_center.orientation.z,
      pix_bot_center.orientation.w])[2]
 
-  if(state == "finished"):
-    print( msg.pose.pose.position.x, msg.pose.pose.position.y, pix_bot_theta)
+  # if(state == "finished"):
+  #   print( msg.pose.pose.position.x, msg.pose.pose.position.y, pix_bot_theta)
 
 
   pix_bot_velocity.linear = msg.twist.twist.linear
   pix_bot_velocity.angular = msg.twist.twist.angular
 
 def pursuitToWaypoint(waypoint, i):
-  print waypoint
+  print waypoint, ODOM_INF
   global pix_bot_center, pix_bot_theta, pix_bot_velocity, cmd_pub
-  rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
+  rospy.wait_for_message(ODOM_INF, Odometry, 5)
   dx = waypoint[0] - pix_bot_center.position.x
   dy = waypoint[1] - pix_bot_center.position.y
   target_distance = math.sqrt(dx*dx + dy*dy)
@@ -89,7 +89,7 @@ def pursuitToWaypoint(waypoint, i):
     velocity = Kp * error_speed + Kd * delta_error
 
     MIN_VEL = 0.2
-    MAX_VEL = 2
+    MAX_VEL = 1
 
     if i == 1:
       MAX_VEL = 1.5
@@ -108,14 +108,14 @@ def pursuitToWaypoint(waypoint, i):
 
 
     cmd_pub.publish(cmd)
-    rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
+    rospy.wait_for_message(ODOM_INF, Odometry, 5)
 
 def perform_retrace(waypoint, i):
   
-  print waypoint
+  print waypoint, ODOM_INF
   
   global pix_bot_center, pix_bot_theta, pix_bot_velocity, cmd_pub
-  rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
+  rospy.wait_for_message(ODOM_INF, Odometry, 5)
   dx = waypoint[0] - pix_bot_center.position.x
   dy = waypoint[1] - pix_bot_center.position.y
   target_distance = math.sqrt(dx*dx + dy*dy)
@@ -176,7 +176,7 @@ def perform_retrace(waypoint, i):
 
 
     cmd_pub.publish(cmd)
-    rospy.wait_for_message("/align/ground_truth/state", Odometry, 5)
+    rospy.wait_for_message(ODOM_INF, Odometry, 5)
 
 if __name__ == '__main__':
 
@@ -193,12 +193,25 @@ if __name__ == '__main__':
 
   pix_bot_center = Pose()
   pix_bot_velocity = Twist()
-  rospy.Subscriber("/align/ground_truth/state",
+  rospy.Subscriber(ODOM_INF,
                    Odometry, vehicleStateCallback)
-  rospy.wait_for_message("/align/ground_truth/state", Odometry,5)
+  rospy.wait_for_message(ODOM_INF, Odometry,5)
 
-  for i_,w in enumerate(waypoints):
-    pursuitToWaypoint(w,i_)
+
+  dx = waypoints[-1,0] - pix_bot_center.position.x
+  dy = waypoints[-1,1] - pix_bot_center.position.y
+  target_distance = math.sqrt(dx*dx + dy*dy)
+  if(target_distance < 0.1):
+    print("Already Close to Goal")
+    state = "finished"
+  else:
+    state = "pure_pursuit"
+
+  # TODO: Find the closest waypoint to begin
+
+  if state == "pure_pursuit":
+    for i_,w in enumerate(waypoints):
+      pursuitToWaypoint(w,i_)
 
   state = "finished"
   print(state)
