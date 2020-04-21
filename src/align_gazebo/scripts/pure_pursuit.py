@@ -5,6 +5,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray, Pose, Twist
 from ackermann_msgs.msg import AckermannDriveStamped
 from angles import *
+from std_msgs.msg import Float64
 
 import tf
 
@@ -12,6 +13,13 @@ import tf
 state = "starting"
 ODOM_INF = "align/ground_truth/state"
 last_goal = False
+dock_error = 0
+def dock_callback(msg):
+  global dock_error, state
+  dock_error = msg.data
+  if state == "verifying_pose":
+    print(dock_error)
+
 def waypointCallback(msg):
   global waypoints, last_goal
   if last_goal == True:
@@ -185,6 +193,9 @@ def perform_retrace(waypoint, i):
 if __name__ == '__main__':
 
   rospy.init_node('pure_pursuit')
+
+  rate = rospy.Rate(0.25)
+
   cmd_pub = rospy.Publisher('/align/ackermann_cmd', AckermannDriveStamped, queue_size=10)
 
   waypoints = np.zeros((num_waypoints, 3))
@@ -200,7 +211,6 @@ if __name__ == '__main__':
   rospy.Subscriber(ODOM_INF,
                    Odometry, vehicleStateCallback)
   rospy.wait_for_message(ODOM_INF, Odometry,5)
-
 
   dx = waypoints[-1,0] - pix_bot_center.position.x
   dy = waypoints[-1,1] - pix_bot_center.position.y
@@ -222,15 +232,22 @@ if __name__ == '__main__':
 
   state = "finished"
   print(state)
-  rate = rospy.Rate(0.25)
   rate.sleep()
+  rate.sleep()
+  rospy.Subscriber("/dock_offset",
+                   Float64,
+                   dock_callback)
+  rospy.wait_for_message("/dock_offset", Float64)
   state = "verifying_pose"
   print(state)
+  rate.sleep()
   goal = waypoints[-1] + 0
   dx = goal[0] - pix_bot_center.position.x
   dy = goal[1] - pix_bot_center.position.y
   target_distance = math.sqrt(dx*dx + dy*dy)
-  print("Pose_Error : = %d", target_distance)
+  print("Pose_Error (Estimated): = ", target_distance)
+  print("Dock_Error (Measured): = ", dock_error)
+  
   print(state)
   if target_distance > 0.1:
     state = "retracing"
