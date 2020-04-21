@@ -1,0 +1,8 @@
+#request 
+string node_name
+---
+#response 
+hms_msg msg
+int64 health
+int64 error_code
+

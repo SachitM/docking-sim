@@ -55,8 +55,7 @@ def listener():
     return None
 
 if __name__ == '__main__':
-    print("JMD")
-    print("chill", pc2)
+
     rospy.init_node('docking_verification', anonymous=True)
 
     flag_useval = 0

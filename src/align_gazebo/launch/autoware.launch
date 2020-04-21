@@ -15,6 +15,7 @@
   <node pkg="phz" type="identify_phz_node" name="phz_identfy" output="screen" launch-prefix="gnome-terminal --command"/>
   <node pkg="phz" type="viz_node" name="visualizer" output="screen"/>
   <node pkg="phz" type="waypoint_publisher_node" name="waypoint_publisher" output="screen" />
+  <include file="$(find hms_client)/launch/hms_launch.launch"/>
 
 
 </launch>

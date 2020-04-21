@@ -10,7 +10,7 @@ import tf
 
 
 state = "starting"
-ODOM_INF = "ground_truth/state"
+ODOM_INF = "align/ground_truth/state"
 last_goal = False
 def waypointCallback(msg):
   global waypoints, last_goal
@@ -18,7 +18,7 @@ def waypointCallback(msg):
     return
 
   for i in range(len(msg.poses)):
-    waypoints[i, 0] = msg.poses[i].position.x
+    waypoints[i, 0] = msg.poses[i].position.x - 0.01
     waypoints[i, 1] = msg.poses[i].position.y
     waypoints[i, 2] = euler_from_quaternion([msg.poses[i].orientation.x, msg.poses[i].orientation.y, msg.poses[i].orientation.z, msg.poses[i].orientation.w])[2]
 
@@ -96,14 +96,14 @@ def pursuitToWaypoint(waypoint, i):
     MAX_VEL = 1
 
     if i == 1:
-      MAX_VEL = 1.5
+      MAX_VEL = 1
     elif i == 2:
       MAX_VEL = 1
     elif i == 3:
       MAX_VEL = 1
     elif i == 4:
-      MAX_VEL = 0.25
-      MIN_VEL = 0.07
+      MAX_VEL = 0.22
+      MIN_VEL = 0.05
 
 
     velocity = max(MIN_VEL, min(MAX_VEL , velocity))
@@ -215,7 +215,7 @@ if __name__ == '__main__':
 
   if state == "pure_pursuit":
     for i_,w in enumerate(waypoints):
-      if i_ == num_waypoints-2:
+      if i_ == num_waypoints-3:
         last_goal = True
       pursuitToWaypoint(w,i_)
 
