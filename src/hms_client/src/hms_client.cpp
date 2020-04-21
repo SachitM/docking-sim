@@ -26,7 +26,8 @@ void PointCloud2_callback(const sensor_msgs::PointCloud2& msg)//1
    flags[0] = 1;
    //sleep(10);
 }
-void LaserScan_callback(const sensor_msgs::LaserScan& msg)//2
+//2
+void LaserScan_callback(const sensor_msgs::LaserScan& msg)
 {
    int min_ = msg.range_min - 0.1;
    int max_ = msg.range_max + 0.1;
@@ -167,7 +168,7 @@ int main(int argc, char **argv)
       {
         if(!flags[m])
         {
-          ROS_ERROR("Failed to recieve data from topic %s !!!", topics[m].c_str());
+          ROS_ERROR("Failed to recieve data from topic %s ", topics[m].c_str());
         }
 
       }
@@ -185,7 +186,7 @@ int main(int argc, char **argv)
       {
         if(srv.response.error_code)//obstacle detected..
         {
-          ROS_ERROR("Error Code 1 received (obstacle detected), Node %s instructed to come to halt", nodes[j].c_str());
+          ROS_ERROR("Error : [Obstacle detected], Node %s instructed to come to halt", nodes[j].c_str());
           geometry_msgs::Twist _msg;
           _msg.linear.x = 0;
           vel_pub.publish(_msg);
@@ -195,7 +196,7 @@ int main(int argc, char **argv)
       }
       else
       {
-        ROS_ERROR("Failed to call service, node %s malfunctioning!!!", srv.request.node_name.c_str());
+        ROS_ERROR("Failed to call service, node %s malfunctioning", srv.request.node_name.c_str());
         //ROS_ERROR("!!!Failed to call service, node malfunctioning!!!");
         if(nodes[j].c_str() == nodem)
         {

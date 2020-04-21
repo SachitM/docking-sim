@@ -5,7 +5,7 @@ import sensor_msgs.point_cloud2 as pc2
 import numpy as np
 from std_msgs.msg import Float64
 
-moving_average = np.zeros(20)
+moving_average = np.zeros(5)
 counter = 0
 
 def docking_offset():
@@ -43,7 +43,7 @@ def velodyne_points_callback(point_cloud):
     mean_y = np.mean(points[1])
     offset = np.sqrt(mean_x**2 + mean_y**2)
 
-    moving_average[counter%20] = offset
+    moving_average[counter%5] = offset
     counter += 1
     # print("Offset ", mean_x, mean_y)
     # moving_average.append(offset)
