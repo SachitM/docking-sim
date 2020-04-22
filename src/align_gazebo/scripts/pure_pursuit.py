@@ -27,7 +27,7 @@ def waypointCallback(msg):
 
   for i in range(len(msg.poses)):
     waypoints[i, 0] = msg.poses[i].position.x
-    waypoints[i, 1] = msg.poses[i].position.y
+    waypoints[i, 1] = msg.poses[i].position.y - 0.005
     waypoints[i, 2] = euler_from_quaternion([msg.poses[i].orientation.x, msg.poses[i].orientation.y, msg.poses[i].orientation.z, msg.poses[i].orientation.w])[2]
 
 def vehicleStateCallback(msg):
@@ -110,7 +110,7 @@ def pursuitToWaypoint(waypoint, i):
     elif i == 3:
       MAX_VEL = 1
     elif i == 4:
-      MAX_VEL = 0.22
+      MAX_VEL = 0.2
       MIN_VEL = 0.05
 
 
@@ -225,7 +225,7 @@ if __name__ == '__main__':
 
   if state == "pure_pursuit":
     for i_,w in enumerate(waypoints):
-      if i_ == num_waypoints-3:
+      if i_ >= num_waypoints-4:
         last_goal = True
       pursuitToWaypoint(w,i_)
 
@@ -246,7 +246,8 @@ if __name__ == '__main__':
   dy = goal[1] - pix_bot_center.position.y
   target_distance = math.sqrt(dx*dx + dy*dy)
   print("Pose_Error (Estimated): = ", target_distance)
-  print("Dock_Error (Measured): = ", dock_error)
+  if dock_error < 0.05:
+    print("Dock_Error (Measured): = ", dock_error)
   
   print(state)
   if target_distance > 0.1:

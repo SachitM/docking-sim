@@ -169,6 +169,7 @@ goal_pub_e goal_publisher::get_legs(void)
 
 			//Shifting Back for interpolation
 			this->goal_pose.pose.position.x += (this->lidar_offset - LENGTH_SHORT_SIDE/2);
+			this->goal_pose.pose.position.y += -0.01;
 
 			this->goal_pose.header.frame_id = "/base_link";
 			this->goal_pose.header.stamp = ros::Time(0);
@@ -236,7 +237,7 @@ goal_pub_e goal_publisher::compute_goal_pose(void)
 
 // HARDCODING LiDar Offset TODO Move to param
 		this->goal_pose.pose.position.x += this->lidar_offset;
-		this->goal_pose.pose.position.y += 0.0;
+		this->goal_pose.pose.position.y += -0.01;
 		ROS_DEBUG("Before TF X:%f, Y:%f, Theta %lf", this->goal_pose.pose.position.x, this->goal_pose.pose.position.y, angle * 180 / M_PI);
 
 		this->goal_pose.header.frame_id = "/base_link";
