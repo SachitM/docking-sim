@@ -1,0 +1,30 @@
+<launch>
+  <master auto="start"/>
+
+<node name="ackermann_converter" pkg="align_gazebo" type="cmd_vel_to_ackermann_drive.py"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find align_navigation)/maps/map.yaml" output="screen">
+
+            <param name="frame_id" value="map"/>
+	</node>
+
+<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+
+      <rosparam file="$(find align_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap"/>
+      <rosparam file="$(find align_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap"/>
+      <rosparam file="$(find align_navigation)/config/local_costmap_params.yaml" command="load"/>
+      <rosparam file="$(find align_navigation)/config/global_costmap_params.yaml" command="load"/>
+      <rosparam file="$(find align_navigation)/config/teb_local_planner_params.yaml" command="load"/>
+      </node>
+<param name="base_global_planner" value="dubins_planner/DubinsGlobalPlanner" /> 
+<param name="planner_frequency" value="1.0" />
+		<param name="planner_patience" value="5.0" />
+
+		<!-- Teb local planner -->
+		<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+		<param name="controller_frequency" value="10.0" />
+		<param name="controller_patience" value="15.0" />
+
+    <param name="clearing_rotation_allowed" value="false" /> 
+
+
+</launch>
