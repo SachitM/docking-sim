@@ -22,7 +22,7 @@
      if(!initialized_) {
          ROS_INFO("Reading Parameters");
          ros::NodeHandle private_nh("~/" + name);
-         private_nh.param("/turning_radius", turning_radius_, 3.2);
+         private_nh.param("/turning_radius", turning_radius_, 3.4);
         private_nh.param("/step_size_dubins", step_size_dubins_, 0.1);
 
          initialized_ = true;
