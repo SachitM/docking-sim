@@ -25,13 +25,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCL
 -->
 <launch>
 
+<param name ="/use_sim_time" value="true"/>
+
   <arg name="no_static_map" default="true"/>
   <node name="ackermann_converter" pkg="align_gazebo" type="cmd_vel_to_ackermann_drive.py"/>
   <!-- <arg name="base_global_planner" default="navfn/NavfnROS"/> -->
   <arg name="base_global_planner" default="dubins_planner/DubinsGlobalPlanner"/> 
   <!-- <param name="base_global_planner" value="dubins_planner/DubinsGlobalPlanner" />  -->
   <!-- <arg name="base_local_planner" default="dwa_local_planner/DWAPlannerROS"/> -->
-  <arg name="base_local_planner" default="base_local_planner/TrajectoryPlannerROS"/>
+  <arg name="base_local_planner" default="teb_local_planner/TebLocalPlannerROS"/>
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 
