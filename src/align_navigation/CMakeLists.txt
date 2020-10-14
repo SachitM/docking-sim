@@ -25,12 +25,16 @@ CATKIN_DEPENDS
 
 include_directories(
   include/dubins_planner
+  include/reeds_shepp_planner
   ${catkin_INCLUDE_DIRS}
 )
 
 add_library(dubins_planner_lib 
 	src/global_dubins.cpp
-	#src/utilfunction.cpp
-	#src/params.cpp
 	src/dubins.cpp
+)
+
+add_library(reeds_shepp_planner_lib 
+	src/global_reeds_shepp.cpp
+	src/reeds_shepp.cpp
 )

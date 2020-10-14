@@ -1,36 +1,18 @@
 <?xml version="1.0"?>
-<!--
-Software License Agreement (BSD)
-
-\file      description.launch
-\authors   Paul Bovbel <pbovbel@clearpathrobotics.com>, Prasenjit Mukherjee <pmukherj@clearpathrobotics.com>
-\copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-the following conditions are met:
- * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-   following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the 
-   following disclaimer in the documentation and/or other materials provided with the distribution.
- * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or promote
-   products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WAR-
-RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-
-DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE
-)ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--->
 <launch>
 
-<param name ="/use_sim_time" value="true"/>
+<arg name="use_sim_time" default="true"/>
+<arg name="odom_gt" default="true"/>
+<arg name="global_planner_use" default="dubins"/>
+<param name ="/use_sim_time" value="$(arg use_sim_time)"/>
 
   <arg name="no_static_map" default="true"/>
   <node name="ackermann_converter" pkg="align_gazebo" type="cmd_vel_to_ackermann_drive.py"/>
+  <node name="gt_braodacaster" pkg="align_gazebo" type="tf_broadcaster_autoware.py" if="$(eval odom_gt=='true')"/>
   <!-- <arg name="base_global_planner" default="navfn/NavfnROS"/> -->
-  <arg name="base_global_planner" default="dubins_planner/DubinsGlobalPlanner"/> 
+  <!-- <arg name="base_global_planner" default="dubins_planner/DubinsGlobalPlanner"/>  -->
+  <arg name="base_global_planner" default="reeds_shepp_planner/ReedsSheppGlobalPlanner"/> 
+
   <!-- <param name="base_global_planner" value="dubins_planner/DubinsGlobalPlanner" />  -->
   <!-- <arg name="base_local_planner" default="dwa_local_planner/DWAPlannerROS"/> -->
   <arg name="base_local_planner" default="teb_local_planner/TebLocalPlannerROS"/>
