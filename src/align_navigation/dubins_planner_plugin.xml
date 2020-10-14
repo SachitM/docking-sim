@@ -1,5 +1,5 @@
 <library path="lib/libdubins_planner_lib">
 <class name="dubins_planner/DubinsGlobalPlanner" type="dubins_planner::DubinsGlobalPlanner" base_class_type="nav_core::BaseGlobalPlanner">
-<description>This is a global planner plugin for align docking</description>
+<description>This is a global planner plugin using dubins curves for car-like robots</description>
 </class>
 </library>

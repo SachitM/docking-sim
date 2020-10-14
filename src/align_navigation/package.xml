@@ -36,5 +36,6 @@
   <run_depend>nav_core</run_depend>
   <export>
 	<nav_core plugin="${prefix}/dubins_planner_plugin.xml" />
+  <nav_core plugin="${prefix}/reeds_shepp_planner_plugin.xml" />
   </export>
 </package>
