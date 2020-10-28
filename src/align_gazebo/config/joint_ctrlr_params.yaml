@@ -82,3 +82,10 @@ right_rear_shock_ctrlr:
   joint: right_rear_shock
   type: effort_controllers/JointPositionController
   pid: {p: 297.8719, i: 0.0, d: 72.4832}
+
+
+#For Docking
+lift_controller:
+  type: "velocity_controllers/JointPositionController"
+  joint: base_link_to_lift
+  pid: {p: 10.0, i: 0.01, d: 1.0}

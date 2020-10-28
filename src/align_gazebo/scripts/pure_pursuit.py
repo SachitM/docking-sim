@@ -9,7 +9,6 @@ from std_msgs.msg import Float64
 
 import tf
 
-
 state = "starting"
 ODOM_INF = "align/ground_truth/state"
 last_goal = False
@@ -215,11 +214,25 @@ if __name__ == '__main__':
   dx = waypoints[-1,0] - pix_bot_center.position.x
   dy = waypoints[-1,1] - pix_bot_center.position.y
   target_distance = math.sqrt(dx*dx + dy*dy)
+  lookahead_theta = math.atan2((dy),(dx))
+
   if(target_distance < 0.1):
     print("Already Close to Goal")
     state = "finished"
   else:
-    state = "pure_pursuit"
+    if abs(lookahead_theta *180/pi) > 30:
+      print("Angle too Large")
+      state = "finished"
+      exit(0)
+    else:
+      state = "pure_pursuit"
+      goals = waypoints[0] + 0
+      dxs = goals[0] - pix_bot_center.position.x
+      dys = goals[1] - pix_bot_center.position.y
+      target_distances = math.sqrt(dxs*dxs + dys*dys)
+      diff_angles = abs(goals[2] - pix_bot_theta)*180/np.pi
+      if target_distances > 1 or diff_angles > 50:
+        print("Very Far From Initial Estimate, Overriding Limits")
 
   # TODO: Find the closest waypoint to begin
 
@@ -245,12 +258,13 @@ if __name__ == '__main__':
   dx = goal[0] - pix_bot_center.position.x
   dy = goal[1] - pix_bot_center.position.y
   target_distance = math.sqrt(dx*dx + dy*dy)
-  print("Pose_Error (Estimated): = ", target_distance)
+  diff_angle = goal[2] - pix_bot_theta
+  print("Pose_Error (Estimated) (cm,degree): = ", target_distance*100, diff_angle * 180/np.pi)
   if dock_error < 0.05:
-    print("Dock_Error (Measured): = ", dock_error)
+    print("Dock_Error (Measured) (cm): = ", dock_error*100)
   
   print(state)
-  if target_distance > 0.1:
+  if target_distance > 0.1 or dock_error > 0.20:
     state = "retracing"
     print(state)
     rate.sleep()
