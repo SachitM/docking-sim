@@ -21,10 +21,10 @@ class Chassis{
             double stopping_distance = (vel * vel * 0.5 / acc) + (buffer_time * vel);
 
             total_distance = stopping_distance + lidar_distance + safe_distance;
-            std::cout << "Calculated distance: " << total_distance << std::endl;
+            // std::cout << "Calculated distance: " << total_distance << std::endl;
 
             double angle = atan2(width, 2 * total_distance);
-            std::cout << "Calculated angle: " << angle * 180 / 3.14 << std::endl;
+            // std::cout << "Calculated angle: " << angle * 180 / 3.14 << std::endl;
 
             double start = (RANGE - angle) / INCREMENT;
             int s = int(start);
@@ -37,14 +37,17 @@ class Chassis{
 
         void obstacle_detection_callback(const sensor_msgs::LaserScan scan)
         {
+            float min_las = 2500;
             // iterating over all values since ideally all element in range should be non zero
             for (int i = 0; i < STEPS; i++){
+                min_las = std::min(min_las,scan.ranges[i]);
                 if (range_array[i] > scan.ranges[i]){
                     // std::cout << scan.ranges[i] << std::endl;
                     if (!obstacle_flag){
-                        std::cout << "Obstacle detected!\n";
+                       ROS_INFO( "Obstacle detected!");
                     }
-
+                
+                    ROS_INFO( "Nearest Entity : %f", min_las);
                     obstacle_flag = true;
                     hms_flag = true;
                     msg.linear.x = 0;
@@ -52,6 +55,7 @@ class Chassis{
                     return;
                 }
             }
+            ROS_INFO( "Nearest Entity : %f", min_las);
             
             obstacle_flag = false;
 
@@ -68,7 +72,7 @@ class Chassis{
             else
                 res.error_code = 0;
 
-            std::cout << "Error code! " << res.error_code << std::endl;
+            // std::cout << "Error code! " << res.error_code << std::endl;
             hms_flag = false;
             return true;
         }
