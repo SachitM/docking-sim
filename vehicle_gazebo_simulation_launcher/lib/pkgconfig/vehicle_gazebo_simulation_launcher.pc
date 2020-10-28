@@ -1,0 +1,8 @@
+prefix=/home/sachit/Desktop/ROS_data/autoware/install/vehicle_gazebo_simulation_launcher
+
+Name: vehicle_gazebo_simulation_launcher
+Description: Description of vehicle_gazebo_simulation_launcher
+Version: 1.11.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: controller_manager robot_state_publisher joint_state_controller
