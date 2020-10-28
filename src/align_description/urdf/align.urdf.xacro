@@ -274,6 +274,13 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
     <material>Gazebo/Grey</material>
   </gazebo> -->
 
+ <joint name="base_link_to_lift" type="prismatic">
+    <parent link="base_link"/>
+    <child link="lift_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0" upper="3" effort="1000" velocity="0.2"/>
+  </joint>
+
 
 <link name="lift_link">
     <visual>
@@ -283,23 +290,27 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
       </geometry>
       <material name="chassis_mat"/>
     </visual>
-    <!-- <collision>
-      <origin rpy="0 0 1.57079633" xyz="0 0 0"/>
+    <!-- CAN VBE MULTIPLE COLLISIONS -->
+    <collision>
+      <origin rpy="0 0 1.57079633" xyz="0 0 0.55"/>
       <geometry>
-        <mesh filename="package://align_description/meshes/chassis.stl" scale="0.001 0.001 0.001"/>
+        <box size="0.5 0.5 0.01"/>
+        <!-- <mesh filename="package://align_description/meshes/chassis.stl" scale="0.001 0.001 0.001"/> -->
       </geometry>
-    </collision> -->
+    </collision>
+    <inertial>
+        <origin rpy="0 0 1.57079633" xyz="-0.02 0 0"/>
+        <mass value="1"/>
+        <inertia
+          ixx="1.0" ixy="0.0" ixz="0.0"
+          iyy="1.0" iyz="0.0"
+          izz="1.0"/>
+    </inertial>
   </link>
   <gazebo reference="lift_link">
     <material>Gazebo/Grey</material>
     <selfCollide>false</selfCollide>
   </gazebo>
-
- <joint name="base_link_to_lift" type="fixed">
-    <parent link="base_link"/>
-    <child link="lift_link"/>
-  </joint>
-
 
   <joint name="hokuyo_joint" type="fixed">
     <origin xyz="1.1 0.00 0.1" rpy="0 0 0" />
@@ -609,5 +620,17 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
   <VLP-16 parent = "base_link" name="/velodyne" topic="/velodyne_points" hz="1" samples="440" max_range="20">
     <origin xyz="0 0 0.5" rpy="0 0 0"/>
   </VLP-16>
+
+   <transmission name="lift_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="base_link_to_lift">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>  
+    <actuator name="lift_motor">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
 
 </robot>
