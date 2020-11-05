@@ -18,5 +18,9 @@
   <run_depend>xacro</run_depend>
   <export>
     <architecture_independent/>
+    <!-- Doing so that we can see the models in Launch File -->
+    <gazebo_ros gazebo_model_path="${prefix}/models"/>
+    <gazebo_ros gazebo_media_path="${prefix}/models"/>
   </export>
+  
 </package>
