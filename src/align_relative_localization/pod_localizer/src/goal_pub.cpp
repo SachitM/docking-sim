@@ -309,7 +309,7 @@ void goal_publisher::extrapolate_the_fourth_point(void)
 
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "goal_publisher");
+	ros::init(argc, argv, "laser_goal_publisher");
 	ros::NodeHandle n;
 
 	goal_publisher gp(&n);
