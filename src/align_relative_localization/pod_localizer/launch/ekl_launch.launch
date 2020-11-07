@@ -1,0 +1,6 @@
+ <launch>
+    <!-- Odom-IMU Extended Kalman Filter-->
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_odom"> 
+        <rosparam command="load" file="$(find pod_localizer)/config/robot_ekf.yaml" />
+    </node>
+</launch>

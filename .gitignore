@@ -2,3 +2,12 @@
 build/
 devel/
 bags/
+src/.vscode/
+
+src/align_gazebo/scripts/tf_OL.py
+
+apriltag
+
+OgreXMLConverter.log
+
+.catkin_workspace

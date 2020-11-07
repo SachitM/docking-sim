@@ -503,7 +503,7 @@ axle_vel_limit = (2 * pi) * (max_speed / (pi * tire_dia)) =
         </scan>
         <range>
           <min>0.10</min>
-          <max>30.0</max>
+          <max>10.0</max>
           <resolution>0.01</resolution>
         </range>
         <noise>

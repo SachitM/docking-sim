@@ -2,11 +2,9 @@
 <launch>
   <arg name="namespace" default="align"/>
   
-  <arg name="pod_x" default="5.0"/>
-  <arg name="pod_y" default="1.0"/>
+  <arg name="pod_x" default="32.5"/>
+  <arg name="pod_y" default="39"/>
   <arg name="pod_theta" default="1.5707"/>
-
-  <group ns="$(arg namespace)">
-    <node name="spawn_table_a" pkg="gazebo_ros" type="spawn_model" args="-file $(find align_gazebo)/models/pod_tag/model.sdf -sdf -x $(arg pod_x) -y $(arg pod_y) -z 0 -Y $(arg pod_theta) -model Pod -gazebo_namespace /$(arg namespace)/gazebo " respawn="false" output="screen" />
-  </group>
+  <!-- <node name="spawn_table_a" pkg="gazebo_ros" type="spawn_model" args="-file $(find align_gazebo)/models/pod_tag/model.sdf -sdf -x $(arg pod_x) -y $(arg pod_y) -z 0 -Y $(arg pod_theta) -model Pod -gazebo_namespace /$(arg namespace)/gazebo " respawn="false" output="screen" /> -->
+    <node name="spawn_table_N" pkg="gazebo_ros" type="spawn_model" args="-file $(find align_gazebo)/models/pod_tag/model.sdf -sdf -x $(arg pod_x) -y $(arg pod_y) -z 0 -Y 3.14159 -model Pod " respawn="false" output="screen" />
 </launch>

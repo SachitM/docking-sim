@@ -24,8 +24,8 @@ target_waypoint = 0
 def dock_callback(msg):
   global dock_error, state
   dock_error = msg.data
-  if state == "verifying_pose":
-    print(dock_error)
+#   if state == "verifying_pose":
+#     print(dock_error)
 
 def waypointCallback(msg):
     global waypoints, last_goal
@@ -100,7 +100,7 @@ def go_to_goal(goal):
         rospy.loginfo("Navigation test finished.")
 
 def docking_execution():
-    global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state
+    global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub
     for i in range(num_waypoints-1):
         go_to_goal(waypoints[i])
 
@@ -121,15 +121,22 @@ def docking_execution():
     target_distance = math.sqrt(dx*dx + dy*dy)
     diff_angle = goal[2] - pix_bot_theta
     print("Pose_Error (Estimated) (cm,degree): = ", target_distance*100, diff_angle * 180/np.pi)
-    if dock_error < 0.05:
-        print("Dock_Error (Measured) (cm): = ", dock_error*100)
-
+    # if dock_error < 0.05:
+    #     print("Dock_Error (Measured) (cm): = ", dock_error*100)
+    dock_error = 0
     print(state)
+    
     if target_distance > 0.1 or dock_error > 0.20:
         state = "retracing"
         print(state)
         rate.sleep()
         go_to_goal(waypoints[-1])
+    else:
+        state = "docking"
+        lift_goal = Float64()
+        lift_goal.data = 0.5
+        cmd_pub.publish(lift_goal)
+        
 
     state = "finished"
     print(state)
@@ -162,6 +169,8 @@ if __name__ == '__main__':
     rospy.Subscriber(ODOM_INF,
                     Odometry, vehicleStateCallback)
     rospy.wait_for_message(ODOM_INF, Odometry,5)
+
+    cmd_pub = rospy.Publisher('/autoware_gazebo/lift_controller/command', Float64, queue_size=1)
 
     docking_execution()
 
