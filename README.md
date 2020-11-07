@@ -69,6 +69,11 @@ rosrun align_gazebo ackermann_drive_to_cmd_vel.py
 sh run_keyop.sh #To manually drive the vehicle
 ```
 
+To use Fake Localization instead of Autoware
+```
+rosrun align_gazebo tf_broadcaster_autoware.py
+```
+
 Future Updates
 
 To install GTSAM (Latest Version)
