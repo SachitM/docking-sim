@@ -1,4 +1,4 @@
-[![ROS Distro: Melodic](https://img.shields.io/badge/ROS-Melodic-blue.svg)](http://wiki.ros.org/melodic) |license|
+[![ROS Distro: Melodic](https://img.shields.io/badge/ROS-Melodic-blue.svg)](http://wiki.ros.org/melodic) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](http://opensource.org/licenses/MIT) 
 =============
 Autonomous Docking for an Ackermann Vehicle
 =============
@@ -76,19 +76,19 @@ sudo add-apt-repository --remove ppa:bernd-pfrommer/gtsam
 
 Please cite outwork if you extend this
 
-##Support
+## Support
 Send a mail to [Sachit Mahajan](mailto:sachitma@andrew.cmu.edu)
 
 
 References
 ==========
 
-.. [Dubins51] Dubins, L.E. (July 1957). "On Curves of Minimal Length with a Constraint on Average Curvature, and with Prescribed Initial and Terminal Positions and Tangents". American Journal of Mathematics 79 (3): 497–516
-.. [LaValle06] LaValle, S. M. (2006). "Planning Algorithms". Cambridge University Press
-.. [Shkel01] Shkel, A. M. and Lumelsky, V. (2001). "Classification of the Dubins set". Robotics and Autonomous Systems 34 (2001) 179–202
-.. [Walker11] Walker, A. (2011). "Hard Real-Time Motion Planning for Autonomous Vehicles", PhD thesis, Swinburne University.
-.. [Smart08] Royce, S. (2008). "Evolutionary Control of Autonomous Underwater Vehicles". PhD thesis, RMIT
-.. [Reeds] Reeds, J., & Shepp, L. (1990). Optimal paths for a car that goes both forwards and backwards. Pacific journal of mathematics, 145(2), 367-393.
+- Dubins, L.E. (July 1957). "On Curves of Minimal Length with a Constraint on Average Curvature, and with Prescribed Initial and Terminal Positions and Tangents". American Journal of Mathematics 79 (3): 497–516
+- LaValle, S. M. (2006). "Planning Algorithms". Cambridge University Press
+- Shkel, A. M. and Lumelsky, V. (2001). "Classification of the Dubins set". Robotics and Autonomous Systems 34 (2001) 179–202
+- Walker, A. (2011). "Hard Real-Time Motion Planning for Autonomous Vehicles", PhD thesis, Swinburne University.
+- Royce, S. (2008). "Evolutionary Control of Autonomous Underwater Vehicles". PhD thesis, RMIT
+- Reeds, J., & Shepp, L. (1990). Optimal paths for a car that goes both forwards and backwards. Pacific journal of mathematics, 145(2), 367-393.
 
 For 'april_tag_ros'
 If you use this code, please kindly inform [Danylo Malyuta](mailto:danylo.malyuta@gmail.com) (to maintain a list here of research works that have benefited from the code) and cite:
@@ -98,6 +98,4 @@ If you use this code, please kindly inform [Danylo Malyuta](mailto:danylo.malyut
 - J. Wang and E. Olson, "[AprilTag 2: Efficient and robust fiducial detection](http://ieeexplore.ieee.org/document/7759617/)," in ''Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)'', October 2016.
 
 
-.. |license| image:: https://img.shields.io/badge/License-MIT-blue.svg
-   :target: http://opensource.org/licenses/MIT
-   :alt: license shield
+
