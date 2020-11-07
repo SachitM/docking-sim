@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="namespace" default="align"/>
+
+  <include file="$(find pod_localizer)/launch/continuous_detection.launch"/>
+  <node pkg="pod_localizer" type="laser_pod_localizer" name="laser_pod_localizer" output="screen" launch-prefix="gnome-terminal --command"/>
+  <node pkg="pod_localizer" type="tag_pod_localizer" name="tag_pod_localizer" output="screen" launch-prefix="gnome-terminal --command"/>
+   <include file="$(find align_gazebo)/launch/waypoint_pub.launch"/>
+   <node pkg="docking_verification" type="docking_verification.py" name="verify_dock" output="screen"/>
+  <group ns="$(arg namespace)">
+  </group>
+</launch>

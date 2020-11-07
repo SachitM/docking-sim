@@ -37,6 +37,7 @@
   </include>
 
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description $(arg spawn_model_flag) -urdf -model autoware_gazebo" />
+  <!-- <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find vehicle_model)/models/pod_tag/model.sdf -sdf -x $(arg pod_x) -y $(arg pod_y) -z 0 -Y 3.14159 -model Pod " respawn="false" output="screen" /> -->
   <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find vehicle_model)/models/pod_tag/model.sdf -sdf -x $(arg pod_x) -y $(arg pod_y) -z 0 -Y 3.14159 -model Pod " respawn="false" output="screen" />
 
   <group ns="/vehicle_info">
