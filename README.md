@@ -16,7 +16,7 @@ Requirements: Ubuntu 18.04+ and ROS-Melodic, python 2.7, move_base, GTSAM and Au
 
 For docking simulation, clone the repo in catkin workspace and run 
 ```
-catkin build
+catkin_make
 source devel/setup.bash
 roslaunch align_gazebo align.launch
 ```
@@ -56,6 +56,11 @@ roslaunch align_navigation mapless_move_base.launch
 roslaunch pod_localizer goal_pub_autoware.launch #For Localizing Pod
 rosrun align_navigation goal_publisher.py #For Approach Navigation
 
+```
+For running the chassis using keyboard
+```
+rosrun align_gazebo ackermann_drive_to_cmd_vel.py
+sh run_keyop.sh #To manually drive the vehicle
 ```
 
 Future Updates
