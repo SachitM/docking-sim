@@ -1,4 +1,4 @@
-[![ROS Distro: Melodic](https://img.shields.io/badge/ROS-Melodic-blue.svg)](http://wiki.ros.org/melodic)
+[![ROS Distro: Melodic](https://img.shields.io/badge/ROS-Melodic-blue.svg)](http://wiki.ros.org/melodic) |license|
 .. |license| image:: https://img.shields.io/badge/License-MIT-blue.svg
    :target: http://opensource.org/licenses/MIT
 =============
@@ -84,15 +84,15 @@ Send a mail to [Sachit Mahajan](mailto:sachitma@andrew.cmu.edu)
 
 References
 ==========
-
+```
 .. [Dubins51] Dubins, L.E. (July 1957). "On Curves of Minimal Length with a Constraint on Average Curvature, and with Prescribed Initial and Terminal Positions and Tangents". American Journal of Mathematics 79 (3): 497–516
 .. [LaValle06] LaValle, S. M. (2006). "Planning Algorithms". Cambridge University Press
 .. [Shkel01] Shkel, A. M. and Lumelsky, V. (2001). "Classification of the Dubins set". Robotics and Autonomous Systems 34 (2001) 179–202
 .. [Walker11] Walker, A. (2011). "Hard Real-Time Motion Planning for Autonomous Vehicles", PhD thesis, Swinburne University.
 .. [Smart08] Royce, S. (2008). "Evolutionary Control of Autonomous Underwater Vehicles". PhD thesis, RMIT
 .. [Reeds] Reeds, J., & Shepp, L. (1990). Optimal paths for a car that goes both forwards and backwards. Pacific journal of mathematics, 145(2), 367-393.
-
-FOR 'april_tag_ros'
+```
+For 'april_tag_ros'
 If you use this code, please kindly inform [Danylo Malyuta](mailto:danylo.malyuta@gmail.com) (to maintain a list here of research works that have benefited from the code) and cite:
 
 - D. Malyuta, C. Brommer, D. Hentzen, T. Stastny, R. Siegwart, and R. Brockers, “[Long-duration fully autonomous operation of rotorcraft unmanned aerial systems for remote-sensing data acquisition](https://onlinelibrary.wiley.com/doi/abs/10.1002/rob.21898),” Journal of Field Robotics, p. arXiv:1908.06381, Aug. 2019.
@@ -100,3 +100,6 @@ If you use this code, please kindly inform [Danylo Malyuta](mailto:danylo.malyut
 - J. Wang and E. Olson, "[AprilTag 2: Efficient and robust fiducial detection](http://ieeexplore.ieee.org/document/7759617/)," in ''Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)'', October 2016.
 
 
+.. |license| image:: https://img.shields.io/badge/License-MIT-blue.svg
+   :target: http://opensource.org/licenses/MIT
+   :alt: license shield
