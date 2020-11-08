@@ -7,9 +7,10 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   tf2
   tf2_geometry_msgs
+  state_machine
 )
 
-catkin_package()
+catkin_package(CATKIN_DEPENDS state_machine)
 
 include_directories(${catkin_INCLUDE_DIRS})
 

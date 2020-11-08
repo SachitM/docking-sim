@@ -165,27 +165,21 @@ void aprilTagGoalPublisher::publishGoal(geometry_msgs::PoseStamped pod_center) {
     if(isIdentifyPod)
     {
         state_pub.publish(StateUpdate);
+        ROS_INFO("PUBLISHED");
     }
-    
-    /*if(isIdentifyPod) {
-        //TODO: REPLY WITH STATE MESSAGE
-        StateUpdate.StateTransitionCond = 1;
-    }
-    else
-    {
-        StateUpdate.StateTransitionCond = 0;
-    }*/
     tag_goal_pub.publish(pod_center);
 }
 
 void aprilTagGoalPublisher::StateMachineCb(const state_machine::StateOut::ConstPtr& InStateInfo)
 {
+    ROS_INFO("CALLBACK TRIGGERED");
     // Assume only the last two digits to be valid
     target_tags = {InStateInfo -> PodInfo / 10, InStateInfo -> PodInfo % 10};
     // Enable goal pub if curr state is pod identification
     if(InStateInfo -> CurrState == state_machine::StateOut::State_Identify || InStateInfo -> CurrState == state_machine::StateOut::State_Approach)
     {
         enable_goal_publishing = true;
+        ROS_INFO("ENABLED");
     }
     else
     {
@@ -193,14 +187,6 @@ void aprilTagGoalPublisher::StateMachineCb(const state_machine::StateOut::ConstP
     }
     // enable_goal_publishing = (InStateInfo -> CurrState == state_machine::StateOut::State_Identify) ? true : false;
     isIdentifyPod = (InStateInfo -> CurrState == state_machine::StateOut::State_Identify) ? true : false;
-    /*if(InStateInfo -> CurrState == state_machine::StateOut::State_Identify)
-    {
-        enable_goal_publishing = true;
-    }
-    else
-    {
-        enable_goal_publishing = false;
-    }*/
 }
  
 int main(int argc, char** argv) {
