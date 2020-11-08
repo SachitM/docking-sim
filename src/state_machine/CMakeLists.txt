@@ -36,7 +36,7 @@ include_directories(
 
 ## Declare a C++ library
 #add_library(${PROJECT_NAME}
- #  src/${PROJECT_NAME}/StateMachineMsgPublisher.cpp
+ #  src/${PROJECT_NAME}/state_machine.cpp
  #)
 
 ## Add cmake target dependencies of the library
@@ -44,7 +44,7 @@ include_directories(
 ## either from message generation or dynamic reconfigure
 #add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_executable(${PROJECT_NAME}_node src/StateMachineMsgPublisher.cpp)
+add_executable(${PROJECT_NAME}_node src/state_machine.cpp)
 
 #add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
