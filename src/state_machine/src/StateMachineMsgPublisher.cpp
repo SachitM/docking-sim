@@ -34,7 +34,7 @@ void HMSStatusCallback(const std_msgs::String::ConstPtr& msg)
 
 int main(int argc, char **argv)
 {
-
+    // Trial Comment
     ros::init(argc, argv, "StateMachineMsgPublisher");
     ros::NodeHandle StateMachineNode;
     ros::Publisher sm_pub = StateMachineNode.advertise<state_machine::StateOut>("system_status", 1000);
