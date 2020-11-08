@@ -1,3 +1,4 @@
+uint8 State_EHS=-1
 uint8 State_Idle=0
 uint8 State_P2P=1
 uint8 State_Identify=2
