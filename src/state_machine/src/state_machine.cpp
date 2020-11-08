@@ -1,3 +1,7 @@
+/*  
+    authors: Poorva Agrawal, Uma Arunachalam
+*/
+
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "state_machine/StateOut.h"
