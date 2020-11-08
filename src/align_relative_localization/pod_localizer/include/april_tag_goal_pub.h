@@ -2,6 +2,8 @@
 #include <apriltag.h>
 #include "apriltag_ros/AprilTagDetection.h"
 #include "apriltag_ros/AprilTagDetectionArray.h"
+#include "state_machine/StateOut.h"
+#include "state_machine/StateIn.h"
 #include <tf/transform_broadcaster.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Quaternion.h>
@@ -31,6 +33,7 @@ class aprilTagGoalPublisher {
         tf::TransformListener listener;
         tf::TransformBroadcaster br;
         void aprilTagDetectionCb(const apriltag_ros::AprilTagDetectionArray msg);
+        void StateMachineCb(const state_machine::StateOut::ConstPtr& StateInfo);
 
         float_t camera_offset;
         std::pair<float_t,float_t> pose_yaws_;
@@ -48,7 +51,7 @@ class aprilTagGoalPublisher {
         
         std::pair<int,int> target_tags;
         
-        bool enable_goal_publishing = true;
+        bool enable_goal_publishing = false;//true;
         bool isIdentifyPod = false;
 
         tag_state_e tag_state_ = FOUND_NO_TAGS;

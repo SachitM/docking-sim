@@ -1,7 +1,8 @@
 /*  
     author: Sachit Mahajan
 */
-#include"april_tag_goal_pub.h"
+#include "april_tag_goal_pub.h"
+
 aprilTagGoalPublisher::aprilTagGoalPublisher(ros::NodeHandle *nodeH) {
 	this->node= nodeH;
 
@@ -15,6 +16,16 @@ aprilTagGoalPublisher::aprilTagGoalPublisher(ros::NodeHandle *nodeH) {
 	else {
 		this->camera_offset = OFFSET_CAMERA;
 	}
+}
+
+void aprilTagGoalPublisher::StateMachineCb(const state_machine::StateOut::ConstPtr& InStateInfo)
+{
+    // Assume only the last two digits to be valid
+    target_tags = {InStateInfo -> PodInfo / 10, InStateInfo -> PodInfo % 10};
+    if(InStateInfo -> CurrState == state_machine::StateOut::State_Identify)
+    {
+        agp.enable_goal_publishing = true;
+    }
 }
 
 void aprilTagGoalPublisher::aprilTagDetectionCb(const apriltag_ros::AprilTagDetectionArray msg) {
