@@ -1,2 +1,3 @@
 Header header 
-uint8 Transitions
+uint8 State
+uint8 StateUpdate
