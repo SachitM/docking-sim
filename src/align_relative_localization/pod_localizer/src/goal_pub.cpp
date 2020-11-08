@@ -327,7 +327,7 @@ int main(int argc, char **argv)
 		status = GOAL_PUB_SUCCESS;
 
 		ros::spinOnce();
-
+		// TODO: sm
 		if(GOAL_PUB_SUCCESS == status)
 		{
 			status = gp.get_goal();
@@ -336,7 +336,7 @@ int main(int argc, char **argv)
 		if(GOAL_PUB_SUCCESS == status)
 		{
 			status = gp.publish_goal();
-		}
+		}//till here
 
 		loop_rate.sleep();
 	}

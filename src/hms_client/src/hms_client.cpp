@@ -4,11 +4,12 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
-#include<geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <bits/stdc++.h> 
 #include <cstdlib>
-#include<cctype>
-#include<string>
+#include <cctype>
+#include <string>
+#include "std_msgs/String.h"
 using namespace std;
 
 int counter = 0;
@@ -79,6 +80,7 @@ int main(int argc, char **argv)
   vector<ros::Subscriber> subs;
   vector<ros::ServiceClient> clients;
   ros::Publisher vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
+  
 
   int cb_queue = 1;
   int loop_count = 0;
@@ -184,6 +186,7 @@ int main(int argc, char **argv)
         val = clients[j].call(srv);
       if(val)
       {
+        counter += 1;
         if(srv.response.error_code)//obstacle detected..
         {
           ROS_ERROR("Error : [Obstacle detected], [Node %s] Vehicle instructed to come to halt", nodes[j].c_str());
@@ -206,6 +209,20 @@ int main(int argc, char **argv)
           ROS_ERROR("[Node %s] Vehicle instructed to come to halt", nodes[j].c_str());
         }
       }
+    }
+
+    ros::Publisher hms_status_pub = nh.advertise<std_msgs::String>("HMS_Status", 1);
+    if(counter == num_nodes + num_topics)
+    {
+      std_msgs::String msg;
+      msg.data = "Passed";
+      hms_status_pub.publish(msg);
+    }
+    else
+    {
+      std_msgs::String msg;
+      msg.data = "Failed";
+      hms_status_pub.publish(msg);
     }
     loop_count += 1;
     loop_rate.sleep();

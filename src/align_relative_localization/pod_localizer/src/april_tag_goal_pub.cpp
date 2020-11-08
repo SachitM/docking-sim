@@ -175,6 +175,7 @@ int main(int argc, char** argv) {
 		agp.tag_state_ = FOUND_NO_TAGS;
 
 		ros::spinOnce();
+        //TODO: enable with sm
         if(agp.enable_goal_publishing) {
             switch(agp.tag_state_) {
                 case FOUND_LEFT_TAG:
