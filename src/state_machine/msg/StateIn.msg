@@ -1,3 +1,3 @@
 Header header 
-uint8 State
-uint8 StateUpdate
+uint8 TransState
+uint8 StateTransitionCond
