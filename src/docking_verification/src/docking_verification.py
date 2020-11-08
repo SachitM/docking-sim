@@ -29,17 +29,17 @@ class DockingVerification():
         if self.docking_state is False: # no need to calculate
             return
 
-        x = y = z = []
+        x, y, z = [], [], []
         for p in pc2.read_points(point_cloud, field_names=("x", "y", "z"), skip_nans=True):
             if abs(p[0]) < 15 and abs(p[1]) < 15 and abs(p[2]) < 0.05:
                 x.append(p[0])
                 y.append(p[1])
                 # z.append(p[2])
 
-        points = np.zeros((3, len(x)))
+        points = np.zeros((2, len(x)))
         points[0, :] = np.array(x)
         points[1, :] = np.array(y)
-        # points[1, :] = np.array(z)
+        # points[2, :] = np.array(z)
 
         mean_x = np.mean(points[0])
         mean_y = np.mean(points[1])
@@ -53,7 +53,7 @@ class DockingVerification():
 
     def state_listener(self, state):
         """Listen to chassis state and update own state."""
-        if state.DestState == 4:    #TODO: Add in more states?
+        if state.CurrState == StateOut.State_Approach:
             self.docking_state = True
         else:
             self.docking_state = False
