@@ -24,7 +24,7 @@ void aprilTagGoalPublisher::StateMachineCb(const state_machine::StateOut::ConstP
     target_tags = {InStateInfo -> PodInfo / 10, InStateInfo -> PodInfo % 10};
     if(InStateInfo -> CurrState == state_machine::StateOut::State_Identify)
     {
-        agp.enable_goal_publishing = true;
+        enable_goal_publishing = true;
     }
 }
 
