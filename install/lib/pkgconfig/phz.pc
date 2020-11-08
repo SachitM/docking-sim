@@ -1,0 +1,8 @@
+prefix=/home/uma/Desktop/MRSD/Capstone/docking-sim/install
+
+Name: phz
+Description: Description of phz
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: state_machine

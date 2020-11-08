@@ -13,6 +13,8 @@ from utils import *
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray, Pose, Twist
 from std_msgs.msg import Float64
+from state_machine.msg import *#StateIn
+#from state_machine.msg import StateOut
 
 import tf
 pi = math.pi
@@ -21,6 +23,12 @@ waypoints = []
 last_goal = False
 dock_error = 0
 target_waypoint = 0
+
+EnableApproach = False
+EnableVerifyPose = False
+EnableRetrace = False
+EnableLock = False
+
 def dock_callback(msg):
   global dock_error, state
   dock_error = msg.data
@@ -100,47 +108,77 @@ def go_to_goal(goal):
         rospy.loginfo("Navigation test finished.")
 
 def docking_execution():
-    global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub
-    for i in range(num_waypoints-1):
-        go_to_goal(waypoints[i])
+    StateUpdateMsg = StateIn()
+    while(True):
+        print(EnableLock, EnableRetrace, EnableVerifyPose, EnableApproach)
+        global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub
+        if EnableApproach:
+            for i in range(num_waypoints-1):
+                go_to_goal(waypoints[i])
 
-    state = "finished"
-    print(state)
-    rate.sleep()
-    rate.sleep()
-    rospy.Subscriber("/dock_offset",
-                    Float64,
-                    dock_callback)
-    # rospy.wait_for_message("/dock_offset", Float64)
-    state = "verifying_pose"
-    print(state)
-    rate.sleep()
-    goal = waypoints[-2] + 0
-    dx = goal[0] - pix_bot_center.position.x
-    dy = goal[1] - pix_bot_center.position.y
-    target_distance = math.sqrt(dx*dx + dy*dy)
-    diff_angle = goal[2] - pix_bot_theta
-    print("Pose_Error (Estimated) (cm,degree): = ", target_distance*100, diff_angle * 180/np.pi)
-    # if dock_error < 0.05:
-    #     print("Dock_Error (Measured) (cm): = ", dock_error*100)
-    dock_error = 0
-    print(state)
-    
-    if target_distance > 0.1 or dock_error > 0.20:
-        state = "retracing"
-        print(state)
-        rate.sleep()
-        go_to_goal(waypoints[-1])
-    else:
-        state = "docking"
-        lift_goal = Float64()
-        lift_goal.data = 0.5
-        cmd_pub.publish(lift_goal)
+            # state = "finished"
+            # print(state)
+            # update state success
+            StateUpdateMsg.TransState = StateOut.State_Approach
+            StateUpdateMsg.StateTransitionCond = 1
+            sm_pub.publish(StateUpdateMsg)
+            rate.sleep()
+            rate.sleep()
+
+        elif EnableVerifyPose:
+            rospy.Subscriber("/dock_offset",
+                            Float64,
+                            dock_callback)
+            # rospy.wait_for_message("/dock_offset", Float64)
+            # state = "verifying_pose"
+            # print(state)
+            rate.sleep()
+            goal = waypoints[-2] + 0
+            dx = goal[0] - pix_bot_center.position.x
+            dy = goal[1] - pix_bot_center.position.y
+            target_distance = math.sqrt(dx*dx + dy*dy)
+            diff_angle = goal[2] - pix_bot_theta
+            print("Pose_Error (Estimated) (cm,degree): = ", target_distance*100, diff_angle * 180/np.pi)
+            # if dock_error < 0.05:
+            #     print("Dock_Error (Measured) (cm): = ", dock_error*100)
+            dock_error = 0
+            # print(state)
+            StateUpdateMsg.TransState = StateOut.State_Verify
+            if target_distance > 0.1 or dock_error > 0.20:
+                # state = "retracing"
+                # print(state)
+                StateUpdateMsg.StateTransitionCond = 0
+                rate.sleep()
+                
+            else:
+                StateUpdateMsg.StateTransitionCond = 1
+                # state = "docking"
+            sm_pub.publish(StateUpdateMsg)
         
+        elif EnableRetrace:
+            go_to_goal(waypoints[-1])
+            StateUpdateMsg.TransState = StateOut.State_Retrace
+            StateUpdateMsg.StateTransitionCond = 1
+            sm_pub.publish(StateUpdateMsg)
 
-    state = "finished"
-    print(state)
+        elif EnableLock:
+            lift_goal = Float64()
+            lift_goal.data = 0.5
+            cmd_pub.publish(lift_goal)
+            StateUpdateMsg.TransState = StateOut.State_Lock
+            StateUpdateMsg.StateTransitionCond = 1
+            sm_pub.publish(StateUpdateMsg) 
+            break     
 
+        # state = "finished"
+        # print(state)
+
+
+def StateMachineCb(StateInfo):
+    EnableApproach = True if StateInfo.CurrState == StateOut.State_Approach else False
+    EnableVerifyPose = True if StateInfo.CurrState == StateOut.State_Verify else False
+    EnableRetrace = True if StateInfo.CurrState == StateOut.State_Retrace else False
+    EnableLock = True if StateInfo.CurrState == StateOut.State_Lock else False
 
 if __name__ == '__main__':
 
@@ -151,6 +189,7 @@ if __name__ == '__main__':
                    PoseArray,
                    waypointCallback)
     # rospy.wait_for_message("/waypoints_goal", PoseArray)
+    rospy.Subscriber("SM_output", StateOut, StateMachineCb)
 
     waypoints[0,0] = 32.5
     waypoints[0,1] = 35
@@ -171,6 +210,7 @@ if __name__ == '__main__':
     rospy.wait_for_message(ODOM_INF, Odometry,5)
 
     cmd_pub = rospy.Publisher('/autoware_gazebo/lift_controller/command', Float64, queue_size=1)
+    sm_pub = rospy.Publisher("SM_input", StateIn, queue_size=1)
 
     docking_execution()
 

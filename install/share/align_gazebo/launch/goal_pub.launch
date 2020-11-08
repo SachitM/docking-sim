@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="namespace" default="align"/>
+
+  <include file="$(find motion_decoder)/launch/motion_decoder.launch"/>
+  <node pkg="align_gazebo" type="goal_pub_node" name="laser_publisher" output="screen" launch-prefix="gnome-terminal --command"/>
+   <include file="$(find align_gazebo)/launch/waypoint_pub.launch"/>
+   <node pkg="docking_verification" type="docking_verification.py" name="verify_dock" output="screen"/>
+  <group ns="$(arg namespace)">
+  </group>
+</launch>

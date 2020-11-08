@@ -1,0 +1,8 @@
+prefix=/home/uma/Desktop/MRSD/Capstone/docking-sim/install
+
+Name: obstacle_2d
+Description: Description of obstacle_2d
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

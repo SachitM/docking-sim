@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="namespace" default="align"/>
+  <arg name="world_name" default="worlds/empty.world"/>
+  <arg name="cmd_timeout" default="0.5"/>
+  <arg name="paused" default="false"/>
+  <!-- Vehicle pose -->
+  <arg name="x" default="0.0"/>
+  <arg name="y" default="0.0"/>
+  <arg name="z" default="0.3"/>
+  <arg name="roll" default="0.0"/>
+  <arg name="pitch" default="0.0"/>
+  <arg name="yaw" default="0.0"/>
+
+  <!-- <arg name="model" default="$(find align_description)/urdf/align.urdf.xacro"/> -->
+  <!-- <param name="robot_description" command="$(find xacro)/xacro inorder $(arg model)" /> -->
+
+  <include file="$(find align_description)/launch/align_vehicle.launch">
+    <arg name="namespace" value="$(arg namespace)"/>
+  </include>
+
+ <include file="$(find align_description)/launch/align_rviz.launch">
+    <arg name="namespace" value="$(arg namespace)"/>
+  </include>
+
+  <!-- TF broadcaster to establish the link map->odom->base_link -->
+    <node name="tf_broadcaster" pkg="align_gazebo" type="tf_broadcaster.py"/>
+
+  <group ns="$(arg namespace)">
+    <!-- Create the world. -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" value="$(arg world_name)"/>
+    </include>
+
+        <!-- Spawn the Pod. -->
+    <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find align_gazebo)/models/pod_tag/model.sdf -sdf -x 4 -y -0 -z 0 -Y 1.5707 -model Pod -gazebo_namespace /$(arg namespace)/gazebo " respawn="false" output="screen" />
+
+  
+    <!-- Spawn the vehicle. -->
+    <node name="spawn_vehicle" pkg="gazebo_ros" type="spawn_model"
+          args="-urdf -param robot_description -model align
+                -gazebo_namespace /$(arg namespace)/gazebo
+                -x $(arg x) -y $(arg y) -z $(arg z)
+                -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)"/>
+
+    <!-- Spawn the target. -->
+    <!-- Or run the command:
+    rosrun gazebo_ros spawn_model -gazebo_namespace /align/gazebo/ -database coke_can -sdf -model target
+    
+    or include:
+    
+    <node name="spawn_target" pkg="gazebo_ros" type="spawn_model"
+          args="-database coke_can -sdf -model target
+                -gazebo_namespace /$(arg namespace)/gazebo
+                -x 1 -y 1 -z 1
+                -R 0 -P 0 -Y 0"/>
+    
+    and for moving, publish the rostopic, e.g:
+    rostopic pub -r 20 /align/gazebo/set_model_state gazebo_msgs/ModelState '{model_name: target, pose: { position: { x: 1, y: 0, z: 2 }, orientation: {x: 0, y: 0.491983115673, z: 0, w: 0.870604813099 } }, twist: { linear: { x: 0, y: 0, z: 0 }, angular: { x: 0, y: 0, z: 0}  }, reference_frame: world }'
+    -->
+
+    <!-- Load the joint controllers. One of these publishes the joint states
+         to joint_states. -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner"
+          args="$(find align_gazebo)/config/joint_ctrlr_params.yaml"/>
+
+    <!-- Control the steering, axle, and shock absorber joints. -->
+    <node name="ackermann_controller" pkg="align_gazebo"
+          type="ackermann_controller.py">
+      <param name="cmd_timeout" value="$(arg cmd_timeout)"/>
+      <rosparam file="$(find align_gazebo)/config/ctrlr_params.yaml" command="load"/>
+    </node>
+    <rosparam file="$(find align_gazebo)/config/pod_locations.yaml" />
+    <rosparam file="$(find align_gazebo)/config/config_off.yaml" />
+  </group>
+</launch>

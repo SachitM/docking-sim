@@ -21,6 +21,8 @@
   <build_depend>navfn</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>tf2_ros</build_depend>
+  <build_depend>state_machine</build_depend>
+  <run_depend>state_machine</run_depend>
   <run_depend>pluginlib</run_depend>
   <run_depend>angles</run_depend>
   <run_depend>tf2_geometry_msgs</run_depend>

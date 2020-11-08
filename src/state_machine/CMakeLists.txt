@@ -36,3 +36,4 @@ include_directories(
 
 add_executable(${PROJECT_NAME}_node src/state_machine_node.cpp)
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+

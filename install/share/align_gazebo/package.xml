@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>align_gazebo</name>
+  <version>0.1.0</version>
+  <description>Ackermann steering vehicle for Pix Chassis</description>
+  <maintainer email="sachit@cmu.edu">Sachit Mahajan</maintainer>
+  <license>MIT</license>
+  <author email="sachit@cmu.edu">Sachit</author>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>state_machine</build_depend>
+  <run_depend>state_machine</run_depend>
+  <run_depend>ackermann_msgs</run_depend>
+  <run_depend>ackermann_vehicle_description</run_depend>
+  <run_depend>controller_manager</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>gazebo_ros_control</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>xacro</run_depend>
+  <export>
+    <architecture_independent/>
+    <!-- Doing so that we can see the models in Launch File -->
+    <gazebo_ros gazebo_model_path="${prefix}/models"/>
+    <gazebo_ros gazebo_media_path="${prefix}/models"/>
+  </export>
+  
+</package>

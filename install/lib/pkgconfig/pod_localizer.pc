@@ -1,0 +1,8 @@
+prefix=/home/uma/Desktop/MRSD/Capstone/docking-sim/install
+
+Name: pod_localizer
+Description: Description of pod_localizer
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

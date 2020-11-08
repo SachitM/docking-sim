@@ -1,0 +1,8 @@
+prefix=/home/uma/Desktop/MRSD/Capstone/docking-sim/install
+
+Name: docking_verification
+Description: Description of docking_verification
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

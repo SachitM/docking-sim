@@ -8,13 +8,18 @@ Autonomous Docking for an Ackermann Vehicle
 Please refer to [our website](https://mrsdprojects.ri.cmu.edu/2020teamj/system-design/) for more detailed system implementation.
 
 ## Setup and Usage
-Since this is ROS package, you will need to [install ROS](http://wiki.ros.org/Installation/Ubuntu). This repo has been tested on Ubuntu 18.04 (ROS
-Melodic). You will also need Autoware and you can refer to [Autoware Installation](https://github.com/CPFL/Autoware-Manuals/blob/master/en/Autoware_UsersManual_v1.1.md#3-d-map-generation-and-sharing)
-Requirements: Ubuntu 18.04+ and ROS-Melodic, python 2.7, move_base, GTSAM and Autoware
+This repo has been tested on Ubuntu 18.04 (ROS Melodic)
+### Requirements: 
+* Ubuntu 18.04+
+* [ROS-Melodic](http://wiki.ros.org/Installation/Ubuntu)
+* python 2.7 
+* [move_base](http://wiki.ros.org/move_base)
+* GTSAM 
+* [Autoware](https://github.com/CPFL/Autoware-Manuals/blob/master/en/Autoware_UsersManual_v1.1.md#3-d-map-generation-and-sharing)
+* [apriltag_ros](https://github.com/AprilRobotics/apriltag)
 
-`apriltag_ros` depends on the latest release of the [AprilTag library](https://github.com/AprilRobotics/apriltag). Clone it and follow instructions.
-
-For docking simulation, clone the repo in catkin workspace and run 
+### Docking Simulation
+Clone the repo in catkin workspace and run 
 ```
 catkin build
 source devel/setup.bash
@@ -29,16 +34,19 @@ rosrun align_gazebo pure_pursuit.py #To plan a path till goal
 rosrun align_navigation goal_publisher.py #To use other planners
 ```
 
-For Autoware Simulation
-    Replace the ..path-to-autoware/autoware/install/vehicle_model with docking-sim/vehicle_model
-    Replace the ..path-to-autoware/autoware/install/vehicle_gazebo_simulation_launcher with docking-sim/vehicle_gazebo_simulation_launcher
-Run
+### Autoware Simulation
+First, for enabling our pod and chassis configuration
+
+* Replace the `..path-to-autoware/autoware/install/vehicle_model` with `docking-sim/vehicle_model`
+* Replace the `..path-to-autoware/autoware/install/vehicle_gazebo_simulation_launcher` with `docking-sim/vehicle_gazebo_simulation_launcher`
+
+Run (from Autoware installed folder) to setup simple world
 ```
 source install/setup.bash 
 #Make sure autoware environment is activated
 roslaunch vehicle_gazebo_simulation_launcher gazebo_launcher.launch world_name:=simple gpu:=true
 ```
-Autoware
+Run Autoware runtime manager
 ```
 #Run Autoware and Configure for use - Required is path planner, NDT localizer and Rviz
 roslaunch runtime_manager runtime_manager.launch
@@ -58,7 +66,7 @@ rosrun align_navigation goal_publisher.py #For Approach Navigation
 
 ```
 
-Future Updates
+### Future Updates
 
 To install GTSAM (Latest Version)
 ```
@@ -74,7 +82,7 @@ sudo add-apt-repository --remove ppa:bernd-pfrommer/gtsam
 
 ## Citation
 
-Please cite outwork if you extend this
+Please cite outwork if you use or extend this
 
 ## Support
 Send a mail to [Sachit Mahajan](mailto:sachitma@andrew.cmu.edu)

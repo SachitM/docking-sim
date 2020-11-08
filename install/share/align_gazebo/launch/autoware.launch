@@ -1,0 +1,21 @@
+<launch>
+  <arg name="namespace" default="align"/>
+
+<!-- <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find vehicle_model)/models/pod_tag/model.sdf -sdf -x 35 -y 40 -z 0 -Y 3.14159 -model Pod " respawn="false" output="screen" /> -->
+  <node name="ackermann_converter" pkg="align_gazebo" type="ackermann_drive_to_cmd_vel.py"/>
+  <group ns="$(arg namespace)">
+    <rosparam file="$(find align_gazebo)/config/pod_locations_auto.yaml" />
+    <rosparam file="$(find align_gazebo)/config/config_off_auto.yaml" />
+  <!-- <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find align_gazebo)/models/Pod/model.sdf -sdf -x 0 -y -0 -z 0 -Y 1.5707 -model Pod" respawn="false" output="screen" /> -->
+  <!-- <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find vehicle_model)/models/pod_tag/model.sdf -sdf -x 35 -y 40 -z 0 -Y 3.14159 -model Pod " respawn="false" output="screen" /> -->
+  </group>
+  
+  <node pkg="phz" type="groundtruth_publisher_node" name="prior_estimate" output="screen"/>
+
+  <node pkg="phz" type="identify_phz_node" name="phz_identfy" output="screen" launch-prefix="gnome-terminal --command"/>
+  <node pkg="phz" type="viz_node" name="visualizer" output="screen"/>
+  <node pkg="phz" type="waypoint_publisher_node" name="waypoint_publisher" output="screen" />
+  <include file="$(find hms_client)/launch/hms_launch.launch"/>
+
+
+</launch>

@@ -1,0 +1,8 @@
+prefix=/home/uma/Desktop/MRSD/Capstone/docking-sim/install
+
+Name: ackermann_drive_teleop
+Description: Description of ackermann_drive_teleop
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: rospy ackermann_msgs
