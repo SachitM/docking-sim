@@ -52,30 +52,20 @@ void StateMachineNode::HMSCallback(const std_msgs::String::ConstPtr& msg){
     }   
 }
 
-StateMachineNode::IpCallback(const std_msgs::String::ConstPtr& msg){
-
-}
-
-StateMachineNode::OpPublisher(){
-
-}
-
-void updateCallback(const state_machine::StateIn::ConstPtr& msg)
-{
-    // if (msg->PodIdentification == 1){
-    //     ROS_INFO("[MODE: %s, HMS CHECK: %s, UPDATE: %s, STATE: %s ]\n", "Pod PickUp", "Passed", "ARTag Detected","Pod Identification" );
-    // } else if (msg->Approach == 1){
-    //     ROS_INFO("[MODE: %s, HMS CHECK: %s, UPDATE: %s, STATE: %s ]\n", "Pod PickUp", "Passed", "Pod Identified", "Approach");
-    // } else if (msg->Verification == 1){
-    //     ROS_INFO("[MODE: %s, HMS CHECK: %s, UPDATE: %s, STATE: %s ]\n", "Pod PickUp", "Passed", "Approach Complete", "Verify Pose");
-    // } else if (msg->Docking == 1){
-    //     ROS_INFO("[MODE: %s, HMS CHECK: %s, UPDATE: %s, STATE: %s ]\n", "Pod PickUp", "Passed", "Pose Achieved", "Lock");
-    // }
-    if(msg -> Transitions == 1)
+void StateMachineNode::IpCallback(const state_machine::StateIn::ConstPtr& msg){
+        if(msg -> Transitions == 1)
     {
         SourceState = 1;
         DestState = 2;
     }
+}
+
+void StateMachineNode::OpPublisher(){
+    out_msg.HMSCheck      = hms_check;
+    out_msg.OperationMode = op_mode;
+    out_msg.PrevState     = prev_state;
+    out_msg.CurrState     = curr_state;
+    output_pub.publish(out_msg);
 }
 
 int main(int argc, char **argv)
@@ -89,8 +79,7 @@ int main(int argc, char **argv)
     ros::Rate loop_rate(10);
     while (ros::ok())
     {
-
-        sm_pub.publish(OutMsg);
+        sm_node.OpPublisher();
         ros::spinOnce();
         loop_rate.sleep();
     }
