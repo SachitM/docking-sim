@@ -10,13 +10,10 @@ find_package(catkin REQUIRED COMPONENTS
   state_machine
 )
 
-<<<<<<< HEAD
+
 catkin_package(
   CATKIN_DEPENDS state_machine
   )
-=======
-catkin_package(CATKIN_DEPENDS state_machine)
->>>>>>> 096d22c1453cb67df0ddbc8bb941118a43426a9c
 
 include_directories(${catkin_INCLUDE_DIRS})
 
