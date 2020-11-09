@@ -81,11 +81,12 @@ int main(int argc, char **argv)
   vector<ros::ServiceClient> clients;
   ros::Publisher vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
   
+  ros::Publisher hms_status_pub = nh.advertise<std_msgs::String>("HMS_Status", 10);
 
   int cb_queue = 1;
   int loop_count = 0;
   
-
+  
   int num_nodes;
   string str, nodei;
   vector<string> nodes;
@@ -186,7 +187,7 @@ int main(int argc, char **argv)
         val = clients[j].call(srv);
       if(val)
       {
-        counter += 1;
+        
         if(srv.response.error_code)//obstacle detected..
         {
           ROS_ERROR("Error : [Obstacle detected], [Node %s] Vehicle instructed to come to halt", nodes[j].c_str());
@@ -195,7 +196,10 @@ int main(int argc, char **argv)
           vel_pub.publish(_msg);
         }
         else
+        {
           ROS_INFO("Node %s is functioning properly", nodes[j].c_str());
+          counter += 1;
+        }
       }
       else
       {
@@ -211,20 +215,23 @@ int main(int argc, char **argv)
       }
     }
 
-    ros::Publisher hms_status_pub = nh.advertise<std_msgs::String>("HMS_Status", 1);
     if(counter == num_nodes + num_topics)
     {
       std_msgs::String msg;
       msg.data = "Passed";
       hms_status_pub.publish(msg);
+      ROS_INFO("Printing here in hms status %s", msg.data.c_str());
     }
     else
     {
       std_msgs::String msg;
       msg.data = "Failed";
       hms_status_pub.publish(msg);
+      ROS_INFO("Printing here in hms status %s", msg.data.c_str());
     }
+
     loop_count += 1;
+    ros::spinOnce();
     loop_rate.sleep();
 
   }  

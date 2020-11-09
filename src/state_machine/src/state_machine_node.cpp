@@ -65,6 +65,7 @@ StateMachineNode::StateMachineNode(ros::NodeHandle *nh){
 	out_msg.OperationMode = op_mode;
 	out_msg.PrevState     = prev_state;
 	out_msg.CurrState     = curr_state;
+	// @todo: set this value via pod server
 	out_msg.PodInfo       = info;
 
 	// Add console output messages to mode dict
@@ -114,7 +115,7 @@ void StateMachineNode::ConsoleOut(std::string action){
 /**
  * HMS_Status topic callback
  */
-void StateMachineNode::HMSCallback(const std_msgs::String::ConstPtr& msg){
+void StateMachineNode::HMSrostopic pub /SM_input state_machine/StateIn '{State: 0, StateUpdate: 12, OperationMode: 1}'Callback(const std_msgs::String::ConstPtr& msg){
 	// Initialisation check: state machine should operate only if HMS is activated
 
 	std::string action = "-";
@@ -164,8 +165,9 @@ void StateMachineNode::IpCallback(const state_machine::StateIn::ConstPtr& msg){
  */
 void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& msg){
 	// Todo : handle unsuccessful cases
-
+	// ROS_INFO("%d", curr_state_update);
 	if ((hms_active)&&(curr_state_update!=-1)){
+		
 		std::string action;
 		// If in IDLE state and STANDBY mode
 		// assign mode and info
