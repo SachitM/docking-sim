@@ -9,6 +9,7 @@
 
 #define RAD2DEG 57.295779513
 
+int    pod_ID;
 double pod_x;
 double pod_y;
 double pod_theta ;
@@ -46,22 +47,36 @@ void set_phz_start(){
 	phz_msg.pose.orientation= tf2::toMsg(quat);
 }
 
+void StateMachineCallback(const state_machine::StateOut::ConstPtr& msg)
+{
+    
+    if((msg->CurrState == state_machine::StateOut::State_Identify)||(msg->CurrState == state_machine::StateOut::State_))
+    {
+        EnableFlag = true;
+        ROS_INFO("ENABLED flag for p2p");
+    }
+    else
+    {
+        EnableFlag = false;
+    }
+}
+
 int main(int argc, char **argv){
 
 	ros::init(argc, argv, "groundtruth_publisher_node");
 	ros::NodeHandle n;
 	
+	ros::Subscriber sm_sub = n.subscribe("SM_output", 10, StateMachineCallback);
 	ros::Publisher pod_gt_pub = n.advertise<geometry_msgs::PoseStamped>("pod_groundtruth", 1000);
 	ros::Publisher phz_start_gt_pub = n.advertise<geometry_msgs::PoseStamped>("phz_start_groundtruth", 1000);
   
 	ros::Rate loop_rate(1);
 
+
+	// modify this to get it from pod_server
 	n.getParam("/align/pod1/x_loc", pod_x);
 	n.getParam("/align/pod1/y_loc", pod_y);
 	n.getParam("/align/pod1/theta", pod_theta);
-
-
-
 
 
 	while(ros::ok()) {
