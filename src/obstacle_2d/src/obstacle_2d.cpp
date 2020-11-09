@@ -1,3 +1,7 @@
+/*
+Author: Sanil Pande
+*/
+
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
@@ -5,17 +9,17 @@
 #include <hms_client/ping_pong.h>
 #include <math.h>
 
-#define RANGE 1.22172999382
-#define INCREMENT 0.0043711271137
-#define STEPS 560
+#define RANGE 1.22172999382         // angular range
+#define INCREMENT 0.0043711271137   // angular increment between laser readings
+#define LASER_STEPS 560
 
-class Chassis{
+class Chassis {
     public:
         ros::Subscriber lidar_sub;
         ros::Publisher obstacle_pub;
         ros::ServiceServer hms_service;
 
-        Chassis(){
+        Chassis() {
             // calculate maximum distance to detect obstacles
             double buffer_time = sense_buffer + comm_buffer + safe_buffer;
             double stopping_distance = (vel * vel * 0.5 / acc) + (buffer_time * vel);
@@ -30,7 +34,7 @@ class Chassis{
             int s = int(start);
 
             // need to add code for blind spot ditances
-            for (int i = s; i < STEPS - s; i++){
+            for (int i = s; i < LASER_STEPS - s; i++) {
                 range_array[i] = total_distance;
             }
         }
@@ -39,14 +43,12 @@ class Chassis{
         {
             float min_las = 2500;
             // iterating over all values since ideally all element in range should be non zero
-            for (int i = 0; i < STEPS; i++){
-                min_las = std::min(min_las,scan.ranges[i]);
-                if (range_array[i] > scan.ranges[i]){
-                    // std::cout << scan.ranges[i] << std::endl;
-                    if (!obstacle_flag){
+            for (int i = 0; i < LASER_STEPS; i++) {
+                min_las = std::min(min_las, scan.ranges[i]);
+                if (range_array[i] > scan.ranges[i]) {
+                    if (!obstacle_flag) {
                        ROS_INFO( "Obstacle detected!");
                     }
-                
                     ROS_INFO( "Nearest Entity : %f", min_las);
                     obstacle_flag = true;
                     hms_flag = true;
@@ -58,7 +60,6 @@ class Chassis{
             ROS_INFO( "Nearest Entity : %f", min_las);
             
             obstacle_flag = false;
-
         }
 
         bool check(hms_client::ping_pong::Request  &req,
@@ -66,12 +67,7 @@ class Chassis{
         {
             res.msg.header.stamp = ros::Time::now();
             res.health = 1;
-
-            if(hms_flag)
-                res.error_code = 1;
-            else
-                res.error_code = 0;
-
+            res.error_code = hms_flag ? 1 : 0; 
             // std::cout << "Error code! " << res.error_code << std::endl;
             hms_flag = false;
             return true;
@@ -81,7 +77,7 @@ class Chassis{
     private:
         bool obstacle_flag;
         bool hms_flag;
-        double range_array[STEPS] = {0};
+        double range_array[LASER_STEPS] = {0};
         geometry_msgs::Twist msg;
 
         double width = 1.85;    // changed since 1.355 wasn not working correctly
