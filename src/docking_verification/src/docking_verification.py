@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Author(s): Sanil Pande and Rohan Rao
 """Calculates offset of chassis (lidar) from pod center."""
 
 import rospy
@@ -83,8 +84,6 @@ class DockingVerification():
         left_lower = np.array(left_lower)
         right_lower = np.array(right_lower)
 
-        print(left_lower.shape, left_upper.shape)
-
         # fit the upper left pod leg
         x, y, z = left_upper.T
         xposLU, yposLU = x.mean(), y.mean()
@@ -106,12 +105,10 @@ class DockingVerification():
         meanY = (yposLU+yposLR+yposRU+yposLL)/4
         offset = np.sqrt(meanX**2 + meanY**2)
 
-        print(meanX, meanY, offset)
-
         self.moving_average[self.counter % self.average_len] = offset
         self.counter += 1
 
-        #lidar is assumed to be at chassis center
+        #lidar is assumed to be at front of chassis
         self.publisher.publish(round(np.mean(self.moving_average), 4))
 
     def state_listener(self, state):
