@@ -21,9 +21,8 @@ pi = math.pi
 
 last_goal = False
 target_waypoint = 0
-APPROACH = 0
-EMERGENCY = 1
-state = APPROACH
+
+enable_p2p = True
 
 goal_tolerance = 0.75
 
@@ -57,7 +56,6 @@ def move_base_cancel_goal():
    # Waits until the action server has started up and started listening for goals.
     client.wait_for_server()
 
-   # Creates a new goal with the MoveBaseGoal constructor
     client.cancel_all_goals()
 
 def movebase_client():
@@ -106,37 +104,41 @@ def is_close():
         return False
 
 def stateCallback(msg):
-    global state
+    global enable_p2p, location_target
     if(msg.data == 1):
-        state = EMERGENCY
+        enable_p2p = True
     if(msg.data == 0):
-        state = APPROACH
+        enable_p2p = False
+    data = 12
+    if location_target != data:
+        location_target = data
 
 def move_to_goal(wp_array):
-    global state, target_waypoint, pix_bot_center, pix_bot_theta, last_goal
+    global enable_p2p, target_waypoint, pix_bot_center, pix_bot_theta, last_goal
     total_wp = len(wp_array)
     i=0
     while(i<total_wp):
-        # goto wp i
-        print("Moving to next Goal")
-        target_waypoint = wp_array[i]
-        if state == APPROACH:
+        
+        if enable_p2p == True:
+            # goto wp i
+            print("Moving to next Goal")
+            target_waypoint = wp_array[i]
             movebase_client()
             # when close (within tol) or move_base_state is success or HMS error
             while not last_goal and not is_close(): #or move_base_state == SUCCESS or HMS_ERROR==True):
-                if state != APPROACH:
+                if enable_p2p != True:
                     break
         
         move_base_cancel_goal()
         # also last_goal flag
-        if state == APPROACH:
+        if enable_p2p == True:
             i+=1
         if i == total_wp-1:
             last_goal = True
 
 if __name__ == '__main__':
     rospy.init_node('undocking_client_py')
-    new_user_input_flag = 1
+    location_target = 12
 
     pix_bot_center = Pose()
     pix_bot_theta = 0
@@ -146,12 +148,13 @@ if __name__ == '__main__':
     rospy.wait_for_message(ODOM_INF, Odometry,5)
 
     while not rospy.is_shutdown():
-        if(new_user_input_flag and state == APPROACH):
+        if(location_target != -1 and enable_p2p == True):
+            #From location_target read waypoints.npy
             waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,30,np.pi/2]])
             try: 
                 move_to_goal(waypoints)
                 print("Target Reached")
-                new_user_input_flag = False
+                location_target = -1
             except:
                 move_base_cancel_goal()
                 break
