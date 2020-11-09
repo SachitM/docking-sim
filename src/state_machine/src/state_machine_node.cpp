@@ -98,6 +98,7 @@ void StateMachineNode::OpPublisher(){
 		out_msg.OperationMode = op_mode;
 		out_msg.PrevState     = prev_state;
 		out_msg.CurrState     = curr_state;
+		out_msg.PodInfo       = info;
 		output_pub.publish(out_msg);
 	}
 	return;
