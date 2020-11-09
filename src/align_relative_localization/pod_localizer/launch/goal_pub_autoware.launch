@@ -4,12 +4,14 @@
   <arg name="namespace" default="align"/>
 
   <!-- <node name="tf_broadcaster_auto" pkg="align_gazebo" type="tf_broadcaster_autoware.py"/> -->
+  <node name="ackermann_converter" pkg="align_gazebo" type="ackermann_drive_to_cmd_vel.py"/>
   <param name="/align/lidar_offset" type="double" value="2.05"/>
   <param name="/align/camera_offset" type="double" value="2.05"/>
   <include file="$(find pod_localizer)/launch/continuous_detection.launch"/>
   <node pkg="pod_localizer" type="laser_pod_localizer" name="laser_pod_localizer" output="screen" launch-prefix="gnome-terminal --command"/>
   <node pkg="pod_localizer" type="tag_pod_localizer" name="tag_pod_localizer" output="screen" launch-prefix="gnome-terminal --command"/>
-  
+  <include file="$(find align_gazebo)/launch/waypoint_pub.launch"/>
+   <node pkg="docking_verification" type="docking_verification.py" name="verify_dock" output="screen"/>
   <group ns="$(arg namespace)">
   </group>
 </launch>

@@ -53,7 +53,8 @@ void set_phz_start(){
 void StateMachineCallback(const state_machine::StateOut::ConstPtr& msg)
 {
     
-    if((msg->CurrState == state_machine::StateOut::State_Identify)||(msg->CurrState == state_machine::StateOut::State_P2P)||(msg->CurrState == state_machine::StateOut::State_Approach))
+    if((msg->CurrState == state_machine::StateOut::State_Identify)||(msg->CurrState == state_machine::StateOut::State_P2P)||
+		(msg->CurrState == state_machine::StateOut::State_Approach)||(msg->CurrState == state_machine::StateOut::State_Verify))
     {
         is_active = true;
     }

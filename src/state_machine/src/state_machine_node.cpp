@@ -116,7 +116,7 @@ void StateMachineNode::ConsoleOut(std::string action){
 /**
  * HMS_Status topic callback
  */
-void StateMachineNode::HMSrostopic pub /SM_input state_machine/StateIn '{State: 0, StateUpdate: 12, OperationMode: 1}'Callback(const std_msgs::String::ConstPtr& msg){
+void StateMachineNode::HMSCallback(const std_msgs::String::ConstPtr& msg){
 	// Initialisation check: state machine should operate only if HMS is activated
 
 	std::string action = "-";

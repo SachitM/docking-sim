@@ -17,11 +17,12 @@ This repo has been tested on Ubuntu 18.04 (ROS Melodic)
 * GTSAM 
 * [Autoware](https://github.com/CPFL/Autoware-Manuals/blob/master/en/Autoware_UsersManual_v1.1.md#3-d-map-generation-and-sharing)
 * [apriltag_ros](https://github.com/AprilRobotics/apriltag)
+* teb-local-planner
 
 ### Docking Simulation
 Clone the repo in catkin workspace and run 
 ```
-catkin build
+catkin_make
 source devel/setup.bash
 roslaunch align_gazebo align.launch
 ```
@@ -64,6 +65,16 @@ roslaunch align_navigation mapless_move_base.launch
 roslaunch pod_localizer goal_pub_autoware.launch #For Localizing Pod
 rosrun align_navigation goal_publisher.py #For Approach Navigation
 
+```
+For running the chassis using keyboard
+```
+rosrun align_gazebo ackermann_drive_to_cmd_vel.py
+sh run_keyop.sh #To manually drive the vehicle
+```
+
+To use Fake Localization instead of Autoware
+```
+rosrun align_gazebo tf_broadcaster_autoware.py
 ```
 
 ### Future Updates
