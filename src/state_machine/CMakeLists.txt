@@ -34,6 +34,12 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+<<<<<<< HEAD
 add_executable(state_machine_node src/state_machine_node.cpp)
 add_dependencies(state_machine_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(state_machine_node ${catkin_LIBRARIES})
+=======
+add_executable(${PROJECT_NAME}_node src/state_machine_node.cpp)
+target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+
+>>>>>>> 096d22c1453cb67df0ddbc8bb941118a43426a9c
