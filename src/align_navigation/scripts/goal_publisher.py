@@ -215,7 +215,7 @@ def docking_execution():
             waypoints[-1, 0] += OFFSET * np.cos(waypoints[-1, 2]) 
             waypoints[-1, 1] += OFFSET * np.sin(waypoints[-1, 2]) 
             pursuitToWaypoint(waypoints[-1],1)
-            StateUpdateMsg.TransState = StateOut.State_Approach
+            StateUpdateMsg.TransState = StateOut.State_D_Approach
             StateUpdateMsg.StateTransitionCond = 1
             sm_pub.publish(StateUpdateMsg)
             rate.sleep()
@@ -274,7 +274,7 @@ def docking_execution():
 
 def StateMachineCb(StateInfo):
     global EnableApproach, EnableLock, EnableRetrace, EnableVerifyPose
-    EnableApproach = True if StateInfo.CurrState == StateOut.State_Approach else False
+    EnableApproach = True if StateInfo.CurrState == StateOut.State_D_Approach else False
     EnableVerifyPose = True if StateInfo.CurrState == StateOut.State_Verify else False
     EnableRetrace = True if StateInfo.CurrState == StateOut.State_Retrace else False
     EnableLock = True if StateInfo.CurrState == StateOut.State_Lock else False
