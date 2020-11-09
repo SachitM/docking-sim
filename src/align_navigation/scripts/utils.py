@@ -8,8 +8,10 @@ from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Point, PoseArray
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
+from ackermann_msgs.msg import AckermannDriveStamped
+from angles import *
 
-num_waypoints = 3
+num_waypoints = 5
 waypoint_tol = 0.1
 retrace_waypoint_tol = 0.15
 
