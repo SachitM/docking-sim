@@ -8,8 +8,7 @@ from sensor_msgs import point_cloud2 as pc2
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import Point32
 from std_msgs.msg import Float64
-from std_msgs.msg import Header
-# from StateMachine.msg import StateOut
+from StateMachine.msg import StateOut
 
 # define constants related to the pod and chassis design
 FRONT_LIDAR_DIST_FROM_CENTER = 1.1
@@ -35,13 +34,11 @@ class DockingVerification():
         self.average_len = average_len
         self.moving_average = np.zeros(average_len)
         self.counter = 0
-        # self.docking_state = False
-        self.docking_state = True
+        self.docking_state = False
 
         self.publisher = rospy.Publisher('dock_offset', Float64, queue_size=10)
-        # self.lidar_sub = rospy.Subscriber('system_status', StateOut,
-                                        #   self.state_listener)
-        self.testlidarpub = rospy.Publisher("filtered_pts", PointCloud2, queue_size=10)
+        self.lidar_sub = rospy.Subscriber('system_status', StateOut,
+                                          self.state_listener)
         self.lidar_sub = rospy.Subscriber("points_raw", PointCloud2,
                                           self.velodyne_points_callback)
 
@@ -51,15 +48,10 @@ class DockingVerification():
             return
 
         x, y, z = [], [], []
-        cloud_points = []
         left_upper = []
         right_upper = []
         left_lower = []
         right_lower = []
-        pcres = PointCloud2()
-        header = Header()
-        header.stamp = rospy.Time.now()
-        header.frame_id = 'velodyne_base_link'
         
         for p in pc2.read_points(point_cloud, field_names=("x", "y", "z"), skip_nans=True):
             # check if the points are within the left upper leg
@@ -85,14 +77,6 @@ class DockingVerification():
                     right_lower.append((x,y,z))
                     cloud_points.append((x,y,z))
 
-        #print(cloud_points)
-        cloud_points.append((right_upper_pod_leg_pos[0], right_upper_pod_leg_pos[1], 0.5))
-        cloud_points.append((left_upper_pod_leg_pos[0],left_upper_pod_leg_pos[1], 0.5))
-        cloud_points.append((right_lower_pod_leg_pos[0], right_lower_pod_leg_pos[1], 0.5))
-        cloud_points.append((left_lower_pod_leg_pos[0], left_lower_pod_leg_pos[1], 0.5))
-        scaled_polygon_pcl = pc2.create_cloud_xyz32(header, cloud_points)
-        # print(scaled_polygon_pcl)
-        self.testlidarpub.publish(scaled_polygon_pcl)
         left_upper = np.array(left_upper)
         right_upper = np.array(right_upper)
         left_lower = np.array(left_lower)
