@@ -15,6 +15,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray, Pose, Twist
 from std_msgs.msg import Float64, Int8
 from angles import *
+from state_machine.msg import *
 
 import tf
 pi = math.pi
@@ -22,7 +23,7 @@ pi = math.pi
 last_goal = False
 target_waypoint = 0
 
-enable_p2p = True
+enable_p2p = False
 
 goal_tolerance = 0.75
 
@@ -103,13 +104,10 @@ def is_close():
     else:
         return False
 
-def stateCallback(msg):
+def stateCallback(StateInfo):
     global enable_p2p, location_target
-    if(msg.data == 1):
-        enable_p2p = True
-    if(msg.data == 0):
-        enable_p2p = False
-    data = 12
+    enable_p2p = True if StateInfo.CurrState == StateOut.State_P2P else False
+    data = StateInfo.PodInfo
     if location_target != data:
         location_target = data
 
@@ -144,9 +142,10 @@ if __name__ == '__main__':
     pix_bot_theta = 0
 
     rospy.Subscriber(ODOM_INF, Odometry, vehicleStateCallback)
-    rospy.Subscriber("/state", Int8, stateCallback)
+    #rospy.Subscriber("/state", Int8, stateCallback)
+    rospy.Subscriber("SM_output", StateOut, stateCallback)
     rospy.wait_for_message(ODOM_INF, Odometry,5)
-
+    sm_pub = rospy.Publisher("SM_input", StateIn, queue_size=1)
     while not rospy.is_shutdown():
         if(location_target != -1 and enable_p2p == True):
             #From location_target read waypoints.npy
@@ -154,6 +153,10 @@ if __name__ == '__main__':
             try: 
                 move_to_goal(waypoints)
                 print("Target Reached")
+                StateUpdateMsg = StateIn()
+                StateUpdateMsg.TransState = StateOut.State_P2P
+                StateUpdateMsg.StateTransitionCond = 1
+                sm_pub.publish(StateUpdateMsg)
                 location_target = -1
             except:
                 move_base_cancel_goal()

@@ -23,6 +23,9 @@ waypoints = []
 last_goal = False
 target_waypoint = 0
 
+EnableApproachUndock = False
+EnableUnlock = False
+
 def waypointCallback(msg):
     global waypoints, last_goal
     if last_goal == True:
@@ -106,14 +109,29 @@ def go_to_goal(goal):
     except rospy.ROSInterruptException:
         rospy.loginfo("[Undocking]: Navigation test finished.")
 
+def StateMachineCb(StateInfo):
+    global EnableApproachUndock, EnableUnlock
+    EnableApproachUndock = True if StateInfo.CurrState == StateOut.State_U_Approach else False
+    EnableUnlock = True if StateInfo.CurrState == StateOut.State_Unlock else False
+
 def undocking_execution():
-    global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub
-    for i in range(num_waypoints-1):
-        go_to_goal(waypoints[i])
-    
-    lift_goal = Float64()
-    lift_goal.data = 0
-    cmd_pub.publish(lift_goal)
+    global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub, EnableApproachUndock, EnableUnlock
+    StateUpdateMsg = StateIn()
+    while not rospy.is_shutdown():
+        if EnableApproachUndock:
+            for i in range(num_waypoints-1):
+                go_to_goal(waypoints[i])
+            StateUpdateMsg.TransState = StateOut.State_U_Approach
+            StateUpdateMsg.StateTransitionCond = 1
+            sm_pub.publish(StateUpdateMsg)
+        if EnableUnlock:
+            lift_goal = Float64()
+            lift_goal.data = 0
+            cmd_pub.publish(lift_goal)
+            StateUpdateMsg.TransState = StateOut.State_Unlock
+            StateUpdateMsg.StateTransitionCond = 1
+            sm_pub.publish(StateUpdateMsg)
+            break
 
 if __name__ == '__main__':
 
@@ -123,7 +141,7 @@ if __name__ == '__main__':
     rospy.Subscriber("/undocking_goal",
                    PoseArray,
                    waypointCallback)
-
+    rospy.Subscriber("SM_output", StateOut, StateMachineCb)
     waypoints[0,0] = 32.5
     waypoints[0,1] = 35
     waypoints[0,2] = math.pi/2
@@ -139,7 +157,7 @@ if __name__ == '__main__':
     rospy.wait_for_message(ODOM_INF, Odometry,5)
 
     cmd_pub = rospy.Publisher('/autoware_gazebo/lift_controller/command', Float64, queue_size=1)
-
+    sm_pub = rospy.Publisher("SM_input", StateIn, queue_size=1)
     undocking_execution()
 
     rospy.spin()

@@ -16,4 +16,4 @@ waypoint_tol = 0.1
 retrace_waypoint_tol = 0.15
 
 wheelbase = 1.9
-ODOM_INF = "/align/ground_truth/state"
+ODOM_INF = "/ground_truth/state"
