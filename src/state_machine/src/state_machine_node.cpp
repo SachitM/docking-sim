@@ -151,8 +151,8 @@ void StateMachineNode::HMSCallback(const std_msgs::String::ConstPtr& msg){
 void StateMachineNode::IpCallback(const state_machine::StateIn::ConstPtr& msg){
 	// update curr_state_update when an update is received from a node
 	if (hms_active){
-		if (msg->State==curr_state){
-			curr_state_update = msg->StateUpdate;
+		if (msg->TransState==curr_state){
+			curr_state_update = msg->StateTransitionCond;
 			StateTransition(msg);
 		}
 	}
@@ -172,7 +172,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 		if ((op_mode == state_machine::StateOut::OperationMode_Standby)&&(curr_state == state_machine::StateOut::State_Idle)){
 			// Todo : Check if pod is present or not for the req mode?
 			op_mode = msg->OperationMode;
-			info    = msg->StateUpdate;
+			info    = msg->StateTransitionCond;
 			prev_state = curr_state;
 			curr_state = state_machine::StateOut::State_P2P;
 
