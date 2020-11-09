@@ -7,6 +7,7 @@ uint8 State_Retrace=5
 uint8 State_Lock=6
 uint8 State_Unlock=7
 uint8 State_EHS= 8
+uint8 OperationMode_Standby = 0
 uint8 OperationMode_Pickup = 1
 uint8 OperationMode_DropOff = 2
 Header header 
