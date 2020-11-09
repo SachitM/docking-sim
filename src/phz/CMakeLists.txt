@@ -24,6 +24,7 @@ target_link_libraries(identify_phz_node
 )
 
 add_executable(groundtruth_publisher_node src/groundtruth_publisher.cpp)
+add_dependencies(groundtruth_publisher_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(groundtruth_publisher_node 
 	${catkin_LIBRARIES}
 )
