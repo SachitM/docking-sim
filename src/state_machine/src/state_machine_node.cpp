@@ -65,7 +65,6 @@ StateMachineNode::StateMachineNode(ros::NodeHandle *nh){
 	out_msg.OperationMode = op_mode;
 	out_msg.PrevState     = prev_state;
 	out_msg.CurrState     = curr_state;
-	// @todo: set this value via pod server
 	out_msg.PodInfo       = info;
 
 	// Add console output messages to mode dict
@@ -77,7 +76,8 @@ StateMachineNode::StateMachineNode(ros::NodeHandle *nh){
 	console_s[state_machine::StateOut::State_Idle] = "Idle";
 	console_s[state_machine::StateOut::State_P2P] = "P2P";
 	console_s[state_machine::StateOut::State_Identify] = "Identify";
-	console_s[state_machine::StateOut::State_Approach] = "Approach Navigation";
+	console_s[state_machine::StateOut::State_D_Approach] = "Dock Approach Navigation";
+	console_s[state_machine::StateOut::State_U_Approach] = "Undock Approach Navigation";
 	console_s[state_machine::StateOut::State_Verify] = "Verify Pose";
 	console_s[state_machine::StateOut::State_Retrace] = "Retrace";
 	console_s[state_machine::StateOut::State_Lock] = "Dock with Pod";
@@ -87,7 +87,6 @@ StateMachineNode::StateMachineNode(ros::NodeHandle *nh){
 	ROS_INFO("[SM] Chassis Initialised in STANDBY MODE");
 	ROS_INFO("[SM] Waiting for HMS");		
 }
-
 
 /**
  *  Publish current state information 
@@ -141,7 +140,7 @@ void StateMachineNode::HMSCallback(const std_msgs::String::ConstPtr& msg){
 	if ((state_machine::StateOut::State_EHS == curr_state)&&(1 == hms_check)){
 		curr_state = prev_state;
 		prev_state = state_machine::StateOut::State_EHS;
-		std::string action = "Diagnostics Complete";
+		action = "Diagnostics Complete";
 		ConsoleOut(action);
 	}
 	return;
@@ -166,25 +165,56 @@ void StateMachineNode::IpCallback(const state_machine::StateIn::ConstPtr& msg){
  */
 void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& msg){
 	// Todo : handle unsuccessful cases
-	// ROS_INFO("%d", curr_state_update);
 	if ((hms_active)&&(curr_state_update!=-1)){
 		
 		std::string action;
 		// If in IDLE state and STANDBY mode
-		// assign mode and info
-		if ((op_mode == state_machine::StateOut::OperationMode_Standby)&&(curr_state == state_machine::StateOut::State_Idle)){
-			// Todo : Check if pod is present or not for the req mode?
-			op_mode = msg->OperationMode;
-			info    = msg->StateTransitionCond;
-			prev_state = curr_state;
-			curr_state = state_machine::StateOut::State_P2P;
+		// Take user input
+		if ((state_machine::StateOut::OperationMode_Standby == op_mode)&&(state_machine::StateOut::State_Idle == curr_state)){
+			
+			if (state_machine::StateOut::State_Lock == prev_state){
+				// When input is to update success of locking
+			
+				if (0 == msg->StateTransitionCond){
+					// Unsuccessful lock
 
-			action  = "Input received";
-			ConsoleOut(action);
+					op_mode = state_machine::StateOut::OperationMode_DropOff;
+					prev_state = curr_state;
+					curr_state = state_machine::StateOut::State_Unlock; 
+					action = "Locking unsuccessful";
+					ConsoleOut(action);
+				} else {
+					// Succesful lock
+					
+					info = 0;
+					prev_state = curr_state;
+					action = "Locking verified & successful";
+					ConsoleOut(action);
+				}
 
+			} else  {
+				// When input for new operation is received
+
+				if((state_machine::StateOut::OperationMode_DropOff==msg->OperationMode)&&(!isPod)){
+					ROS_INFO("[SM] Error: Not docked to any pod, cannot drop off");
+					return;
+				}
+				
+				if((state_machine::StateOut::OperationMode_Pickup==msg->OperationMode)&&(isPod)){
+					ROS_INFO("[SM] Error: Already docked to pod, cannot pick up");
+					return;
+				}
+
+				op_mode = msg->OperationMode;
+				info    = msg->StateTransitionCond;
+				prev_state = curr_state;
+				curr_state = state_machine::StateOut::State_P2P;
+
+				action  = "Input received";
+				ConsoleOut(action);
+			} 
 		} else if (state_machine::StateOut::OperationMode_Pickup == op_mode){
 
-			
 			switch(curr_state){
 
 				case state_machine::StateOut::State_Idle :
@@ -204,7 +234,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 				case state_machine::StateOut::State_Identify :
 					if (1 == curr_state_update){
 						prev_state = curr_state; 
-						curr_state = state_machine::StateOut::State_Approach;
+						curr_state = state_machine::StateOut::State_D_Approach;
 						action  = "PHZ Correctly Identified";
 						ConsoleOut(action);
 					} else if (0 == curr_state_update){
@@ -215,7 +245,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 					}
 					break;
 
-				case state_machine::StateOut::State_Approach :
+				case state_machine::StateOut::State_D_Approach :
 					if (1 == curr_state_update){
 						prev_state = curr_state; 
 						curr_state = state_machine::StateOut::State_Verify;	
@@ -233,7 +263,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 					} else if (0 == curr_state_update){
 						prev_state = curr_state; 
 						curr_state = state_machine::StateOut::State_Retrace;
-						action  = "Error in Pose";
+						action     = "Error in Pose";
 						ConsoleOut(action);
 					}
 					break;
@@ -242,7 +272,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 					if (1 == curr_state_update){
 						prev_state = curr_state; 
 						curr_state = state_machine::StateOut::State_Lock;
-						action  = "Retrace Complete";
+						action     = "Retrace Complete";
 						ConsoleOut(action);
 					}
 					break;
@@ -252,8 +282,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 						prev_state = curr_state; 
 						curr_state = state_machine::StateOut::State_Idle;
 						op_mode    = state_machine::StateOut::OperationMode_Standby;
-						isPod      = true;
-						action     = "Locking Successful";
+						action     = "Locking Complete";
 						ConsoleOut(action);
 					}
 					break;	
@@ -273,8 +302,17 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 				case state_machine::StateOut::State_P2P :
 					if (1 == curr_state_update){
 						prev_state = curr_state; 
+						curr_state = state_machine::StateOut::State_U_Approach;
+						action     = "Destination Reached";
+						ConsoleOut(action);
+					}
+					break;
+
+				case state_machine::StateOut::State_U_Approach :
+					if (1 == curr_state_update){
+						prev_state = curr_state; 
 						curr_state = state_machine::StateOut::State_Unlock;
-						action  = "Destination Reached";
+						action     = "Approach Complete";
 						ConsoleOut(action);
 					}
 					break;
@@ -284,8 +322,9 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 						prev_state = curr_state; 
 						curr_state = state_machine::StateOut::State_Idle;
 						op_mode    = state_machine::StateOut::OperationMode_Standby;
-						isPod      = false;
-						action  = "Unlocking Successful";
+						isPod	   = false;
+						info       = 0;
+						action     = "Unlocking Complete";
 						ConsoleOut(action);
 					}
 					break;	
