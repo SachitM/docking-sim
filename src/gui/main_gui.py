@@ -49,6 +49,9 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
         QVBoxLayout, QWidget)
 
+# ROS related libraries
+import rospy
+from std_msgs.msg import Float64, Int8
 
 class WidgetGallery(QDialog):
     def __init__(self, parent=None):
@@ -73,6 +76,9 @@ class WidgetGallery(QDialog):
 
         self.setWindowTitle("Align: An Autonomous Payload Handling System")
         self.changeStyle('Fusion')
+
+        # ROS topics to publish
+        self.cmd_pub = rospy.Publisher('/userActionState', Int8, queue_size=1)
 
     def changeStyle(self, styleName):
         QApplication.setStyle(QStyleFactory.create(styleName))
@@ -111,14 +117,17 @@ class WidgetGallery(QDialog):
         self.topRightGroupBox.setLayout(layout)
 
     def podpickup(self):
+        self.cmd_pub.publish(0)
         self.textEdit.setDisabled(False)
         self.textEdit.setPlainText("(replace with pod ID)")
 
     def poddropoff(self):
+        self.cmd_pub.publish(1)
         self.textEdit.setDisabled(False)
         self.textEdit.setPlainText("(replace with drop off location)")
     
     def podunlock(self):
+        self.cmd_pub.publish(2)
         self.textEdit.setDisabled(True)
 
     def sendtextdata(self):
@@ -129,13 +138,16 @@ class WidgetGallery(QDialog):
         elif int(text) > 100:
             print("Invalid input!")
         else:
+            # publish this to the pod server or state machine
             pass
 
 if __name__ == '__main__':
 
     import sys
 
-    app = QApplication(sys.argv)
-    alignGUI = WidgetGallery()
-    alignGUI.show()
-    sys.exit(app.exec_()) 
+    rospy.init_node('gui_client_py')
+    while not rospy.is_shutdown():
+        app = QApplication(sys.argv)
+        alignGUI = WidgetGallery()
+        alignGUI.show()
+        sys.exit(app.exec_()) 
