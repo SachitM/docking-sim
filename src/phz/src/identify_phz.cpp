@@ -84,8 +84,7 @@ int main(int argc, char **argv){
 	ros::Rate loop_rate(10);
 
 	while(ros::ok()) {
-		// if(CompletedP2P)
-		if(EnableFlag)
+		if(CompletedP2P)
 		{
 			state_machine::StateIn StateUpdate;
 			// update the curr state under transition
@@ -94,7 +93,6 @@ int main(int argc, char **argv){
 			StateUpdate.StateTransitionCond = 1;
 			// Publish update
 			sm_pub.publish(StateUpdate);
-			//CompletedP2P = false;
 			ROS_INFO("Publishing state update p2p");
 		}
 		ros::spinOnce();

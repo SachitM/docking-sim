@@ -43,11 +43,22 @@ def vehicleStateCallback(msg):
     [pix_bot_center.orientation.x, pix_bot_center.orientation.y, pix_bot_center.orientation.z,
         pix_bot_center.orientation.w])[2]
 
+    pix_bot_center.position.x, pix_bot_center.position.y = adjustRearAxletoCenter(pix_bot_center.position.x, pix_bot_center.position.y, pix_bot_theta)
     # if(state == "finished"):
     #   print( msg.pose.pose.position.x, msg.pose.pose.position.y, pix_bot_theta)
 
     pix_bot_velocity.linear = msg.twist.twist.linear
     pix_bot_velocity.angular = msg.twist.twist.angular
+
+def adjustCentertoRearAxle(p_x, p_y, p_theta):
+  p_x = p_x - 0.95 * np.cos(p_theta)
+  p_y = p_y - 0.95 * np.sin(p_theta)
+  return p_x, p_y
+
+def adjustRearAxletoCenter(p_x, p_y, p_theta):
+  p_x = p_x + 0.95 * np.cos(p_theta)
+  p_y = p_y + 0.95 * np.sin(p_theta)
+  return p_x, p_y
 
 def movebase_client():
 
@@ -85,6 +96,7 @@ def movebase_client():
 
 def go_to_goal(goal):
     global target_waypoint
+    goal[0], goal[1] = adjustCentertoRearAxle(goal[0], goal[1], goal[2])
     target_waypoint = goal
     try:
     # Initializes a rospy node to let the SimpleActionClient publish and subscribe

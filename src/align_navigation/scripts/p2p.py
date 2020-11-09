@@ -13,16 +13,22 @@ import math
 from utils import *
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray, Pose, Twist
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Int8
+from angles import *
 
 import tf
 pi = math.pi
 
 last_goal = False
 target_waypoint = 0
+APPROACH = 0
+EMERGENCY = 1
+state = APPROACH
+
+goal_tolerance = 0.75
 
 def vehicleStateCallback(msg):
-    global pix_bot_center
+    global pix_bot_center, pix_bot_theta
     pix_bot_center.position.x = msg.pose.pose.position.x
     pix_bot_center.position.y = msg.pose.pose.position.y
     pix_bot_center.orientation = msg.pose.pose.orientation
@@ -30,8 +36,18 @@ def vehicleStateCallback(msg):
     [pix_bot_center.orientation.x, pix_bot_center.orientation.y, pix_bot_center.orientation.z,
      pix_bot_center.orientation.w])[2]
 
-    pix_bot_center.position.x = pix_bot_center.position.x + 0.95 * np.cos(pix_bot_theta)
-    pix_bot_center.position.y = pix_bot_center.position.y + 0.95 * np.sin(pix_bot_theta)
+    # @Rohan Since you are using goals for base_link the center will be rear_axle, if tests fail we can revert this
+    # pix_bot_center.position.x, pix_bot_center.position.y = adjustRearAxletoCenter(pix_bot_center.position.x, pix_bot_center.position.y, pix_bot_theta)
+
+def adjustCentertoRearAxle(p_x, p_y, p_theta):
+  p_x = p_x - 0.95 * np.cos(p_theta)
+  p_y = p_y - 0.95 * np.sin(p_theta)
+  return p_x, p_y
+
+def adjustRearAxletoCenter(p_x, p_y, p_theta):
+  p_x = p_x + 0.95 * np.cos(p_theta)
+  p_y = p_y + 0.95 * np.sin(p_theta)
+  return p_x, p_y
 
 def move_base_cancel_goal():
 
@@ -80,43 +96,62 @@ def movebase_client():
         # Result of executing the action
             return client.get_result()   
 
+def is_close():
+    global target_waypoint, pix_bot_center, pix_bot_theta, goal_tolerance
+    centererr = np.sqrt((target_waypoint[0]-pix_bot_center.position.x)**2+(target_waypoint[1]-pix_bot_center.position.y)**2)
+    thetaerr = shortest_angular_distance(pix_bot_theta,target_waypoint[2])
+    if(centererr < goal_tolerance and thetaerr < 0.25):
+        return True
+    else:
+        return False
+
+def stateCallback(msg):
+    global state
+    if(msg.data == 1):
+        state = EMERGENCY
+    if(msg.data == 0):
+        state = APPROACH
+
 def move_to_goal(wp_array):
-    global target_waypoint, pix_bot_center, pix_bot_theta, last_goal
+    global state, target_waypoint, pix_bot_center, pix_bot_theta, last_goal
     total_wp = len(wp_array)
     i=0
     while(i<total_wp):
         # goto wp i
-        target_waypoint = wp_array[i]
-        # if state is approach:
-        movebase_client()
-        # when close (within tol) or move_base_state is success or HMS error
-        while (np.sqrt((target_waypoint[0]-pix_bot_center.position.x)**2+(target_waypoint[1]-pix_bot_center.position.y)**2) > 0.5): #or move_base_state == SUCCESS or HMS_ERROR==True):
-            #if state not approach
-            #break
-            pass
         print("Moving to next Goal")
+        target_waypoint = wp_array[i]
+        if state == APPROACH:
+            movebase_client()
+            # when close (within tol) or move_base_state is success or HMS error
+            while not last_goal and not is_close(): #or move_base_state == SUCCESS or HMS_ERROR==True):
+                if state != APPROACH:
+                    break
+        
         move_base_cancel_goal()
         # also last_goal flag
+        if state == APPROACH:
+            i+=1
         if i == total_wp-1:
             last_goal = True
-        # if state is approach:
-        i+=1
 
 if __name__ == '__main__':
     rospy.init_node('undocking_client_py')
     new_user_input_flag = 1
 
     pix_bot_center = Pose()
-    pix_bot_theta = Twist()
+    pix_bot_theta = 0
 
-    rospy.Subscriber(ODOM_INF,
-                    Odometry, vehicleStateCallback)
+    rospy.Subscriber(ODOM_INF, Odometry, vehicleStateCallback)
+    rospy.Subscriber("/state", Int8, stateCallback)
     rospy.wait_for_message(ODOM_INF, Odometry,5)
 
-    while True:
-        if(new_user_input_flag): #and IS_APPROACH):
+    while not rospy.is_shutdown():
+        if(new_user_input_flag and state == APPROACH):
             waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,30,np.pi/2]])
-            move_to_goal(waypoints)
-            new_user_input_flag = False
-            #try catch adn stop
-
+            try: 
+                move_to_goal(waypoints)
+                print("Target Reached")
+                new_user_input_flag = False
+            except:
+                move_base_cancel_goal()
+                break

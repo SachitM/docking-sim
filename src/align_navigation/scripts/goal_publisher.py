@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # license removed for brevity
 
+# Author: Sachit Mahajan
+
 import rospy
 import tf
 # Brings in the SimpleActionClient
@@ -55,11 +57,100 @@ def vehicleStateCallback(msg):
     [pix_bot_center.orientation.x, pix_bot_center.orientation.y, pix_bot_center.orientation.z,
         pix_bot_center.orientation.w])[2]
 
+    pix_bot_center.position.x, pix_bot_center.position.y = adjustRearAxletoCenter(pix_bot_center.position.x, pix_bot_center.position.y, pix_bot_theta)
     # if(state == "finished"):
     #   print( msg.pose.pose.position.x, msg.pose.pose.position.y, pix_bot_theta)
 
     pix_bot_velocity.linear = msg.twist.twist.linear
     pix_bot_velocity.angular = msg.twist.twist.angular
+
+def adjustCentertoRearAxle(p_x, p_y, p_theta):
+  p_x = p_x - 0.95 * np.cos(p_theta)
+  p_y = p_y - 0.95 * np.sin(p_theta)
+  return p_x, p_y
+
+def adjustRearAxletoCenter(p_x, p_y, p_theta):
+  p_x = p_x + 0.95 * np.cos(p_theta)
+  p_y = p_y + 0.95 * np.sin(p_theta)
+  return p_x, p_y
+
+def pursuitToWaypoint(waypoint, i):
+  global pix_bot_center, pix_bot_theta, pix_bot_velocity, cmd_vel_pub, ODOM_INF
+  print waypoint
+  Kp = 0.9
+  Kd = 0.4
+  waypoint_tol_ = [0.08,0.05]
+  max_acc_ = [ 0.7, 0.3]
+  max_steering_angle_ = [0.3,0.1]
+  MAX_VEL_ = [0.5, 0.2]
+  MIN_VEL_ = [0.2, 0.05]
+  MAX_VEL = MAX_VEL_[i]
+  MIN_VEL = MIN_VEL_[i]
+  max_acc = max_acc_[i]
+  waypoint_tol = waypoint_tol_[i]
+  max_steering_angle = max_steering_angle_[i]
+  rospy.wait_for_message(ODOM_INF, Odometry, 5)
+  dx = waypoint[0] - pix_bot_center.position.x
+  dy = waypoint[1] - pix_bot_center.position.y
+  target_distance = math.sqrt(dx*dx + dy*dy)
+
+  cmd = AckermannDriveStamped()
+  cmd.header.stamp = rospy.Time.now()
+  cmd.header.frame_id = "base_link"
+  cmd.drive.speed = pix_bot_velocity.linear.x
+
+  cmd.drive.acceleration = max_acc
+
+  delta_error = 0.0
+  last_error = 0.0
+
+  while target_distance > waypoint_tol:
+    dx = waypoint[0] - pix_bot_center.position.x
+    dy = waypoint[1] - pix_bot_center.position.y
+    lookahead_dist = np.sqrt(dx * dx + dy * dy)
+    lookahead_theta = math.atan2(dy, dx)
+    # lookahead_theta = waypoint[2]
+    alpha = shortest_angular_distance(pix_bot_theta, lookahead_theta)
+    cmd.header.stamp = rospy.Time.now()
+    cmd.header.frame_id = "base_link"
+    # Publishing constant speed of 1m/s
+    cmd.drive.speed = 1
+
+    # Reactive steering
+    if alpha < 0:
+      st_ang = max(-max_steering_angle, alpha)
+    else:
+      st_ang = min(max_steering_angle, alpha)
+
+    cmd.drive.steering_angle = st_ang
+
+    target_distance = math.sqrt(dx * dx + dy * dy)
+
+    error_speed = target_distance
+    if last_error == 0:
+      pass
+    else:
+      delta_error = error_speed - last_error
+
+    velocity = Kp * error_speed + Kd * delta_error
+
+    velocity = max(MIN_VEL, min(MAX_VEL , velocity))
+    cmd.drive.speed = velocity
+
+    cmd_vel_pub.publish(cmd)
+    rospy.wait_for_message(ODOM_INF, Odometry, 5)
+
+  if i == 1 :
+    cmd = AckermannDriveStamped() 
+    cmd.drive.acceleration = 0.0
+    cmd.drive.speed = 0
+    cmd.header.stamp = rospy.Time.now()
+    cmd.header.frame_id = "base_link"
+    cmd.drive.steering_angle = 0
+    cmd_vel_pub.publish(cmd)
+    # rospy.wait_for_message(ODOM_INF, Odometry, 5)
+    # cmd_vel_pub.publish(cmd)
+
 
 def movebase_client():
 
@@ -98,6 +189,7 @@ def movebase_client():
 
 def go_to_goal(goal):
     global target_waypoint
+    goal[0], goal[1] = adjustCentertoRearAxle(goal[0], goal[1], goal[2])
     target_waypoint = goal
     try:
     # Initializes a rospy node to let the SimpleActionClient publish and subscribe
@@ -108,17 +200,21 @@ def go_to_goal(goal):
         rospy.loginfo("Navigation test finished.")
 
 def docking_execution():
+    
     StateUpdateMsg = StateIn()
-    while(True):
+    while not rospy.is_shutdown():
+        global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub, EnableApproach, EnableLock, EnableRetrace, EnableVerifyPose
         print(EnableLock, EnableRetrace, EnableVerifyPose, EnableApproach)
-        global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub
         if EnableApproach:
-            for i in range(num_waypoints-1):
-                go_to_goal(waypoints[i])
-
-            # state = "finished"
-            # print(state)
-            # update state success
+            last_goal = False
+            go_to_goal(waypoints[0])
+            go_to_goal(waypoints[1])
+            last_goal = True
+            OFFSET = 0.03
+            pursuitToWaypoint(waypoints[-2],0)
+            waypoints[-1, 0] += OFFSET * np.cos(waypoints[-1, 2]) 
+            waypoints[-1, 1] += OFFSET * np.sin(waypoints[-1, 2]) 
+            pursuitToWaypoint(waypoints[-1],1)
             StateUpdateMsg.TransState = StateOut.State_Approach
             StateUpdateMsg.StateTransitionCond = 1
             sm_pub.publish(StateUpdateMsg)
@@ -133,7 +229,7 @@ def docking_execution():
             # state = "verifying_pose"
             # print(state)
             rate.sleep()
-            goal = waypoints[-2] + 0
+            goal = waypoints[-1] + 0
             dx = goal[0] - pix_bot_center.position.x
             dy = goal[1] - pix_bot_center.position.y
             target_distance = math.sqrt(dx*dx + dy*dy)
@@ -154,9 +250,10 @@ def docking_execution():
                 StateUpdateMsg.StateTransitionCond = 1
                 # state = "docking"
             sm_pub.publish(StateUpdateMsg)
+
         
         elif EnableRetrace:
-            go_to_goal(waypoints[-1])
+            go_to_goal(waypoints[0])
             StateUpdateMsg.TransState = StateOut.State_Retrace
             StateUpdateMsg.StateTransitionCond = 1
             sm_pub.publish(StateUpdateMsg)
@@ -168,40 +265,32 @@ def docking_execution():
             StateUpdateMsg.TransState = StateOut.State_Lock
             StateUpdateMsg.StateTransitionCond = 1
             sm_pub.publish(StateUpdateMsg) 
-            break     
+            break
+         
 
         # state = "finished"
         # print(state)
 
 
 def StateMachineCb(StateInfo):
+    global EnableApproach, EnableLock, EnableRetrace, EnableVerifyPose
     EnableApproach = True if StateInfo.CurrState == StateOut.State_Approach else False
     EnableVerifyPose = True if StateInfo.CurrState == StateOut.State_Verify else False
     EnableRetrace = True if StateInfo.CurrState == StateOut.State_Retrace else False
     EnableLock = True if StateInfo.CurrState == StateOut.State_Lock else False
+    #print("Curr state, enabled ", StateInfo.CurrState, EnableApproach)
 
 if __name__ == '__main__':
 
     rospy.init_node('movebase_client_py')
     waypoints = np.zeros((num_waypoints, 3))
     rate = rospy.Rate(0.25)
+    
     rospy.Subscriber("/waypoints_goal",
                    PoseArray,
                    waypointCallback)
-    # rospy.wait_for_message("/waypoints_goal", PoseArray)
     rospy.Subscriber("SM_output", StateOut, StateMachineCb)
-
-    waypoints[0,0] = 32.5
-    waypoints[0,1] = 35
-    waypoints[0,2] = math.pi/2
-
-    waypoints[1,0] = 32.5
-    waypoints[1,1] = 38.13
-    waypoints[1,2] = math.pi/2
-
-    waypoints[2,0] = 32.5
-    waypoints[2,1] = 34
-    waypoints[2,2] = math.pi/2
+    rospy.wait_for_message("/waypoints_goal", PoseArray)
 
     pix_bot_center = Pose()
     pix_bot_velocity = Twist()
@@ -209,32 +298,9 @@ if __name__ == '__main__':
                     Odometry, vehicleStateCallback)
     rospy.wait_for_message(ODOM_INF, Odometry,5)
 
+    cmd_vel_pub = rospy.Publisher('/align/ackermann_cmd', AckermannDriveStamped, queue_size=10)
     cmd_pub = rospy.Publisher('/autoware_gazebo/lift_controller/command', Float64, queue_size=1)
     sm_pub = rospy.Publisher("SM_input", StateIn, queue_size=1)
-
     docking_execution()
-
-    # dx = waypoints[-2,0] - pix_bot_center.position.x
-    # dy = waypoints[-2,1] - pix_bot_center.position.y
-    # target_distance = math.sqrt(dx*dx + dy*dy)
-    # lookahead_theta = math.atan2((dy),(dx))
-
-    # if(target_distance < 0.1):
-    #     print("Already Close to Goal")
-    #     state = "finished"
-    # else:
-    #     if abs(lookahead_theta *180/pi) > 300:
-    #         print("Angle too Large")
-    #         state = "finished"
-    #         exit(0)
-    #     else:
-    #         print("Moving to 1st Waypoint")
-    #         goals = waypoints[0] + 0
-    #         dxs = goals[0] - pix_bot_center.position.x
-    #         dys = goals[1] - pix_bot_center.position.y
-    #         target_distances = math.sqrt(dxs*dxs + dys*dys)
-    #         diff_angles = abs(goals[2] - pix_bot_theta)*180/np.pi
-    #         if target_distances > 1 or diff_angles > 50:
-    #             print("Very Far From Initial Estimate, Overriding Limits")
 
     
