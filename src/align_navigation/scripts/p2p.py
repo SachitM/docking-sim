@@ -135,7 +135,7 @@ def move_to_goal(wp_array):
             last_goal = True
 
 if __name__ == '__main__':
-    rospy.init_node('undocking_client_py')
+    rospy.init_node('p2p_py')
     location_target = 12
 
     pix_bot_center = Pose()
@@ -149,7 +149,10 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         if(location_target != -1 and enable_p2p == True):
             #From location_target read waypoints.npy
-            waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,30,np.pi/2]])
+            # waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,35,np.pi/2]])
+            waypoints = np.array([[0,0,0],[6, 0, 0]])
+            # waypoints = np.array([[11,0,0]])
+
             try: 
                 move_to_goal(waypoints)
                 print("Target Reached")

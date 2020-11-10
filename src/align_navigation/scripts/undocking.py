@@ -143,13 +143,21 @@ if __name__ == '__main__':
                    PoseArray,
                    waypointCallback)
     rospy.Subscriber("SM_output", StateOut, StateMachineCb)
-    waypoints[0,0] = 32.5
-    waypoints[0,1] = 35
-    waypoints[0,2] = math.pi/2
+    waypoints[0,0] = 12
+    waypoints[0,1] = 0
+    waypoints[0,2] = 0
 
-    waypoints[1,0] = 32.5
-    waypoints[1,1] = 38.13
-    waypoints[1,2] = math.pi/2
+    waypoints[1,0] = 14
+    waypoints[1,1] = 0
+    waypoints[1,2] = 0
+
+    # waypoints[0,0] = 32.5
+    # waypoints[0,1] = 42
+    # waypoints[0,2] = math.pi/2
+
+    # waypoints[1,0] = 32.5
+    # waypoints[1,1] = 43
+    # waypoints[1,2] = math.pi/2
 
     pix_bot_center = Pose()
     pix_bot_velocity = Twist()

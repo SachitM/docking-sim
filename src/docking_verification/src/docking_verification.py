@@ -113,7 +113,7 @@ class DockingVerification():
 
     def state_listener(self, state):
         """Listen to chassis state and update own state."""
-        if state.CurrState == StateOut.State_D_Approach:
+        if state.CurrState == StateOut.State_Verify:
             self.docking_state = True
         else:
             self.docking_state = False

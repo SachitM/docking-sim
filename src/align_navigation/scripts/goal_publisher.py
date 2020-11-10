@@ -208,8 +208,8 @@ def docking_execution():
         if EnableApproach:
             last_goal = False
             go_to_goal(waypoints[0])
-            go_to_goal(waypoints[1])
             last_goal = True
+            go_to_goal(waypoints[1])
             OFFSET = 0.03
             pursuitToWaypoint(waypoints[-2],0)
             waypoints[-1, 0] += OFFSET * np.cos(waypoints[-1, 2]) 
