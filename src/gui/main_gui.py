@@ -89,22 +89,28 @@ class WidgetGallery(QDialog):
         radioButton1 = QRadioButton("Pick up pod given pod ID")
         radioButton2 = QRadioButton("Drop off pod at drop location")
         radioButton3 = QRadioButton("Unlock the pod from the chassis")
+        radioButton4 = QRadioButton("Locking successful")
+        radioButton5 = QRadioButton("Approach Navigation")
         radioButton1.clicked.connect(self.podpickup)
         radioButton2.clicked.connect(self.poddropoff)
         radioButton3.clicked.connect(self.podunlock)
+        radioButton4.clicked.connect(self.lockingsuccess)
+        radioButton5.clicked.connect(self.approachnavigation)
         radioButton1.setChecked(True)
 
         layout = QVBoxLayout()
         layout.addWidget(radioButton1)
         layout.addWidget(radioButton2)
         layout.addWidget(radioButton3)
+        layout.addWidget(radioButton4)
+        layout.addWidget(radioButton5)
         layout.addStretch(1)
         self.topLeftGroupBox.setLayout(layout)    
 
     def createTopRightGroupBox(self):
         self.topRightGroupBox = QGroupBox("Provide pod information")
 
-        sendPodID = QPushButton("Send the pod ID")
+        sendPodID = QPushButton("Send!")
         sendPodID.setDefault(True)
         sendPodID.clicked.connect(self.sendtextdata)
 
@@ -129,6 +135,15 @@ class WidgetGallery(QDialog):
     def podunlock(self):
         self.cmd_pub.publish(2)
         self.textEdit.setDisabled(True)
+
+    def lockingsuccess(self):
+        self.cmd_pub.publish(3)
+        self.textEdit.setDisabled(True)
+
+    def approachnavigation(self):
+        self.cmd_pub.publish(4)
+        self.textEdit.setDisabled(False)
+        self.textEdit.setPlainText("(replace with pod ID)")
 
     def sendtextdata(self):
         text = self.textEdit.toPlainText()
