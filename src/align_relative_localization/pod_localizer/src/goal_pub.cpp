@@ -11,7 +11,7 @@ goal_publisher::goal_publisher(ros::NodeHandle *nodeH)
 
 	this->laser_sub = node->subscribe("/scan", 1, &goal_publisher::laser_data_cb, this);
 	this->goal_pub = node->advertise<geometry_msgs::PoseStamped>("/pod_predicted_laser", 1);
-
+	this->prior_sub = node->subscribe("/pod_predicted_tag", 1, &goal_publisher::prior_cb, this);
 	if (ros::param::has("/align/lidar_offset")) 
 	{
 		ros::param::get("/align/lidar_offset", this->lidar_offset);
@@ -64,10 +64,60 @@ void goal_publisher::laser_data_cb(const sensor_msgs::LaserScanConstPtr& scan)
 	this->laser_data = *scan;
 }
 
+void goal_publisher::prior_cb(const geometry_msgs::PoseStamped& pose_msg)
+{
+	if(!this->prior_set) {
+		this->prior_set = true;
+		this->transformed_prior = false;
+		this->prior_pose = pose_msg;
+		this->pod_prior_lidar_frame = {pose_msg.pose.position.x, pose_msg.pose.position.y};
+		ROS_INFO("[GOAL_PUB] Prior Received");
+	}
+	
+}
+
+bool goal_publisher::inCircle(float_t x, float_t y) {
+
+	return ((pow(x-pod_prior_lidar_frame.first,2) + pow(y-pod_prior_lidar_frame.second,2)) <= pow(CIRCLE_RADIUS, 2));
+
+}
+
 goal_pub_e goal_publisher::get_legs(void)
 {
 	goal_pub_e status = GOAL_PUB_SUCCESS;
+	int left_limit = 0;
+	if(this->prior_set && !this->transformed_prior) {
 
+		try
+		{
+			this->prior_pose.header.frame_id = "/map";
+			this->listener.waitForTransform("/hokuyo", "/map", ros::Time(0), ros::Duration(1.0));
+			this->listener.transformPose("/hokuyo", this->prior_pose, this->prior_pose);
+			this->pod_prior_lidar_frame = {this->prior_pose.pose.position.x, this->prior_pose.pose.position.y};
+			ROS_INFO("[GOAL_PUB] PRIOR (%f, %f)",this->pod_prior_lidar_frame.first, this->pod_prior_lidar_frame.second );
+			this->transformed_prior = true;
+		}
+
+		catch (tf::TransformException &ex)
+		{
+			ROS_ERROR("%s",ex.what());
+			return status;
+		}
+
+	}
+	// float_t angle_left = 0;
+	// int angle_left_index = 0;
+	if(this->prior_set && this->transformed_prior) {
+		ROS_INFO("[GOAL_PUB] PRIOR (%f, %f)",this->pod_prior_lidar_frame.first, this->pod_prior_lidar_frame.second );
+		/*Not Using Angle Limiting as circle check is sufficiently fast*/
+		// std::pair<float_t, float_t> left_point = {this->pod_prior_lidar_frame.first, this->pod_prior_lidar_frame.second -1};
+		// // std::pair<float_t, float_t> right_point = {this->pod_prior_lidar_frame.first, this->pod_prior_lidar_frame.second + 1};
+		// angle_left = atan2(left_point.first, left_point.second);
+		// angle_left = M_PI - angle_left;
+		// angle_left = (angle_left - laser_data.angle_min )/laser_data.angle_increment;
+		// angle_left_index = std::min(0, int(angle_left));
+		
+	}
 	int32_t i = 0;
 	float_t angle = 0.0;
 	int32_t previous_detection = 0;
@@ -76,13 +126,22 @@ goal_pub_e goal_publisher::get_legs(void)
 	int32_t same_leg_count = 0;
 	int8_t no_of_leg_detected = 0;
 
-	//First 40 samples on each side are ignored as the error will not be very high (10 degrees)
-
+	//First SAMPLES_SKIPPED samples on each side are ignored as the error will not be very high (if 40 then 10 degrees)
+	int k = 0;
 	for(i = SAMPLES_SKIPPED; i < (NO_OF_SAMPLES_LASER-SAMPLES_SKIPPED); i++)
 	{
 		// ROS_INFO("MAX RG = %f", this->laser_data.range_max );
 		if((this->laser_data.ranges[i] < MAX_RANGE_ALLOWED) && (this->laser_data.ranges[i] > this->laser_data.range_min))
 		{
+			if(this->prior_set && transformed_prior) {
+				angle = laser_data.angle_min + i*laser_data.angle_increment;
+				if(!inCircle((this->laser_data.ranges[i])* cos(angle), (this->laser_data.ranges[i])* sin(angle))) {
+					k++;
+					continue;
+				}
+			}
+
+
 			if(i != previous_detection+1)
 			{
 				leg_indexes[no_of_leg_detected] = i;
@@ -103,6 +162,7 @@ goal_pub_e goal_publisher::get_legs(void)
 
 		}
 	}
+	ROS_INFO("[GOAL_PUB] Points Removed (%d)",k);
 
 	leg_indexes[no_of_leg_detected-1] = leg_indexes[no_of_leg_detected-1] + same_leg_count /2;
 
@@ -124,6 +184,9 @@ goal_pub_e goal_publisher::get_legs(void)
 	}
 	else if(no_of_leg_detected < 3)
 	{
+		//Ideally this should be done only when legs <2 not <=2, but this provides more stability
+		this->prior_set = false;
+		this->transformed_prior = false;
 		ROS_ERROR(" %d legs detected. ", no_of_leg_detected);
 		if(no_of_leg_detected == 2)
 		{	
@@ -202,7 +265,9 @@ goal_pub_e goal_publisher::compute_goal_pose(void)
 		this->goal_pose.pose.position.x = (this->leg_points[0].x + this->leg_points[1].x + this->leg_points[2].x + this->leg_points[3].x) / 4.0;
 		this->goal_pose.pose.position.y = (this->leg_points[0].y + this->leg_points[1].y + this->leg_points[2].y + this->leg_points[3].y) / 4.0;
 
-// HARDCODING LiDar Offset TODO Move to param
+		//Update the prior based on last measurment
+		this->pod_prior_lidar_frame = {this->goal_pose.pose.position.x, this->goal_pose.pose.position.y};
+		// HARDCODING LiDar Offset TODO Move to param
 		this->goal_pose.pose.position.x += this->lidar_offset;
 		this->goal_pose.pose.position.y += -0.01;
 		ROS_DEBUG("Before TF X:%f, Y:%f, Theta %lf", this->goal_pose.pose.position.x, this->goal_pose.pose.position.y, angle * 180 / M_PI);

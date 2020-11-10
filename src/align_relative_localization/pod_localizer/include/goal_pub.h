@@ -11,7 +11,8 @@
 #define LENGTH_SHORT_SIDE			0.9
 #define ERROR_THRESHOLD_COMPARE		0.05
 #define MAX_RANGE_ALLOWED			8
-#define SAMPLES_SKIPPED				0 //Corresponds to 10degrees
+#define SAMPLES_SKIPPED				0 //40 Corresponds to 10degrees
+#define CIRCLE_RADIUS				1.5
 
 //TODO Move to param server
 #define BASE_LINK_OFFSET_X			1.1 //+0.95
@@ -30,11 +31,14 @@ class goal_publisher
 	private:
 
 		void laser_data_cb(const sensor_msgs::LaserScanConstPtr& scan);
+		void prior_cb(const geometry_msgs::PoseStamped& pose_msg);
+		bool inCircle(float_t x, float_t y);
 		goal_pub_e get_legs();
 		goal_pub_e compute_goal_pose();
 
 		ros::NodeHandle *node;
 		ros::Subscriber laser_sub;
+		ros::Subscriber prior_sub;
 		ros::Publisher goal_pub;
 
 		sensor_msgs::LaserScan laser_data;
@@ -47,7 +51,10 @@ class goal_publisher
 		void extrapolate_the_fourth_point(void);
 
 		float_t lidar_offset;
-
+		bool prior_set = false;
+		bool transformed_prior = false;
+		geometry_msgs::PoseStamped prior_pose;
+		std::pair<float_t,float_t> pod_prior_lidar_frame;
 	public:
 
 		goal_pub_e get_goal();
