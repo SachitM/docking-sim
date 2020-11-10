@@ -52,6 +52,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
 # ROS related libraries
 import rospy
 from std_msgs.msg import Float64, Int8
+from state_machine.msg import *
 
 class WidgetGallery(QDialog):
     def __init__(self, parent=None):
@@ -78,7 +79,9 @@ class WidgetGallery(QDialog):
         self.changeStyle('Fusion')
 
         # ROS topics to publish
-        self.cmd_pub = rospy.Publisher('/userActionState', Int8, queue_size=1)
+        self.cmd_pub = rospy.Publisher('SM_input', StateIn, queue_size=1)
+        self.StateUpdate = StateIn()
+        self.which_callback = -1
 
     def changeStyle(self, styleName):
         QApplication.setStyle(QStyleFactory.create(styleName))
@@ -123,25 +126,25 @@ class WidgetGallery(QDialog):
         self.topRightGroupBox.setLayout(layout)
 
     def podpickup(self):
-        self.cmd_pub.publish(0)
+        self.which_callback = 0
         self.textEdit.setDisabled(False)
         self.textEdit.setPlainText("(replace with pod ID)")
 
     def poddropoff(self):
-        self.cmd_pub.publish(1)
+        self.which_callback = 1
         self.textEdit.setDisabled(False)
         self.textEdit.setPlainText("(replace with drop off location)")
     
     def podunlock(self):
-        self.cmd_pub.publish(2)
+        self.which_callback = 2
         self.textEdit.setDisabled(True)
 
     def lockingsuccess(self):
-        self.cmd_pub.publish(3)
+        self.which_callback = 3
         self.textEdit.setDisabled(True)
 
     def approachnavigation(self):
-        self.cmd_pub.publish(4)
+        self.which_callback = 4
         self.textEdit.setDisabled(False)
         self.textEdit.setPlainText("(replace with pod ID)")
 
@@ -154,7 +157,38 @@ class WidgetGallery(QDialog):
             print("Invalid input!")
         else:
             # publish this to the pod server or state machine
-            pass
+            if self.which_callback == 0:
+                #pickup
+                self.StateUpdate.StateTransitionCond = int(text)
+                self.StateUpdate.TransState = 0
+                self.StateUpdate.OperationMode = 1
+
+            elif self.which_callback == 1:
+                #dropoff
+                self.StateUpdate.StateTransitionCond = int(text)
+                self.StateUpdate.TransState = 0
+                self.StateUpdate.OperationMode = 2
+
+            elif self.which_callback == 2:
+                #podunlock
+                self.StateUpdate.StateTransitionCond = 0
+                self.StateUpdate.TransState = 0
+                self.StateUpdate.OperationMode = 2
+
+            elif self.which_callback == 3:
+                #podlocksuccess
+                self.StateUpdate.StateTransitionCond = 1
+                self.StateUpdate.TransState = 0
+                self.StateUpdate.OperationMode = 0
+
+            elif self.which_callback == 4:
+                #approach
+                self.StateUpdate.StateTransitionCond = int(text)
+                self.StateUpdate.TransState = 0
+                self.StateUpdate.OperationMode = 0
+                
+            self.cmd_pub.publish(self.StateUpdate)
+            
 
 if __name__ == '__main__':
 
