@@ -23,7 +23,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/uma/Desktop/MRSD/Capstone/docking-sim/src/align_gazebo/models/Pod/meshes/pod_f.dae</uri>
+            <uri>/home/sanil/docking-sim/src/align_gazebo/models/Pod/meshes/pod_f.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -50,7 +50,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/uma/Desktop/MRSD/Capstone/docking-sim/src/align_gazebo/models/Pod/meshes/pod_f.dae</uri>
+            <uri>/home/sanil/docking-sim/src/align_gazebo/models/Pod/meshes/pod_f.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>

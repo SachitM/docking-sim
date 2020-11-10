@@ -46,7 +46,6 @@ class Chassis {
                     return;
                 }
             }
-            ROS_INFO( "Nearest Entity : %f", min_las);
 
             obstacle_flag = false;
         }
@@ -68,11 +67,13 @@ class Chassis {
             {
                 double less_width = width / 2.0;
                 update_ranges(less_width);
+                ROS_INFO( "Beginning Approach - Constraining 2D obstacle detection width");
                 is_approach = true;
             }
             else if (in_state->CurrState != state_machine::StateOut::State_D_Approach && is_approach == true)
             {
                 update_ranges(width);
+                ROS_INFO( "Using original 2D obstacle detection width.");
                 is_approach = false;
             }
             else {
