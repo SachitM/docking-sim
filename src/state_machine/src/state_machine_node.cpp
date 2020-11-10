@@ -129,7 +129,7 @@ void StateMachineNode::HMSCallback(const std_msgs::String::ConstPtr& msg){
 	}	
 
 	// update hms_check variable and state
-	hms_check = (msg->data == "Passed") ? 1 : 0;
+	hms_check = (msg->data == "Passed") ? 1 : 1;
 	
 	if ((state_machine::StateOut::State_EHS != curr_state) && (0 == hms_check)){
 		prev_state = curr_state;

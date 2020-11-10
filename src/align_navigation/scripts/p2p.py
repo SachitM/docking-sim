@@ -142,9 +142,9 @@ if __name__ == '__main__':
     pix_bot_theta = 0
 
     rospy.Subscriber(ODOM_INF, Odometry, vehicleStateCallback)
+    rospy.wait_for_message(ODOM_INF, Odometry,5)
     #rospy.Subscriber("/state", Int8, stateCallback)
     rospy.Subscriber("SM_output", StateOut, stateCallback)
-    rospy.wait_for_message(ODOM_INF, Odometry,5)
     sm_pub = rospy.Publisher("SM_input", StateIn, queue_size=1)
     while not rospy.is_shutdown():
         if(location_target != -1 and enable_p2p == True):

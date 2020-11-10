@@ -15,6 +15,7 @@ from utils import *
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray, Pose, Twist
 from std_msgs.msg import Float64
+from state_machine.msg import *
 
 import tf
 pi = math.pi
