@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<package>
+  <name>align_navigation</name>
+  <version>0.0.0</version>
+  <description>The pixbot package</description>
+  <maintainer email="sachit@cmu.edu">Sachit Mahajan</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>move_base</build_depend>
+  <build_depend>nav_core</build_depend>
+  <build_depend>pluginlib</build_depend>
+
+  <build_depend>angles</build_depend>
+  <build_depend>tf2_geometry_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>move_base</build_depend>
+  <build_depend>costmap_2d</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>navfn</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>angles</run_depend>
+  <run_depend>tf2_geometry_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>costmap_2d</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>nav_msgs</run_depend>
+  <run_depend>navfn</run_depend>
+  <run_depend>tf2_ros</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>move_base</run_depend>
+  <run_depend>nav_core</run_depend>
+  <export>
+	<nav_core plugin="${prefix}/dubins_planner_plugin.xml" />
+  <nav_core plugin="${prefix}/reeds_shepp_planner_plugin.xml" />
+  </export>
+</package>

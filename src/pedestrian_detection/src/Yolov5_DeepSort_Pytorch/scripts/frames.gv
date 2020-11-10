@@ -1,0 +1,25 @@
+digraph G {
+"base_link" -> "velodyne_base_link"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 2092.910 sec old)\nBuffer length: 0.000 sec\n"];
+"odom" -> "base_link"[label="Broadcaster: /tf_broadcaster\nAverage rate: 50.214 Hz\nMost recent transform: 2092.872 ( 0.038 sec old)\nBuffer length: 4.680 sec\n"];
+"velodyne_base_link" -> "velodyne"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 2092.910 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "chassis"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 2092.910 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "lift_link"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 2092.910 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "camera_link"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 2092.910 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "hokuyo"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 2092.910 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "imu_link"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 2092.910 sec old)\nBuffer length: 0.000 sec\n"];
+"left_front_axle_carrier" -> "left_front_wheel"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"left_steering_link" -> "left_front_axle_carrier"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"chassis" -> "left_steering_link"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"left_rear_axle_carrier" -> "left_rear_wheel"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"chassis" -> "left_rear_axle_carrier"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"right_front_axle_carrier" -> "right_front_wheel"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"right_steering_link" -> "right_front_axle_carrier"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"chassis" -> "right_steering_link"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"right_rear_axle_carrier" -> "right_rear_wheel"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"chassis" -> "right_rear_axle_carrier"[label="Broadcaster: /align/vehicle_state_publisher\nAverage rate: 20.069 Hz\nMost recent transform: 2092.867 ( 0.043 sec old)\nBuffer length: 4.634 sec\n"];
+"map" -> "odom"[label="Broadcaster: /map_broadcaster\nAverage rate: 10.200 Hz\nMost recent transform: 2092.968 ( -0.058 sec old)\nBuffer length: 4.608 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 2092.910"[ shape=plaintext ] ;
+ }->"map";
+}

@@ -1,0 +1,16 @@
+[35m[1mScanning dependencies of target groundtruth_publisher_node[0m
+[35m[1mScanning dependencies of target waypoint_publisher_node[0m
+[35m[1mScanning dependencies of target viz_node[0m
+[35m[1mScanning dependencies of target identify_phz_node[0m
+[ 12%] [32mBuilding CXX object CMakeFiles/groundtruth_publisher_node.dir/src/groundtruth_publisher.cpp.o[0m
+[ 25%] [32mBuilding CXX object CMakeFiles/viz_node.dir/src/viz.cpp.o[0m
+[ 37%] [32mBuilding CXX object CMakeFiles/waypoint_publisher_node.dir/src/waypoint_publisher.cpp.o[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/identify_phz_node.dir/src/identify_phz.cpp.o[0m
+[ 62%] [32m[1mLinking CXX executable /home/sanil/docking-sim/devel/.private/phz/lib/phz/groundtruth_publisher_node[0m
+[ 75%] [32m[1mLinking CXX executable /home/sanil/docking-sim/devel/.private/phz/lib/phz/identify_phz_node[0m
+[ 75%] Built target groundtruth_publisher_node
+[ 75%] Built target identify_phz_node
+[ 87%] [32m[1mLinking CXX executable /home/sanil/docking-sim/devel/.private/phz/lib/phz/waypoint_publisher_node[0m
+[ 87%] Built target waypoint_publisher_node
+[100%] [32m[1mLinking CXX executable /home/sanil/docking-sim/devel/.private/phz/lib/phz/viz_node[0m
+[100%] Built target viz_node

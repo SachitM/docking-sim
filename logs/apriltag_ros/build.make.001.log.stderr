@@ -1,0 +1,4 @@
+make[2]: *** No rule to make target '/usr/lib/x86_64-linux-gnu/libopencv_objdetect.so.3.2.0', needed by '/home/sanil/docking-sim/devel/.private/apriltag_ros/lib/libapriltag_ros_common.so'.  Stop.
+make[1]: *** [CMakeFiles/apriltag_ros_common.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+make: *** [all] Error 2

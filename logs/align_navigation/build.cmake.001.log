@@ -1,0 +1,37 @@
+Not searching for unused variables given on the command line.
+[36m--[0m Using CATKIN_DEVEL_PREFIX: /home/sanil/docking-sim/devel/.private/align_navigation
+[36m--[0m Using CMAKE_PREFIX_PATH: /home/sanil/docking-sim/devel;/opt/ros/melodic
+[36m--[0m This workspace overlays: /home/sanil/docking-sim/devel;/opt/ros/melodic
+[36m--[0m Found PythonInterp: /usr/bin/python2 (found suitable version "2.7.17", minimum required is "2")
+[36m--[0m Using PYTHON_EXECUTABLE: /usr/bin/python2
+[36m--[0m Using Debian Python package layout
+[36m--[0m Using empy: /usr/bin/empy
+[36m--[0m Using CATKIN_ENABLE_TESTING: ON
+[36m--[0m Call enable_testing()
+[36m--[0m Using CATKIN_TEST_RESULTS_DIR: /home/sanil/docking-sim/build/align_navigation/test_results
+[36m--[0m Found gtest sources under '/usr/src/googletest': gtests will be built
+[36m--[0m Found gmock sources under '/usr/src/googletest': gmock will be built
+[36m--[0m Found PythonInterp: /usr/bin/python2 (found version "2.7.17")
+[36m--[0m Using Python nosetests: /usr/bin/nosetests-2.7
+[36m--[0m catkin 0.7.28
+[36m--[0m BUILD_SHARED_LIBS is on
+[36m--[0m Could NOT find nav_core (missing: nav_core_DIR)
+[36m--[0m Could not find the required component 'nav_core'. The following CMake error indicates that you either need to install the package with the same name or change your environment so that it can be found.
+[31m[1mCMake Error[0m at /opt/ros/melodic/share/catkin/cmake/catkinConfig.cmake:83 (find_package):
+  Could not find a package configuration file provided by "nav_core" with any
+  of the following names:
+
+    nav_coreConfig.cmake
+    nav_core-config.cmake
+
+  Add the installation prefix of "nav_core" to CMAKE_PREFIX_PATH or set
+  "nav_core_DIR" to a directory containing one of the above files.  If
+  "nav_core" provides a separate development package or SDK, be sure it has
+  been installed.
+[36mCall Stack (most recent call first):[0m
+  CMakeLists.txt:4 (find_package)
+
+
+[36m--[0m Configuring incomplete, errors occurred!
+See also "/home/sanil/docking-sim/build/align_navigation/CMakeFiles/CMakeOutput.log".
+See also "/home/sanil/docking-sim/build/align_navigation/CMakeFiles/CMakeError.log".

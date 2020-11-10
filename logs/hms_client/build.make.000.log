@@ -1,0 +1,26 @@
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target _hms_client_generate_messages_check_deps_hms_msg
+[  0%] Built target rosgraph_msgs_generate_messages_nodejs
+[  0%] Built target _hms_client_generate_messages_check_deps_ping_pong
+[  0%] Built target rosgraph_msgs_generate_messages_py
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target rosgraph_msgs_generate_messages_lisp
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target rosgraph_msgs_generate_messages_eus
+[  0%] Built target roscpp_generate_messages_nodejs
+[  0%] Built target roscpp_generate_messages_lisp
+[  0%] Built target roscpp_generate_messages_eus
+[  0%] Built target roscpp_generate_messages_cpp
+[  0%] Built target roscpp_generate_messages_py
+[  0%] Built target rosgraph_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_lisp
+[ 26%] Built target hms_client_generate_messages_py
+[ 40%] Built target hms_client_generate_messages_cpp
+[ 60%] Built target hms_client_generate_messages_eus
+[ 73%] Built target hms_client_generate_messages_nodejs
+[ 86%] Built target hms_client_generate_messages_lisp
+[ 93%] [32mBuilding CXX object CMakeFiles/hms_client.dir/src/hms_client.cpp.o[0m
+[ 93%] Built target hms_client_generate_messages
+[100%] [32m[1mLinking CXX executable /home/sanil/docking-sim/devel/.private/hms_client/lib/hms_client/hms_client[0m
+[100%] Built target hms_client
