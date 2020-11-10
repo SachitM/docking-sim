@@ -26,8 +26,8 @@ target_waypoint = 0
 def dock_callback(msg):
   global dock_error, state
   dock_error = msg.data
-#   if state == "verifying_pose":
-#     print(dock_error)
+  if state == "verifying_pose":
+    print(dock_error)
 
 def waypointCallback(msg):
     global waypoints, last_goal
@@ -71,11 +71,11 @@ def pursuitToWaypoint(waypoint, i):
   print waypoint
   Kp = 0.9
   Kd = 0.4
-  waypoint_tol_ = [0.08,0.05]
-  max_acc_ = [ 0.7, 0.3]
-  max_steering_angle_ = [0.3,0.1]
-  MAX_VEL_ = [0.5, 0.2]
-  MIN_VEL_ = [0.2, 0.05]
+  waypoint_tol_ = [0.08, 0.08,0.05]
+  max_acc_ = [ 0.6, 0.3, 0.2]
+  max_steering_angle_ = [0.4, 0.2,0.12]
+  MAX_VEL_ = [0.5, 0.4, 0.2]
+  MIN_VEL_ = [0.2, 0.2, 0.05]
   MAX_VEL = MAX_VEL_[i]
   MIN_VEL = MIN_VEL_[i]
   max_acc = max_acc_[i]
@@ -132,7 +132,7 @@ def pursuitToWaypoint(waypoint, i):
     cmd_vel_pub.publish(cmd)
     rospy.wait_for_message(ODOM_INF, Odometry, 5)
 
-  if i == 1 :
+  if i == 2 :
     cmd = AckermannDriveStamped() 
     cmd.drive.acceleration = 0.0
     cmd.drive.speed = 0
@@ -195,13 +195,14 @@ def docking_execution():
     global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub
     last_goal = False
     go_to_goal(waypoints[0])
-    go_to_goal(waypoints[1])
     last_goal = True
-    OFFSET = 0.03
-    pursuitToWaypoint(waypoints[-2],0)
+    go_to_goal(waypoints[1])
+    pursuitToWaypoint(waypoints[-3],0)
+    pursuitToWaypoint(waypoints[-2],1)
+    OFFSET = 0.04
     waypoints[-1, 0] += OFFSET * np.cos(waypoints[-1, 2]) 
     waypoints[-1, 1] += OFFSET * np.sin(waypoints[-1, 2]) 
-    pursuitToWaypoint(waypoints[-1],1)
+    pursuitToWaypoint(waypoints[-1],2)
 
     state = "finished"
     print(state)
@@ -243,25 +244,13 @@ def docking_execution():
 
 if __name__ == '__main__':
 
-    rospy.init_node('movebase_client_py')
+    rospy.init_node('Approach_Navigation_py')
     waypoints = np.zeros((num_waypoints, 3))
     rate = rospy.Rate(0.25)
     rospy.Subscriber("/waypoints_goal",
                    PoseArray,
                    waypointCallback)
     rospy.wait_for_message("/waypoints_goal", PoseArray)
-
-    # waypoints[0,0] = 32.5
-    # waypoints[0,1] = 35
-    # waypoints[0,2] = math.pi/2
-
-    # waypoints[1,0] = 32.5
-    # waypoints[1,1] = 39
-    # waypoints[1,2] = math.pi/2
-
-    # waypoints[2,0] = 32.5
-    # waypoints[2,1] = 34
-    # waypoints[2,2] = math.pi/2
 
     pix_bot_center = Pose()
     pix_bot_velocity = Twist()

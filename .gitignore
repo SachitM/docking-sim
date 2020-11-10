@@ -13,3 +13,11 @@ OgreXMLConverter.log
 .catkin_workspace
 
 vehicle_model/share/vehicle_model/meshes/chassis.stl
+
+vehicle_model/share/.vscode/
+
+vehicle_model/.vscode/c_cpp_properties.json
+
+vehicle_model/.vscode/settings.json
+
+src/align_navigation/scripts/utils.pyc
