@@ -1,0 +1,7 @@
+Symlinking /home/sanil/docking-sim/devel/lib/pkgconfig/phz.pc
+Symlinking /home/sanil/docking-sim/devel/lib/phz/viz_node
+Symlinking /home/sanil/docking-sim/devel/lib/phz/groundtruth_publisher_node
+Symlinking /home/sanil/docking-sim/devel/lib/phz/identify_phz_node
+Symlinking /home/sanil/docking-sim/devel/lib/phz/waypoint_publisher_node
+Symlinking /home/sanil/docking-sim/devel/share/phz/cmake/phzConfig-version.cmake
+Symlinking /home/sanil/docking-sim/devel/share/phz/cmake/phzConfig.cmake

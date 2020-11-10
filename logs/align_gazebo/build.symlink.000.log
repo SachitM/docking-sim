@@ -1,0 +1,4 @@
+Symlinking /home/sanil/docking-sim/devel/lib/pkgconfig/align_gazebo.pc
+Symlinking /home/sanil/docking-sim/devel/lib/align_gazebo/odom_transformation_node
+Symlinking /home/sanil/docking-sim/devel/share/align_gazebo/cmake/align_gazeboConfig.cmake
+Symlinking /home/sanil/docking-sim/devel/share/align_gazebo/cmake/align_gazeboConfig-version.cmake

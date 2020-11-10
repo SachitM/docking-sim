@@ -1,0 +1,29 @@
+[  0%] Built target sensor_msgs_generate_messages_cpp
+[  0%] Built target geometry_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target _apriltag_ros_generate_messages_check_deps_AprilTagDetection
+[  0%] Built target geometry_msgs_generate_messages_py
+[  0%] Built target sensor_msgs_generate_messages_py
+[  0%] Built target _apriltag_ros_generate_messages_check_deps_AprilTagDetectionArray
+[  0%] Built target _apriltag_ros_generate_messages_check_deps_AnalyzeSingleImage
+[  0%] Built target sensor_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_lisp
+[  0%] Built target std_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_eus
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target sensor_msgs_generate_messages_eus
+[  0%] Built target geometry_msgs_generate_messages_nodejs
+[  0%] Built target sensor_msgs_generate_messages_nodejs
+[ 10%] Built target apriltag_ros_generate_messages_cpp
+[ 10%] Built target std_msgs_generate_messages_nodejs
+[ 26%] Built target apriltag_ros_generate_messages_py
+[ 40%] Built target apriltag_ros_generate_messages_eus
+[ 50%] Built target apriltag_ros_generate_messages_lisp
+make[2]: *** No rule to make target '/usr/lib/x86_64-linux-gnu/libopencv_objdetect.so.3.2.0', needed by '/home/sanil/docking-sim/devel/.private/apriltag_ros/lib/libapriltag_ros_common.so'.  Stop.
+make[1]: *** [CMakeFiles/apriltag_ros_common.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+CMakeFiles/Makefile2:2659: recipe for target 'CMakeFiles/apriltag_ros_common.dir/all' failed
+[ 60%] Built target apriltag_ros_generate_messages_nodejs
+Makefile:140: recipe for target 'all' failed
+make: *** [all] Error 2

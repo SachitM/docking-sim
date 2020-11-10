@@ -1,0 +1,4 @@
+[ 25%] Built target groundtruth_publisher_node
+[ 50%] Built target waypoint_publisher_node
+[ 75%] Built target viz_node
+[100%] Built target identify_phz_node

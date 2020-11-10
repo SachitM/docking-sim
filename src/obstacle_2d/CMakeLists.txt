@@ -5,12 +5,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   hms_client
+  state_machine
 )
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES obstacle_2d
-#  CATKIN_DEPENDS roscpp std_msgs
+#  CATKIN_DEPENDS roscpp std_msgs state_machine
 #  DEPENDS system_lib
 )
 

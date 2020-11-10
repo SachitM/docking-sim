@@ -1,0 +1,24 @@
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target rosgraph_msgs_generate_messages_nodejs
+[  0%] Built target rosgraph_msgs_generate_messages_py
+[  0%] Built target _hms_client_generate_messages_check_deps_hms_msg
+[  0%] Built target _hms_client_generate_messages_check_deps_ping_pong
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target rosgraph_msgs_generate_messages_lisp
+[  0%] Built target rosgraph_msgs_generate_messages_eus
+[  0%] Built target roscpp_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target roscpp_generate_messages_eus
+[  0%] Built target roscpp_generate_messages_lisp
+[  0%] Built target roscpp_generate_messages_cpp
+[  0%] Built target roscpp_generate_messages_py
+[  0%] Built target rosgraph_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_lisp
+[  0%] Built target std_msgs_generate_messages_nodejs
+[ 26%] Built target hms_client_generate_messages_py
+[ 46%] Built target hms_client_generate_messages_eus
+[ 60%] Built target hms_client_generate_messages_lisp
+[ 73%] Built target hms_client_generate_messages_nodejs
+[ 86%] Built target hms_client_generate_messages_cpp
+[ 86%] Built target hms_client_generate_messages
+[100%] Built target hms_client
