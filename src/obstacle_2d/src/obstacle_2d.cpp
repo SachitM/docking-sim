@@ -100,12 +100,12 @@ class Chassis {
         bool is_approach = false;
         double range_array[LASER_STEPS] = {0};
 
-        double width = 1.85;    // changed since 1.355 wasn not working correctly
-        double vel = 4;
-        double acc = 3; // assuming acc == deceleration
+        double width = 1.5;    // changed since 1.355 wasn not working correctly
+        double vel = 3;
+        double acc = 2; // assuming acc == deceleration
 
         // distances are in meters
-        double total_distance = 5;      // to be overwritten in constructor
+        double total_distance = 3;      // to be overwritten in constructor
         double lidar_distance = 0.1;     // from the front
         double safe_distance = 0.3;
 

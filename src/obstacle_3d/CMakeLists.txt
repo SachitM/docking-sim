@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  autoware_msgs
+  #autoware_msgs
   tf
   hms_client
   state_machine
