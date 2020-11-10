@@ -18,6 +18,12 @@ from std_msgs.msg import Float64
 from state_machine.msg import *
 
 import tf
+
+Path = 'src/align_navigation/scripts/PodLocationServer/'
+import sys
+sys.path.insert(1, Path)
+from PodServer import *
+
 pi = math.pi
 
 waypoints = []
@@ -26,6 +32,7 @@ target_waypoint = 0
 
 EnableApproachUndock = False
 EnableUnlock = False
+PodId = 12
 
 def waypointCallback(msg):
     global waypoints, last_goal
@@ -111,9 +118,10 @@ def go_to_goal(goal):
         rospy.loginfo("[Undocking]: Navigation test finished.")
 
 def StateMachineCb(StateInfo):
-    global EnableApproachUndock, EnableUnlock
+    global EnableApproachUndock, EnableUnlock, PodId
     EnableApproachUndock = True if StateInfo.CurrState == StateOut.State_U_Approach else False
     EnableUnlock = True if StateInfo.CurrState == StateOut.State_Unlock else False
+    PodId = StateInfo.PodInfo
 
 def undocking_execution():
     global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub, EnableApproachUndock, EnableUnlock
@@ -143,13 +151,15 @@ if __name__ == '__main__':
                    PoseArray,
                    waypointCallback)
     rospy.Subscriber("SM_output", StateOut, StateMachineCb)
-    waypoints[0,0] = 12
-    waypoints[0,1] = 0
-    waypoints[0,2] = 0
+    # Location, WaypointsFile = GetPodLocAndWaypointsFileName(Path + 'DropoffPodLoc.json', str(PodId))
+    
+    waypoints[0,0] = 11#Location[0] - 3 * np.sin(np.deg2rad(Location[2]))
+    waypoints[0,1] = 0#Location[1] - 3 * np.cos(np.deg2rad(Location[2]))
+    waypoints[0,2] = 0#np.deg2rad(Location[2])
 
-    waypoints[1,0] = 14
-    waypoints[1,1] = 0
-    waypoints[1,2] = 0
+    waypoints[1,0] = 13#Location[0] 
+    waypoints[1,1] = 0#Location[1]
+    waypoints[1,2] = 0#np.deg2rad(Location[2])
 
     # waypoints[0,0] = 32.5
     # waypoints[0,1] = 42

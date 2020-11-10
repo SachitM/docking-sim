@@ -4,6 +4,10 @@
 # Author: Rohan Rao
 
 import rospy
+Path = 'src/align_navigation/scripts/PodLocationServer/'
+import sys
+sys.path.insert(1, Path)
+from PodServer import *
 import tf
 # Brings in the SimpleActionClient
 import actionlib
@@ -16,6 +20,7 @@ from geometry_msgs.msg import PoseArray, Pose, Twist
 from std_msgs.msg import Float64, Int8
 from angles import *
 from state_machine.msg import *
+
 
 import tf
 pi = math.pi
@@ -107,9 +112,9 @@ def is_close():
 def stateCallback(StateInfo):
     global enable_p2p, location_target
     enable_p2p = True if StateInfo.CurrState == StateOut.State_P2P else False
-    data = StateInfo.PodInfo
-    if location_target != data:
-        location_target = data
+    PodId = StateInfo.PodInfo
+    if location_target != PodId:
+        location_target = PodId
 
 def move_to_goal(wp_array):
     global enable_p2p, target_waypoint, pix_bot_center, pix_bot_theta, last_goal
@@ -149,6 +154,10 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         if(location_target != -1 and enable_p2p == True):
             #From location_target read waypoints.npy
+            '''
+            Location, WaypointsFile = GetPodLocAndWaypointsFileName(Path + 'PickupPodLoc.json', str(location_target))
+            waypoints = np.load(WaypointsFile)
+            '''
             # waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,35,np.pi/2]])
             waypoints = np.array([[0,0,0],[7, 0, 0]])
             # waypoints = np.array([[11,0,0]])
@@ -164,3 +173,4 @@ if __name__ == '__main__':
             except:
                 move_base_cancel_goal()
                 break
+    rospy.spin()

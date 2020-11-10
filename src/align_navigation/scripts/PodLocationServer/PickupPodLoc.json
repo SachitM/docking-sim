@@ -1,0 +1,4 @@
+{
+    "12": {"PodId": 12, "PodLocation": [32.5,35,90], "PodState": "ForPickup", "FileName": "Waypoints1.npy"}, 
+    "21": {"PodId": 21, "PodLocation": [32.5,35,90], "PodState": "ForPickup", "FileName": "Waypoints2.npy"}
+}

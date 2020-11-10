@@ -6,5 +6,5 @@ rate2: 40.0
 topic3: "ndt_pose"
 rate3: 1.0
 num_topics: 2
-num_nodes: 0
+num_nodes: 1
 min_rate: 0.5
