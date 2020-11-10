@@ -10,7 +10,7 @@ from sensor_msgs.msg import PointCloud2
 
 from geometry_msgs.msg import Point32
 from std_msgs.msg import Float64
-from StateMachine.msg import StateOut
+from state_machine.msg import StateOut
 
 # define constants related to the pod and chassis design
 FRONT_LIDAR_DIST_FROM_CENTER = 1.1
@@ -39,7 +39,11 @@ class DockingVerification():
         self.docking_state = False
 
         self.publisher = rospy.Publisher('dock_offset', Float64, queue_size=10)
+<<<<<<< HEAD
         self.status_sub = rospy.Subscriber('system_status', StateOut,
+=======
+        self.lidar_sub = rospy.Subscriber('SM_output', StateOut,
+>>>>>>> 48c5bdf7c265b0b8bb9323bd322a95293ab33915
                                           self.state_listener)
         self.lidar_sub = rospy.Subscriber("points_raw", PointCloud2,
                                           self.velodyne_points_callback)
@@ -113,7 +117,7 @@ class DockingVerification():
 
     def state_listener(self, state):
         """Listen to chassis state and update own state."""
-        if state.CurrState == StateOut.State_Approach:
+        if state.CurrState == StateOut.State_D_Approach:
             self.docking_state = True
         else:
             self.docking_state = False

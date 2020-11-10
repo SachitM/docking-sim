@@ -15,6 +15,7 @@ from utils import *
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray, Pose, Twist
 from std_msgs.msg import Float64
+from state_machine.msg import *
 
 import tf
 pi = math.pi
@@ -22,6 +23,9 @@ pi = math.pi
 waypoints = []
 last_goal = False
 target_waypoint = 0
+
+EnableApproachUndock = False
+EnableUnlock = False
 
 def waypointCallback(msg):
     global waypoints, last_goal
@@ -43,11 +47,22 @@ def vehicleStateCallback(msg):
     [pix_bot_center.orientation.x, pix_bot_center.orientation.y, pix_bot_center.orientation.z,
         pix_bot_center.orientation.w])[2]
 
+    pix_bot_center.position.x, pix_bot_center.position.y = adjustRearAxletoCenter(pix_bot_center.position.x, pix_bot_center.position.y, pix_bot_theta)
     # if(state == "finished"):
     #   print( msg.pose.pose.position.x, msg.pose.pose.position.y, pix_bot_theta)
 
     pix_bot_velocity.linear = msg.twist.twist.linear
     pix_bot_velocity.angular = msg.twist.twist.angular
+
+def adjustCentertoRearAxle(p_x, p_y, p_theta):
+  p_x = p_x - 0.95 * np.cos(p_theta)
+  p_y = p_y - 0.95 * np.sin(p_theta)
+  return p_x, p_y
+
+def adjustRearAxletoCenter(p_x, p_y, p_theta):
+  p_x = p_x + 0.95 * np.cos(p_theta)
+  p_y = p_y + 0.95 * np.sin(p_theta)
+  return p_x, p_y
 
 def movebase_client():
 
@@ -85,6 +100,7 @@ def movebase_client():
 
 def go_to_goal(goal):
     global target_waypoint
+    goal[0], goal[1] = adjustCentertoRearAxle(goal[0], goal[1], goal[2])
     target_waypoint = goal
     try:
     # Initializes a rospy node to let the SimpleActionClient publish and subscribe
@@ -94,14 +110,29 @@ def go_to_goal(goal):
     except rospy.ROSInterruptException:
         rospy.loginfo("[Undocking]: Navigation test finished.")
 
+def StateMachineCb(StateInfo):
+    global EnableApproachUndock, EnableUnlock
+    EnableApproachUndock = True if StateInfo.CurrState == StateOut.State_U_Approach else False
+    EnableUnlock = True if StateInfo.CurrState == StateOut.State_Unlock else False
+
 def undocking_execution():
-    global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub
-    for i in range(num_waypoints-1):
-        go_to_goal(waypoints[i])
-    
-    lift_goal = Float64()
-    lift_goal.data = 0
-    cmd_pub.publish(lift_goal)
+    global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub, EnableApproachUndock, EnableUnlock
+    StateUpdateMsg = StateIn()
+    while not rospy.is_shutdown():
+        if EnableApproachUndock:
+            for i in range(num_waypoints-1):
+                go_to_goal(waypoints[i])
+            StateUpdateMsg.TransState = StateOut.State_U_Approach
+            StateUpdateMsg.StateTransitionCond = 1
+            sm_pub.publish(StateUpdateMsg)
+        if EnableUnlock:
+            lift_goal = Float64()
+            lift_goal.data = 0
+            cmd_pub.publish(lift_goal)
+            StateUpdateMsg.TransState = StateOut.State_Unlock
+            StateUpdateMsg.StateTransitionCond = 1
+            sm_pub.publish(StateUpdateMsg)
+            break
 
 if __name__ == '__main__':
 
@@ -111,7 +142,7 @@ if __name__ == '__main__':
     rospy.Subscriber("/undocking_goal",
                    PoseArray,
                    waypointCallback)
-
+    rospy.Subscriber("SM_output", StateOut, StateMachineCb)
     waypoints[0,0] = 32.5
     waypoints[0,1] = 35
     waypoints[0,2] = math.pi/2
@@ -127,7 +158,7 @@ if __name__ == '__main__':
     rospy.wait_for_message(ODOM_INF, Odometry,5)
 
     cmd_pub = rospy.Publisher('/autoware_gazebo/lift_controller/command', Float64, queue_size=1)
-
+    sm_pub = rospy.Publisher("SM_input", StateIn, queue_size=1)
     undocking_execution()
 
     rospy.spin()

@@ -1,14 +1,18 @@
 /*  
     author: Sachit Mahajan
 */
-#include"april_tag_goal_pub.h"
+#include "april_tag_goal_pub.h"
+
 aprilTagGoalPublisher::aprilTagGoalPublisher(ros::NodeHandle *nodeH) {
 	this->node= nodeH;
 
 	this->tag_sub = node->subscribe("/tag_detections", 1000, &aprilTagGoalPublisher::aprilTagDetectionCb, this);
     // ros::Subscriber sub = n.subscribe("/tag_detections", 1000, apriltag_detection_callback);
 	this->tag_goal_pub = node->advertise<geometry_msgs::PoseStamped>("/pod_predicted_tag", 1);
-
+    // State machine output is this nodes input (for determining current state)
+    this -> state_sub = node -> subscribe("SM_output", 10, &aprilTagGoalPublisher::StateMachineCb, this);
+    // State machine input is this nodes output (for determining transition condition)
+    this -> state_pub = node -> advertise<state_machine::StateIn>("SM_input", 10);
 	if (ros::param::has("/align/camera_offset")) {
 		ros::param::get("/align/camera_offset", this->camera_offset);
 	}
@@ -153,12 +157,38 @@ geometry_msgs::PoseStamped aprilTagGoalPublisher::averageCenters() {
 }
 
 void aprilTagGoalPublisher::publishGoal(geometry_msgs::PoseStamped pod_center) {
-    if(isIdentifyPod) {
-        //TODO: REPLY WITH STATE MESSAGE
+    state_machine::StateIn StateUpdate;
+    // update the curr state under transition
+    StateUpdate.TransState = state_machine::StateOut::State_Identify;
+    // Whether or not it is completed
+    StateUpdate.StateTransitionCond = (isIdentifyPod) ? 1 : 0;
+    if(isIdentifyPod)
+    {
+        state_pub.publish(StateUpdate);
+        ROS_INFO("PUBLISHED");
     }
     tag_goal_pub.publish(pod_center);
 }
 
+void aprilTagGoalPublisher::StateMachineCb(const state_machine::StateOut::ConstPtr& InStateInfo)
+{
+    ROS_INFO("CALLBACK TRIGGERED");
+    // Assume only the last two digits to be valid
+    target_tags = {InStateInfo -> PodInfo / 10, InStateInfo -> PodInfo % 10};
+    // Enable goal pub if curr state is pod identification
+    if(InStateInfo -> CurrState == state_machine::StateOut::State_Identify || InStateInfo -> CurrState == state_machine::StateOut::State_D_Approach)
+    {
+        enable_goal_publishing = true;
+        ROS_INFO("ENABLED");
+    }
+    else
+    {
+        enable_goal_publishing = false;
+    }
+    // enable_goal_publishing = (InStateInfo -> CurrState == state_machine::StateOut::State_Identify) ? true : false;
+    isIdentifyPod = (InStateInfo -> CurrState == state_machine::StateOut::State_Identify) ? true : false;
+}
+ 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "pod_localizer");
     ros::NodeHandle n;
@@ -168,13 +198,14 @@ int main(int argc, char** argv) {
     ROS_INFO("aprilTag Localizer has started");
 
     //TODO: Change this to STATE MACHINE
-    agp.target_tags = {1,2};
+    // agp.target_tags = {1,2};
     while (ros::ok())
 	{
         geometry_msgs::PoseStamped pod_center;
 		agp.tag_state_ = FOUND_NO_TAGS;
 
 		ros::spinOnce();
+        //TODO: enable with sm
         if(agp.enable_goal_publishing) {
             switch(agp.tag_state_) {
                 case FOUND_LEFT_TAG:

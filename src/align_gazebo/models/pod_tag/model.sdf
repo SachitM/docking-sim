@@ -24,7 +24,7 @@
           <pose frame=''>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>model://Pod/meshes/pod_f.dae</uri>
+              <uri>/home/uma/Desktop/MRSD/Capstone/docking-sim/src/align_gazebo/models/Pod/meshes/pod_f.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -51,7 +51,7 @@
           <pose frame=''>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>model://Pod/meshes/pod_f.dae</uri>
+              <uri>/home/uma/Desktop/MRSD/Capstone/docking-sim/src/align_gazebo/models/Pod/meshes/pod_f.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -107,7 +107,7 @@
       <pose frame=''>0 0 0 0 -0 0</pose>
     </model>
     <model name='Tag1'>
-      <static>0</static>
+      <static>1</static>
       <link name='link'>
         <pose frame=''>0 0 0.1 0 -0 0</pose>
         <collision name='collision'>
@@ -126,8 +126,8 @@
           </geometry>
           <material>
             <script>
-              <uri>model://pod_tag/Tag1/materials/scripts</uri>
-              <uri>model://pod_tag/Tag1/materials/textures</uri>
+              <uri>/home/uma/Desktop/MRSD/Capstone/docking-sim/src/align_gazebo/models/pod_tag/Tag1/materials/scripts</uri>
+              <uri>/home/uma/Desktop/MRSD/Capstone/docking-sim/src/align_gazebo/models/pod_tag/Tag1/materials/textures</uri>
               <name>vrc/Tag1</name>
             </script>
           </material>
@@ -136,7 +136,7 @@
       <pose frame=''>0.75031 0.437018 1.1256 0 -0 0</pose>
     </model>
     <model name='Tag2'>
-      <static>0</static>
+      <static>1</static>
       <link name='link'>
         <pose frame=''>0 0 0.1 0 1.57 0</pose>
         <collision name='collision'>
@@ -155,8 +155,8 @@
           </geometry>
           <material>
             <script>
-              <uri>model://pod_tag/Tag2/materials/scripts</uri>
-              <uri>model://pod_tag/Tag2/materials/textures</uri>
+              <uri>/home/uma/Desktop/MRSD/Capstone/docking-sim/src/align_gazebo/models/pod_tag/Tag2/materials/scripts</uri>
+              <uri>/home/uma/Desktop/MRSD/Capstone/docking-sim/src/align_gazebo/models/pod_tag/Tag2/materials/textures</uri>
               <name>vrc/Tag2</name>
             </script>
           </material>

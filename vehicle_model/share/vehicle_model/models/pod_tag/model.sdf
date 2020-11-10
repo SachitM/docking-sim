@@ -24,7 +24,7 @@
           <pose frame=''>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>model://Pod/meshes/pod_f.dae</uri>
+              <uri>/home/uma/autoware.ai/install/vehicle_model/share/vehicle_model/models/Pod/meshes/pod_f.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -51,7 +51,7 @@
           <pose frame=''>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>model://Pod/meshes/pod_f.dae</uri>
+              <uri>/home/uma/autoware.ai/install/vehicle_model/share/vehicle_model/models/Pod/meshes/pod_f.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -126,8 +126,8 @@
           </geometry>
           <material>
             <script>
-              <uri>model://pod_tag/Tag1/materials/scripts</uri>
-              <uri>model://pod_tag/Tag1/materials/textures</uri>
+              <uri>/home/uma/autoware.ai/install/vehicle_model/share/vehicle_model/models/pod_tag/Tag1/materials/scripts</uri>
+              <uri>/home/uma/autoware.ai/install/vehicle_model/share/vehicle_model/models/pod_tag/Tag1/materials/textures</uri>
               <name>vrc/Tag1</name>
             </script>
           </material>
@@ -155,8 +155,8 @@
           </geometry>
           <material>
             <script>
-              <uri>model://pod_tag/Tag2/materials/scripts</uri>
-              <uri>model://pod_tag/Tag2/materials/textures</uri>
+              <uri>/home/uma/autoware.ai/install/vehicle_model/share/vehicle_model/models/pod_tag/Tag2/materials/scripts</uri>
+              <uri>/home/uma/autoware.ai/install/vehicle_model/share/vehicle_model/models/pod_tag/Tag2/materials/textures</uri>
               <name>vrc/Tag2</name>
             </script>
           </material>

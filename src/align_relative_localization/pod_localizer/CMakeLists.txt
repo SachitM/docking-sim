@@ -17,9 +17,12 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   apriltag_ros
   image_geometry
+  state_machine
 )
 
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS state_machine
+)
 
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(

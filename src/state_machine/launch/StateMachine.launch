@@ -1,0 +1,10 @@
+<launch>
+  <!-- <include file="$(find align_gazebo)/launch/autoware.launch" /> -->
+  <include file="$(find hms_client)/launch/hms_launch.launch" />
+  <node name="state_machine_node" pkg="state_machine" type="state_machine_node" output = "screen" launch-prefix="gnome-terminal --command" />
+  <node pkg="align_navigation" name="p2p" type="p2p.py" />
+  <node pkg="align_navigation" name="goal_publisher" type="goal_publisher.py" /> 
+  <node pkg="align_navigation" name="undocking" type="undocking.py" /> 
+  <include file="$(find pod_localizer)/launch/goal_pub_autoware.launch" />
+  <include file="$(find align_navigation)/launch/mapless_move_base.launch" />
+</launch>
