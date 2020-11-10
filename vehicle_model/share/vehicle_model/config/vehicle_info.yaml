@@ -1,5 +1,5 @@
 wheel_radius: 0.3
-wheel_width: 0.2
+wheel_width: 0.15
 wheel_base: 1.9
 wheel_tread: 1.36
 vehicle_mass: 500.0

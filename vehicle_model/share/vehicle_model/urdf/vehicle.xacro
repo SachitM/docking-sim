@@ -78,10 +78,10 @@
     </visual>
     <!-- CAN VBE MULTIPLE COLLISIONS -->
     <collision>
-      <origin xyz="${wheel_base/2 + calibration['base_link2lift']['x']} ${calibration['base_link2lift']['y']} ${0.55 + calibration['base_link2lift']['z']}" 
+          <origin xyz="${wheel_base/2 + calibration['base_link2lift']['x']} ${calibration['base_link2lift']['y']} ${calibration['base_link2lift']['z']}" 
             rpy="${calibration['base_link2lift']['roll']} ${calibration['base_link2lift']['pitch']} ${calibration['base_link2lift']['yaw']}" />
       <geometry>
-        <box size="0.5 0.5 0.01"/>
+        <mesh filename="package://vehicle_model/meshes/lift_f_col.dae"/>
       </geometry>
     </collision>
     <inertial>

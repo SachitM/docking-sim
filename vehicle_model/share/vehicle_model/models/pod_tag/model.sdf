@@ -4,7 +4,7 @@
     <model name='Pod'>
       <link name='link_0'>
         <inertial>
-          <mass>1</mass>
+          <mass>5</mass>
           <inertia>
             <ixx>0.166667</ixx>
             <ixy>0</ixy>
@@ -24,7 +24,7 @@
           <pose frame=''>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>model://Pod/meshes/pod_f.dae</uri>
+              <uri>/home/sachit/Desktop/ROS_data/autoware/install/vehicle_model/share/vehicle_model/models/Pod/meshes/pod_f.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -45,13 +45,41 @@
           <transparency>0</transparency>
           <cast_shadows>1</cast_shadows>
         </visual>
+        <!-- <collision name='collision_2'>
+          <pose>0 0 1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.5 0.01</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>10</mu>
+                <mu2>10</mu2>
+                <fdir1>1 1 0</fdir1>
+                <slip1>1</slip1>
+                <slip2>1</slip2>
+              </ode>
+              <torsional>
+                <coefficient>1</coefficient>
+                <patch_radius>0</patch_radius>
+                <surface_radius>0</surface_radius>
+                <use_patch_radius>1</use_patch_radius>
+                <ode>
+                  <slip>0</slip>
+                </ode>
+              </torsional>
+            </friction>
+          </surface>
+        </collision> -->
         <collision name='collision'>
           <laser_retro>0</laser_retro>
           <max_contacts>10</max_contacts>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>model://Pod/meshes/pod_f.dae</uri>
+              <uri>/home/sachit/Desktop/ROS_data/autoware/install/vehicle_model/share/vehicle_model/models/Pod/meshes/pod_f.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -126,8 +154,8 @@
           </geometry>
           <material>
             <script>
-              <uri>model://pod_tag/Tag1/materials/scripts</uri>
-              <uri>model://pod_tag/Tag1/materials/textures</uri>
+              <uri>/home/sachit/Desktop/ROS_data/autoware/install/vehicle_model/share/vehicle_model/models/pod_tag/Tag1/materials/scripts</uri>
+              <uri>/home/sachit/Desktop/ROS_data/autoware/install/vehicle_model/share/vehicle_model/models/pod_tag/Tag1/materials/textures</uri>
               <name>vrc/Tag1</name>
             </script>
           </material>
@@ -155,8 +183,8 @@
           </geometry>
           <material>
             <script>
-              <uri>model://pod_tag/Tag2/materials/scripts</uri>
-              <uri>model://pod_tag/Tag2/materials/textures</uri>
+              <uri>/home/sachit/Desktop/ROS_data/autoware/install/vehicle_model/share/vehicle_model/models/pod_tag/Tag2/materials/scripts</uri>
+              <uri>/home/sachit/Desktop/ROS_data/autoware/install/vehicle_model/share/vehicle_model/models/pod_tag/Tag2/materials/textures</uri>
               <name>vrc/Tag2</name>
             </script>
           </material>
