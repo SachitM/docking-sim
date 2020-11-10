@@ -39,11 +39,7 @@ class DockingVerification():
         self.docking_state = False
 
         self.publisher = rospy.Publisher('dock_offset', Float64, queue_size=10)
-<<<<<<< HEAD
-        self.status_sub = rospy.Subscriber('system_status', StateOut,
-=======
         self.lidar_sub = rospy.Subscriber('SM_output', StateOut,
->>>>>>> 48c5bdf7c265b0b8bb9323bd322a95293ab33915
                                           self.state_listener)
         self.lidar_sub = rospy.Subscriber("points_raw", PointCloud2,
                                           self.velodyne_points_callback)

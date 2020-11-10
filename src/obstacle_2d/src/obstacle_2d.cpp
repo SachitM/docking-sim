@@ -96,6 +96,7 @@ class Chassis {
 
     private:
         bool hms_flag;
+        bool obstacle_flag = false;
         bool is_approach = false;
         double range_array[LASER_STEPS] = {0};
 
