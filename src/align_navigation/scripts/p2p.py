@@ -150,7 +150,7 @@ if __name__ == '__main__':
         if(location_target != -1 and enable_p2p == True):
             #From location_target read waypoints.npy
             # waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,35,np.pi/2]])
-            waypoints = np.array([[0,0,0],[6, 0, 0]])
+            waypoints = np.array([[0,0,0],[7, 0, 0]])
             # waypoints = np.array([[11,0,0]])
 
             try: 
