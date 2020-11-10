@@ -17,6 +17,7 @@ Author: Sanil Pande
 #include <tf/transform_listener.h>
 #include <hms_client/hms_msg.h>
 #include <hms_client/ping_pong.h>
+#include <state_machine/StateOut.h>
 
 
 using namespace std;
@@ -25,6 +26,7 @@ class LidarDetect{
     public:
         ros::Subscriber cluster_sub;    // get centroids of clusters
         ros::ServiceServer hms_service;
+        ros::Subscriber state_sub;
 
         LidarDetect() {
             double buffer_time = sense_buffer + comm_buffer + safe_buffer;
@@ -65,21 +67,15 @@ class LidarDetect{
             return true;
         }
 
-        void state_callback(ADD_STATE in_state)
+        void state_callback(const state_machine::StateOut::ConstPtr& in_state)
         {
-            if (in_state->CurrState == state_machine::StateOut::State_Approach && is_approach == false)
+            if (in_state->CurrState == state_machine::StateOut::State_D_Approach)
             {
-                double less_width = width / 2.0;
-                update_ranges(less_width);
                 is_approach = true;
             }
-            else if (in_state->CurrState != state_machine::StateOut::State_Approach && is_approach == true)
+            else
             {
-                update_ranges(width);
                 is_approach = false;
-            }
-            else {
-                return;
             }
         }
 
@@ -113,7 +109,7 @@ int main (int argc, char** argv)
     LidarDetect lid;
 
     lid.cluster_sub = n.subscribe("/cluster_centroids", 10, &LidarDetect::clustering_callback, &lid);
-
+    lid.state_sub = n.subscribe("SM_output", 1000, &LidarDetect::state_callback, &lid);
     lid.hms_service = n.advertiseService("health_check_obstacle_3d", &LidarDetect::check, &lid);
 
     ros::Rate loop_rate(50);

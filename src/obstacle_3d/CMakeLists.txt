@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   autoware_msgs
   tf
   hms_client
+  state_machine
 )
 
 #add_dependencies(obj_detect  ${catkin_EXPORTED_TARGETS})
