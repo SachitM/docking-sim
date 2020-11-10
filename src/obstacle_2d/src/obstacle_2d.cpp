@@ -34,20 +34,21 @@ class Chassis {
 
         void obstacle_detection_callback(const sensor_msgs::LaserScan scan)
         {
-            float min_las = 2500;
             // iterating over all values since ideally all element in range should be non zero
             for (int i = 0; i < LASER_STEPS; i++) {
-                min_las = std::min(min_las, scan.ranges[i]);
                 if (range_array[i] > scan.ranges[i]) {
-                    if (!obstacle_flag) {
+                    if (!hms_flag) {
                        ROS_INFO( "Obstacle detected!");
                     }
                     hms_flag = true;
                     return;
                 }
             }
-
-            obstacle_flag = false;
+            if (hms_flag)
+            {
+                hms_flag = false;
+                ROS_INFO( "Obstacle removed!");
+            }
         }
 
         bool check(hms_client::ping_pong::Request  &req,
@@ -56,7 +57,6 @@ class Chassis {
             res.msg.header.stamp = ros::Time::now();
             res.health = 1;
             res.error_code = hms_flag ? 1 : 0;
-            // std::cout << "Error code! " << res.error_code << std::endl;
             hms_flag = false;
             return true;
         }
@@ -97,12 +97,11 @@ class Chassis {
 
     private:
         bool hms_flag;
-        bool obstacle_flag = false;
         bool is_approach = false;
         double range_array[LASER_STEPS] = {0};
 
         double width = 1.85;    // changed since 1.355 wasn not working correctly
-        double vel = 2;
+        double vel = 4;
         double acc = 3; // assuming acc == deceleration
 
         // distances are in meters
