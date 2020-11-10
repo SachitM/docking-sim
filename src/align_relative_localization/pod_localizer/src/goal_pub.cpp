@@ -184,7 +184,7 @@ goal_pub_e goal_publisher::get_legs(void)
 	}
 	else if(no_of_leg_detected < 3)
 	{
-		//Ideakky this should be done only when legs <2 not <=2, but this provides more stability
+		//Ideally this should be done only when legs <2 not <=2, but this provides more stability
 		this->prior_set = false;
 		this->transformed_prior = false;
 		ROS_ERROR(" %d legs detected. ", no_of_leg_detected);
