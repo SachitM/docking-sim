@@ -10,13 +10,19 @@ Please refer to [our website](https://mrsdprojects.ri.cmu.edu/2020teamj/system-d
 ## Setup and Usage
 Since this is ROS package, you will need to [install ROS](http://wiki.ros.org/Installation/Ubuntu). This repo has been tested on Ubuntu 18.04 (ROS
 Melodic). You will also need Autoware and you can refer to [Autoware Installation](https://github.com/CPFL/Autoware-Manuals/blob/master/en/Autoware_UsersManual_v1.1.md#3-d-map-generation-and-sharing)
-Requirements: Ubuntu 18.04+ and ROS-Melodic, python 2.7, move_base, GTSAM and Autoware
+Requirements: Ubuntu 18.04+ and ROS-Melodic, python 2.7, move_base, opencv 3.2.0 GTSAM and Autoware 1.12
 
 `apriltag_ros` depends on the latest release of the [AprilTag library](https://github.com/AprilRobotics/apriltag). Clone it and follow instructions.
 
+
+Ensure you have ros navigation, roscore and move_base
+```
+sudo apt install ros-melodic-move-base
+```
+
 For docking simulation, clone the repo in catkin workspace and run 
 ```
-catkin build
+catkin_make
 source devel/setup.bash
 roslaunch align_gazebo align.launch
 ```
@@ -56,6 +62,16 @@ roslaunch align_navigation mapless_move_base.launch
 roslaunch pod_localizer goal_pub_autoware.launch #For Localizing Pod
 rosrun align_navigation goal_publisher.py #For Approach Navigation
 
+```
+For running the chassis using keyboard
+```
+rosrun align_gazebo ackermann_drive_to_cmd_vel.py
+sh run_keyop.sh #To manually drive the vehicle
+```
+
+To use Fake Localization instead of Autoware
+```
+rosrun align_gazebo tf_broadcaster_autoware.py
 ```
 
 Future Updates
