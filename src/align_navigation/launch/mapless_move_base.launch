@@ -7,7 +7,7 @@
 <param name ="/use_sim_time" value="$(arg use_sim_time)"/>
 
   <arg name="no_static_map" default="true"/>
-  <node name="ackermann_converter" pkg="align_gazebo" type="cmd_vel_to_ackermann_drive.py"/>
+  <!-- <node name="ackermann_converter" pkg="align_gazebo" type="cmd_vel_to_ackermann_drive.py"/> -->
   <node name="gt_broadacaster" pkg="align_gazebo" type="tf_broadcaster_autoware.py"/>
   <!-- <arg name="base_global_planner" default="navfn/NavfnROS"/> -->
   <!-- <arg name="base_global_planner" default="dubins_planner/DubinsGlobalPlanner"/>  -->

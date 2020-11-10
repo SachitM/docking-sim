@@ -2,7 +2,7 @@
 <launch>
 
   <arg name="namespace" default="align"/>
-  <node pkg="phz" type="groundtruth_publisher_node" name="prior_estimate" output="screen"/>
+  <!-- <node pkg="phz" type="groundtruth_publisher_node" name="prior_estimate" output="screen"/> -->
   <node pkg="phz" type="viz_node" name="visualizer" output="screen"/>
   <node pkg="phz" type="waypoint_publisher_node" name="waypoint_publisher" output="screen" launch-prefix="gnome-terminal --command" />
 
