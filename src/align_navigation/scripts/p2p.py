@@ -115,7 +115,7 @@ def stateCallback(StateInfo):
     PodId = StateInfo.PodInfo
     if location_target != PodId:
         location_target = PodId
-    print('In p2p call back p2p flag ', enable_p2p)
+    # print('In p2p call back p2p flag ', enable_p2p)
 
 def move_to_goal(wp_array):
     global enable_p2p, target_waypoint, pix_bot_center, pix_bot_theta, last_goal
