@@ -10,7 +10,7 @@ rostopic pub /HMS_Status std_msgs/String '{data: "Failed"}'
 rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 12, OperationMode: 1}'
 
 4. Initialisation Message - drop pod
-rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 1, OperationMode: 2}'
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 101, OperationMode: 2}'
 
 5. P2P Valid
 rostopic pub /SM_input state_machine/StateIn '{TransState: 1, StateTransitionCond: 1, OperationMode: 1}'

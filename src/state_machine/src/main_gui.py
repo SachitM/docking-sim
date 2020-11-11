@@ -186,7 +186,7 @@ class WidgetGallery(QDialog):
                 #approach
                 self.StateUpdate.StateTransitionCond = int(text)
                 self.StateUpdate.TransState = 0
-                self.StateUpdate.OperationMode = 0
+                self.StateUpdate.OperationMode = 3
                 
             self.cmd_pub.publish(self.StateUpdate)
             
