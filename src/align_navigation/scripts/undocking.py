@@ -135,7 +135,7 @@ def undocking_execution():
             sm_pub.publish(StateUpdateMsg)
         if EnableUnlock:
             lift_goal = Float64()
-            lift_goal.data = 0
+            lift_goal.data = 0.0
             cmd_pub.publish(lift_goal)
             StateUpdateMsg.TransState = StateOut.State_Unlock
             StateUpdateMsg.StateTransitionCond = 1
@@ -145,7 +145,7 @@ def undocking_execution():
 if __name__ == '__main__':
 
     rospy.init_node('undocking_client_py')
-    waypoints = np.zeros((num_waypoints, 3))
+    waypoints = np.zeros((2, 3))
     rate = rospy.Rate(0.25)
     rospy.Subscriber("/undocking_goal",
                    PoseArray,
@@ -160,14 +160,6 @@ if __name__ == '__main__':
     waypoints[1,0] = -53#Location[0] 
     waypoints[1,1] = 28#Location[1]
     waypoints[1,2] = -math.pi/2#np.deg2rad(Location[2])
-
-    # waypoints[0,0] = 32.5
-    # waypoints[0,1] = 42
-    # waypoints[0,2] = math.pi/2
-
-    # waypoints[1,0] = 32.5
-    # waypoints[1,1] = 43
-    # waypoints[1,2] = math.pi/2
 
     pix_bot_center = Pose()
     pix_bot_velocity = Twist()

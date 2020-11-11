@@ -104,7 +104,7 @@ def is_close():
     global target_waypoint, pix_bot_center, pix_bot_theta, goal_tolerance
     centererr = np.sqrt((target_waypoint[0]-pix_bot_center.position.x)**2+(target_waypoint[1]-pix_bot_center.position.y)**2)
     thetaerr = shortest_angular_distance(pix_bot_theta,target_waypoint[2])
-    if(centererr < goal_tolerance and thetaerr < 0.25):
+    if(centererr < goal_tolerance and thetaerr < 0.3):
         return True
     else:
         return False
@@ -113,9 +113,13 @@ def stateCallback(StateInfo):
     global enable_p2p, location_target
     enable_p2p = True if StateInfo.CurrState == StateOut.State_P2P else False
     PodId = StateInfo.PodInfo
-    if location_target != PodId:
-        location_target = PodId
-    print('In p2p call back p2p flag ', enable_p2p)
+    if enable_p2p:
+        if location_target != PodId:
+            location_target = PodId
+    else:
+        location_target = -1
+    
+    print('In p2p callback p2p flag ', enable_p2p, location_target)
 
 def move_to_goal(wp_array):
     global enable_p2p, target_waypoint, pix_bot_center, pix_bot_theta, last_goal
@@ -135,7 +139,7 @@ def move_to_goal(wp_array):
         
         move_base_cancel_goal()
         # also last_goal flag
-        if enable_p2p == True:
+        if enable_p2p == True or last_goal == True:
             i+=1
         if i == total_wp-1:
             last_goal = True
@@ -163,10 +167,12 @@ if __name__ == '__main__':
             if location_target == 12:
                 waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,28,np.pi/2], [32.5,30,np.pi/2]])
             elif location_target == 3:
-                waypoints = np.array([[-46.5, -25, np.pi], [-54, -18, 0], [-44,-10,np.pi/2], [-44,4,np.pi/2], [-44,20,np.pi/2], [-50.7,28,-np.pi], [-51.7,28,-np.pi]])
+                waypoints = np.array([[32.5,38,np.pi/2], [27.5, 47, np.pi], [12.3,47, np.pi], [-10.87, 46.7, np.pi], [-24, 40, -np.pi/2], [-24, 31.5, -np.pi/2], [-50.7,28,-np.pi], [-51.7,28,-np.pi]])
             else:
                 print("Unknown Goal Given")
                 #TODO: Send failure to SM node
+
+            
 
             try: 
                 move_to_goal(waypoints)
