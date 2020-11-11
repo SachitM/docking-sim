@@ -28,8 +28,8 @@ class Chassis {
             double stopping_distance = (vel * vel * 0.5 / acc) + (buffer_time * vel);
 
             total_distance = stopping_distance + lidar_distance + safe_distance;
-
-            update_ranges(width);
+            
+            update_ranges(width, total_distance);
         }
 
         void obstacle_detection_callback(const sensor_msgs::LaserScan scan)
@@ -65,14 +65,15 @@ class Chassis {
         {
             if (in_state->CurrState == state_machine::StateOut::State_D_Approach && is_approach == false)
             {
-                double less_width = width / 2.0;
-                update_ranges(less_width);
+                double less_width = width / 1.5;
+                double less_distance = 0.6; // anything less than 0.4 gives out of range error, don't do it
+                update_ranges(less_width, less_distance);
                 ROS_INFO( "Beginning Approach - Constraining 2D obstacle detection width");
                 is_approach = true;
             }
             else if (in_state->CurrState != state_machine::StateOut::State_D_Approach && is_approach == true)
             {
-                update_ranges(width);
+                update_ranges(width, total_distance);
                 ROS_INFO( "Using original 2D obstacle detection width.");
                 is_approach = false;
             }
@@ -81,16 +82,16 @@ class Chassis {
             }
         }
 
-        void update_ranges(double new_width)
+        void update_ranges(double new_width, double distance=1.0)
         {
-            double angle = atan2(width, 2 * total_distance);
+            double angle = atan2(width, 2 * distance);
 
             double start = (RANGE - angle) / INCREMENT;
             int s = int(start);
 
             // need to add code for blind spot ditances
             for (int i = s; i < LASER_STEPS - s; i++) {
-                range_array[i] = total_distance;
+                range_array[i] = distance;
             }
         }
 
@@ -100,12 +101,12 @@ class Chassis {
         bool is_approach = false;
         double range_array[LASER_STEPS] = {0};
 
-        double width = 1.5;    // changed since 1.355 wasn not working correctly
-        double vel = 3;
-        double acc = 2; // assuming acc == deceleration
+        double width = 1.355;    // changed since 1.355 wasn not working correctly
+        double vel = 2.5;
+        double acc = 4; // assuming acc == deceleration
 
         // distances are in meters
-        double total_distance = 3;      // to be overwritten in constructor
+        double total_distance = 5;      // to be overwritten in constructor
         double lidar_distance = 0.1;     // from the front
         double safe_distance = 0.3;
 
