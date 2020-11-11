@@ -196,23 +196,44 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 			} else  {
 				// When input for new operation is received
 
-				if((state_machine::StateOut::OperationMode_DropOff==msg->OperationMode)&&(!isPod)){
-					ROS_INFO("[SM] Error: Not docked to any pod, cannot drop off");
-					return;
+				if (state_machine::StateOut::OperationMode_DropOff==msg->OperationMode){
+					if (!isPod){
+						ROS_INFO("[SM] Error: Not docked to any pod, cannot drop off");
+						return;
+					}
+					op_mode = msg->OperationMode;
+					info    = msg->StateTransitionCond;
+					prev_state = curr_state;
+					curr_state = state_machine::StateOut::State_P2P;
+					action  = "Input received";
+					ConsoleOut(action);
+				} 
+				
+				if (state_machine::StateOut::OperationMode_Pickup==msg->OperationMode){
+					if (isPod){
+						ROS_INFO("[SM] Error: Already docked to pod, cannot pick up");
+						return;
+					}
+					op_mode = msg->OperationMode;
+					info    = msg->StateTransitionCond;
+					prev_state = curr_state;
+					curr_state = state_machine::StateOut::State_P2P;
+					action  = "Input received";
+					ConsoleOut(action);
 				}
 				
-				if((state_machine::StateOut::OperationMode_Pickup==msg->OperationMode)&&(isPod)){
-					ROS_INFO("[SM] Error: Already docked to pod, cannot pick up");
-					return;
+				if (3==msg->OperationMode){
+					// if (isPod){
+					// 	ROS_INFO("[SM] Error: Already docked to pod, cannot pick up");
+					// 	return;
+					// }
+					op_mode = state_machine::StateOut::OperationMode_Pickup;
+					info    = msg->StateTransitionCond;
+					prev_state = curr_state;
+					curr_state = state_machine::StateOut::State_D_Approach;
+					action  = "Input received, Direct Approach";
+					ConsoleOut(action);
 				}
-
-				op_mode = msg->OperationMode;
-				info    = msg->StateTransitionCond;
-				prev_state = curr_state;
-				curr_state = state_machine::StateOut::State_P2P;
-
-				action  = "Input received";
-				ConsoleOut(action);
 			} 
 		} else if (state_machine::StateOut::OperationMode_Pickup == op_mode){
 
