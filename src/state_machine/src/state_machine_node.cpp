@@ -293,7 +293,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 				case state_machine::StateOut::State_Retrace :
 					if (1 == curr_state_update){
 						prev_state = curr_state; 
-						curr_state = state_machine::StateOut::State_Lock;
+						curr_state = state_machine::StateOut::State_D_Approach;
 						action     = "Retrace Complete";
 						ConsoleOut(action);
 					}
