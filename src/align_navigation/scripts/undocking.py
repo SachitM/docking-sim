@@ -128,7 +128,7 @@ def undocking_execution():
     StateUpdateMsg = StateIn()
     while not rospy.is_shutdown():
         if EnableApproachUndock:
-            for i in range(num_waypoints-1):
+            for i in range(2):
                 go_to_goal(waypoints[i])
             StateUpdateMsg.TransState = StateOut.State_U_Approach
             StateUpdateMsg.StateTransitionCond = 1
@@ -155,11 +155,11 @@ if __name__ == '__main__':
     
     waypoints[0,0] = -52.7#Location[0] - 3 * np.sin(np.deg2rad(Location[2]))[-51.7,28,-np.pi]
     waypoints[0,1] = 28#Location[1] - 3 * np.cos(np.deg2rad(Location[2]))
-    waypoints[0,2] = -math.pi/2#np.deg2rad(Location[2])
+    waypoints[0,2] = -math.pi#np.deg2rad(Location[2])
 
     waypoints[1,0] = -53#Location[0] 
     waypoints[1,1] = 28#Location[1]
-    waypoints[1,2] = -math.pi/2#np.deg2rad(Location[2])
+    waypoints[1,2] = -math.pi#np.deg2rad(Location[2])
 
     pix_bot_center = Pose()
     pix_bot_velocity = Twist()

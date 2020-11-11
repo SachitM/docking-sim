@@ -203,7 +203,7 @@ def docking_execution():
    
     StateUpdateMsg = StateIn()
     while not rospy.is_shutdown():
-        global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub, EnableApproach, EnableLock, EnableRetrace, EnableVerifyPose
+        global last_goal, waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub, EnableApproach, EnableLock, EnableRetrace, EnableVerifyPose
         print(EnableLock, EnableRetrace, EnableVerifyPose, EnableApproach)
         if EnableApproach:
             last_goal = False
@@ -221,7 +221,7 @@ def docking_execution():
             sm_pub.publish(StateUpdateMsg)
             rate.sleep()
             rate.sleep()
-
+            last_goal = False
         elif EnableVerifyPose:
             rospy.Subscriber("/dock_offset",
                             Float64,
@@ -266,7 +266,7 @@ def docking_execution():
             StateUpdateMsg.TransState = StateOut.State_Lock
             StateUpdateMsg.StateTransitionCond = 1
             sm_pub.publish(StateUpdateMsg) 
-            break
+            # break
          
 
         # state = "finished"

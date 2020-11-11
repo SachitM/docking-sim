@@ -30,7 +30,7 @@ target_waypoint = 0
 
 enable_p2p = False
 
-goal_tolerance = 0.75
+goal_tolerance = 0.8
 
 def vehicleStateCallback(msg):
     global pix_bot_center, pix_bot_theta
@@ -104,7 +104,7 @@ def is_close():
     global target_waypoint, pix_bot_center, pix_bot_theta, goal_tolerance
     centererr = np.sqrt((target_waypoint[0]-pix_bot_center.position.x)**2+(target_waypoint[1]-pix_bot_center.position.y)**2)
     thetaerr = shortest_angular_distance(pix_bot_theta,target_waypoint[2])
-    if(centererr < goal_tolerance and thetaerr < 0.3):
+    if(centererr < goal_tolerance and thetaerr < 0.35):
         return True
     else:
         return False
@@ -125,6 +125,7 @@ def move_to_goal(wp_array):
     global enable_p2p, target_waypoint, pix_bot_center, pix_bot_theta, last_goal
     total_wp = len(wp_array)
     i=0
+    last_goal = False
     while(i<total_wp):
         
         if enable_p2p == True:
@@ -155,7 +156,10 @@ if __name__ == '__main__':
     rospy.wait_for_message(ODOM_INF, Odometry,5)
     #rospy.Subscriber("/state", Int8, stateCallback)
     rospy.Subscriber("SM_output", StateOut, stateCallback)
+    rospy.wait_for_message("SM_output", StateOut, 3)
+    print("[P2P] Started")
     sm_pub = rospy.Publisher("SM_input", StateIn, queue_size=1)
+    last_loc_target = -1
     while not rospy.is_shutdown():
         if(location_target != -1 and enable_p2p == True):
             #From location_target read waypoints.npy
@@ -167,12 +171,10 @@ if __name__ == '__main__':
             if location_target == 12:
                 waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,28,np.pi/2], [32.5,30,np.pi/2]])
             elif location_target == 3:
-                waypoints = np.array([[32.5,38,np.pi/2], [27.5, 47, np.pi], [12.3,47, np.pi], [-10.87, 46.7, np.pi], [-24, 40, -np.pi/2], [-24, 31.5, -np.pi/2], [-50.7,28,-np.pi], [-51.7,28,-np.pi]])
+                waypoints = np.array([[32.5,38,np.pi/2], [32.5,40,np.pi/2], [25, 47, np.pi], [12.3,47, np.pi], [-10.87, 46.7, np.pi], [-24, 40, -np.pi/2], [-24, 31.5, -np.pi/2], [-50.7,28,-np.pi], [-51.7,28,-np.pi]])
             else:
                 print("Unknown Goal Given")
                 #TODO: Send failure to SM node
-
-            
 
             try: 
                 move_to_goal(waypoints)
@@ -181,7 +183,8 @@ if __name__ == '__main__':
                 StateUpdateMsg.TransState = StateOut.State_P2P
                 StateUpdateMsg.StateTransitionCond = 1
                 sm_pub.publish(StateUpdateMsg)
-                location_target = -1
+                rospy.wait_for_message("SM_output", StateOut, 3)
+                rospy.wait_for_message("SM_output", StateOut, 3)
             except:
                 move_base_cancel_goal()
                 break
