@@ -12,6 +12,10 @@ goal_publisher::goal_publisher(ros::NodeHandle *nodeH)
 	this->laser_sub = node->subscribe("/scan", 1, &goal_publisher::laser_data_cb, this);
 	this->goal_pub = node->advertise<geometry_msgs::PoseStamped>("/pod_predicted_laser", 1);
 	this->prior_sub = node->subscribe("/pod_predicted_tag", 1, &goal_publisher::prior_cb, this);
+
+	// State machine output is this nodes input (for determining current state)
+    this -> state_sub = node -> subscribe("SM_output", 10, &goal_publisher::StateMachineCb, this);
+
 	if (ros::param::has("/align/lidar_offset")) 
 	{
 		ros::param::get("/align/lidar_offset", this->lidar_offset);
@@ -23,6 +27,7 @@ goal_publisher::goal_publisher(ros::NodeHandle *nodeH)
 	
 
 }
+
 
 goal_publisher::~goal_publisher()
 {
@@ -371,6 +376,24 @@ void goal_publisher::extrapolate_the_fourth_point(void)
 
 }
 
+void goal_publisher::StateMachineCb(const state_machine::StateOut::ConstPtr& InStateInfo)
+{
+    ROS_INFO("CALLBACK TRIGGERED for goal pub lidar");
+    // Enable goal pub if curr state is pod identification or approach
+    if(InStateInfo -> CurrState == state_machine::StateOut::State_Identify || InStateInfo -> CurrState == state_machine::StateOut::State_D_Approach)
+    {
+        EnableGoalPub = true;
+
+        ROS_INFO("ENABLED");
+    }
+    else
+    {
+        EnableGoalPub = false;
+		prior_set = false;
+		transformed_prior = false;
+    }
+}
+
 
 int main(int argc, char **argv)
 {
@@ -392,15 +415,18 @@ int main(int argc, char **argv)
 		status = GOAL_PUB_SUCCESS;
 
 		ros::spinOnce();
-
-		if(GOAL_PUB_SUCCESS == status)
+		// TODO: sm
+		if(gp.EnableGoalPub)
 		{
-			status = gp.get_goal();
-		}
+			if(GOAL_PUB_SUCCESS == status)
+			{
+				status = gp.get_goal();
+			}
 
-		if(GOAL_PUB_SUCCESS == status)
-		{
-			status = gp.publish_goal();
+			if(GOAL_PUB_SUCCESS == status)
+			{
+				status = gp.publish_goal();
+			}
 		}
 
 		loop_rate.sleep();

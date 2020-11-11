@@ -15,13 +15,24 @@ from utils import *
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray, Pose, Twist
 from std_msgs.msg import Float64
+from state_machine.msg import *
 
 import tf
+
+Path = 'src/align_navigation/scripts/PodLocationServer/'
+import sys
+sys.path.insert(1, Path)
+from PodServer import *
+
 pi = math.pi
 
 waypoints = []
 last_goal = False
 target_waypoint = 0
+
+EnableApproachUndock = False
+EnableUnlock = False
+PodId = 12
 
 def waypointCallback(msg):
     global waypoints, last_goal
@@ -106,14 +117,30 @@ def go_to_goal(goal):
     except rospy.ROSInterruptException:
         rospy.loginfo("[Undocking]: Navigation test finished.")
 
+def StateMachineCb(StateInfo):
+    global EnableApproachUndock, EnableUnlock, PodId
+    EnableApproachUndock = True if StateInfo.CurrState == StateOut.State_U_Approach else False
+    EnableUnlock = True if StateInfo.CurrState == StateOut.State_Unlock else False
+    PodId = StateInfo.PodInfo
+
 def undocking_execution():
-    global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub
-    for i in range(num_waypoints-1):
-        go_to_goal(waypoints[i])
-    
-    lift_goal = Float64()
-    lift_goal.data = 0
-    cmd_pub.publish(lift_goal)
+    global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub, EnableApproachUndock, EnableUnlock
+    StateUpdateMsg = StateIn()
+    while not rospy.is_shutdown():
+        if EnableApproachUndock:
+            for i in range(num_waypoints-1):
+                go_to_goal(waypoints[i])
+            StateUpdateMsg.TransState = StateOut.State_U_Approach
+            StateUpdateMsg.StateTransitionCond = 1
+            sm_pub.publish(StateUpdateMsg)
+        if EnableUnlock:
+            lift_goal = Float64()
+            lift_goal.data = 0
+            cmd_pub.publish(lift_goal)
+            StateUpdateMsg.TransState = StateOut.State_Unlock
+            StateUpdateMsg.StateTransitionCond = 1
+            sm_pub.publish(StateUpdateMsg)
+            break
 
 if __name__ == '__main__':
 
@@ -123,14 +150,24 @@ if __name__ == '__main__':
     rospy.Subscriber("/undocking_goal",
                    PoseArray,
                    waypointCallback)
+    rospy.Subscriber("SM_output", StateOut, StateMachineCb)
+    # Location, WaypointsFile = GetPodLocAndWaypointsFileName(Path + 'DropoffPodLoc.json', str(PodId))
+    
+    waypoints[0,0] = -52.7#Location[0] - 3 * np.sin(np.deg2rad(Location[2]))[-51.7,28,-np.pi]
+    waypoints[0,1] = 28#Location[1] - 3 * np.cos(np.deg2rad(Location[2]))
+    waypoints[0,2] = -math.pi/2#np.deg2rad(Location[2])
 
-    waypoints[0,0] = 32.5
-    waypoints[0,1] = 35
-    waypoints[0,2] = math.pi/2
+    waypoints[1,0] = -53#Location[0] 
+    waypoints[1,1] = 28#Location[1]
+    waypoints[1,2] = -math.pi/2#np.deg2rad(Location[2])
 
-    waypoints[1,0] = 32.5
-    waypoints[1,1] = 38.13
-    waypoints[1,2] = math.pi/2
+    # waypoints[0,0] = 32.5
+    # waypoints[0,1] = 42
+    # waypoints[0,2] = math.pi/2
+
+    # waypoints[1,0] = 32.5
+    # waypoints[1,1] = 43
+    # waypoints[1,2] = math.pi/2
 
     pix_bot_center = Pose()
     pix_bot_velocity = Twist()
@@ -139,7 +176,7 @@ if __name__ == '__main__':
     rospy.wait_for_message(ODOM_INF, Odometry,5)
 
     cmd_pub = rospy.Publisher('/autoware_gazebo/lift_controller/command', Float64, queue_size=1)
-
+    sm_pub = rospy.Publisher("SM_input", StateIn, queue_size=1)
     undocking_execution()
 
     rospy.spin()

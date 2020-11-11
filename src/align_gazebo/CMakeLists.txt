@@ -6,9 +6,12 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   gazebo_msgs
   tf
+  state_machine
 )
 
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS state_machine
+)
 
 include_directories(${catkin_INCLUDE_DIRS})
 

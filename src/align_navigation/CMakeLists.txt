@@ -15,12 +15,14 @@ find_package(catkin REQUIRED COMPONENTS
 	roscpp
 	tf2_geometry_msgs
 	tf2_ros
+	state_machine
 )
+
 catkin_package(
 CATKIN_DEPENDS 
   	roscpp std_msgs costmap_2d dynamic_reconfigure 
     geometry_msgs nav_core navfn nav_msgs
-    pluginlib tf2_ros
+    pluginlib tf2_ros state_machine
 )
 
 include_directories(

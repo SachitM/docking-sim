@@ -3,6 +3,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include "geometry_msgs/Point.h"
 #include <tf/transform_listener.h>
+#include "state_machine/StateOut.h"
 #include "tf/tf.h"
 
 #define NO_OF_SAMPLES_LASER			560
@@ -41,6 +42,8 @@ class goal_publisher
 		ros::Subscriber prior_sub;
 		ros::Publisher goal_pub;
 
+		ros::Subscriber state_sub;
+
 		sensor_msgs::LaserScan laser_data;
 		geometry_msgs::PoseStamped goal_pose;
 
@@ -49,14 +52,16 @@ class goal_publisher
 
 		float_t get_table_pose_angle(geometry_msgs::Point point_1, geometry_msgs::Point point_2);
 		void extrapolate_the_fourth_point(void);
-
+		void StateMachineCb(const state_machine::StateOut::ConstPtr& StateInfo);
 		float_t lidar_offset;
+
 		bool prior_set = false;
 		bool transformed_prior = false;
 		geometry_msgs::PoseStamped prior_pose;
 		std::pair<float_t,float_t> pod_prior_lidar_frame;
-	public:
 
+	public:
+		bool EnableGoalPub = false;
 		goal_pub_e get_goal();
 		goal_pub_e publish_goal();
 		goal_publisher(ros::NodeHandle* nodeH);
