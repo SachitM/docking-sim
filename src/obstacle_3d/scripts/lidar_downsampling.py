@@ -42,6 +42,8 @@ class LidarDownSampling():
 
     def velodyne_points_callback(self, point_cloud):
         """Downsample points."""
+        if self.direction == 0:
+            return
         field_names = ("x", "y", "z")
         point_list = list(pc2.read_points(point_cloud, field_names=field_names, skip_nans=True))
         points_array = np.array(point_list)
