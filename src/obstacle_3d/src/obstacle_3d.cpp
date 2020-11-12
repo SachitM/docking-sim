@@ -93,7 +93,6 @@ class LidarDetect{
     private:
         bool hms_flag;
         bool is_p2p = false;
-        double range_array[LASER_STEPS] = {0};
 
         double width = 2.0;    // Wheelbase is 1.9m + some allowance
         double velocity = 0.0;

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <launch>
   <rosparam command="load" file="$(find hms_client)/config/settings.yaml" />
-  <node name="obstacle_2d" pkg="obstacle_2d" type="obstacle_2d" launch-prefix="gnome-terminal --command" >
-  </node>
-  <node name="hms_client" pkg="hms_client" type="hms_client" output = "screen" launch-prefix="gnome-terminal --command">
-  </node>
+  <node name="obstacle_2d" pkg="obstacle_2d" type="obstacle_2d" launch-prefix="gnome-terminal --command" />
+  <node name="obstacle_3d" pkg="obstacle_3d" type="obstacle_3d" launch-prefix="gnome-terminal --command" />
+  <node pkg="obstacle_3d" name="lidar_downsampling" type="lidar_downsampling.py" output="screen"/>
+  
+  <node name="hms_client" pkg="hms_client" type="hms_client" output = "screen" launch-prefix="gnome-terminal --command"/>
+  
 </launch>

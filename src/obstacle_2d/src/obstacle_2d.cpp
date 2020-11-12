@@ -30,7 +30,7 @@ class Chassis {
 
         void obstacle_detection_callback(const sensor_msgs::LaserScan scan)
         {
-            if (is_approach != true && is_p2p != true) {
+            if (is_approach != true && is_p2p != true && is_emergency != true) {
                 return;
             }
             // iterating over all values since ideally all element in range should be non zero
@@ -64,7 +64,7 @@ class Chassis {
             res.msg.header.stamp = ros::Time::now();
             res.health = 1;
             res.error_code = hms_flag ? 1 : 0;
-            hms_flag = false;
+            //hms_flag = false;
             return true;
         }
 
@@ -77,6 +77,7 @@ class Chassis {
                 ROS_INFO( "Beginning Approach - Constraining 2D obstacle detection width");
                 is_p2p = false;
                 is_approach = true;
+                is_emergency = false;
             }
             else if (in_state->CurrState == state_machine::StateOut::State_P2P)
             {
@@ -84,10 +85,17 @@ class Chassis {
                 ROS_INFO( "Using original 2D obstacle detection width.");
                 is_approach = false;
                 is_p2p = true;
+                is_emergency = false;
+            }
+            else if (in_state->CurrState == state_machine::StateOut::State_EHS){
+                is_approach = false;
+                is_p2p = false;
+                is_emergency = true;
             }
             else {
                 is_approach = false;
                 is_p2p = false;
+                is_emergency = false;
                 return;
             }
         }
@@ -117,9 +125,10 @@ class Chassis {
 
 
     private:
-        bool hms_flag;
+        bool hms_flag = false;
         bool is_approach = false;
         bool is_p2p = false;
+        bool is_emergency = false;
         double range_array[LASER_STEPS] = {0};
 
         double width = 2.0;    // Wheelbase is 1.9m + some allowance
