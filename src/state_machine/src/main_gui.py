@@ -151,44 +151,46 @@ class WidgetGallery(QDialog):
     def sendtextdata(self):
         text = self.textEdit.toPlainText()
         print(text, self.which_callback)
-        if not text.isnumeric():
-            print("Invalid input!")
-        elif int(text) > 100:
-            print("Invalid input!")
-        else:
-            # publish this to the pod server or state machine
-            if self.which_callback == 0:
-                #pickup
-                print('this is what i should be pub')
-                self.StateUpdate.StateTransitionCond = int(text)
-                self.StateUpdate.TransState = 0
-                self.StateUpdate.OperationMode = 1
+        if self.which_callback == 0 or self.which_callback == 1 or self.which_callback == 4:
+            if not text.isnumeric():
+                print("Invalid input!")
+                return
+            elif int(text) > 100:
+                print("Invalid input!")
+                return
 
-            elif self.which_callback == 1:
-                #dropoff
-                self.StateUpdate.StateTransitionCond = int(text)
-                self.StateUpdate.TransState = 0
-                self.StateUpdate.OperationMode = 2
+        # publish this to the pod server or state machine
+        if self.which_callback == 0:
+            #pickup
+            self.StateUpdate.StateTransitionCond = int(text)
+            self.StateUpdate.TransState = 0
+            self.StateUpdate.OperationMode = 1
 
-            elif self.which_callback == 2:
-                #podunlock
-                self.StateUpdate.StateTransitionCond = 0
-                self.StateUpdate.TransState = 0
-                self.StateUpdate.OperationMode = 2
+        elif self.which_callback == 1:
+            #dropoff
+            self.StateUpdate.StateTransitionCond = int(text)
+            self.StateUpdate.TransState = 0
+            self.StateUpdate.OperationMode = 2
 
-            elif self.which_callback == 3:
-                #podlocksuccess
-                self.StateUpdate.StateTransitionCond = 1
-                self.StateUpdate.TransState = 0
-                self.StateUpdate.OperationMode = 0
+        elif self.which_callback == 2:
+            #podunlock
+            self.StateUpdate.StateTransitionCond = 0
+            self.StateUpdate.TransState = 0
+            self.StateUpdate.OperationMode = 2
 
-            elif self.which_callback == 4:
-                #approach
-                self.StateUpdate.StateTransitionCond = int(text)
-                self.StateUpdate.TransState = 0
-                self.StateUpdate.OperationMode = 3
-                
-            self.cmd_pub.publish(self.StateUpdate)
+        elif self.which_callback == 3:
+            #podlocksuccess
+            self.StateUpdate.StateTransitionCond = 1
+            self.StateUpdate.TransState = 0
+            self.StateUpdate.OperationMode = 0
+
+        elif self.which_callback == 4:
+            #approach
+            self.StateUpdate.StateTransitionCond = int(text)
+            self.StateUpdate.TransState = 0
+            self.StateUpdate.OperationMode = 3
+            
+        self.cmd_pub.publish(self.StateUpdate)
             
 
 if __name__ == '__main__':
