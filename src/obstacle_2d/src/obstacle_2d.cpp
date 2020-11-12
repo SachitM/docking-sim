@@ -9,6 +9,7 @@ Author: Sanil Pande
 #include <hms_client/ping_pong.h>
 #include <math.h>
 #include <state_machine/StateOut.h>
+#include <nav_msgs/Odometry.h>
 
 #define RANGE 1.22172999382         // angular range
 #define INCREMENT 0.0043711271137   // angular increment between laser readings
@@ -18,18 +19,13 @@ class Chassis {
     public:
         ros::Subscriber lidar_sub;
         ros::Subscriber state_sub;
+        ros::Subscriber vehicle_state_sub;
 
         ros::Publisher obstacle_pub;
         ros::ServiceServer hms_service;
 
-        Chassis() {
-            // calculate maximum distance to detect obstacles
-            double buffer_time = sense_buffer + comm_buffer + safe_buffer;
-            double stopping_distance = (vel * vel * 0.5 / acc) + (buffer_time * vel);
-
-            total_distance = stopping_distance + lidar_distance + safe_distance;
-            
-            update_ranges(width, total_distance);
+        Chassis() {            
+            update_ranges(width);
         }
 
         void obstacle_detection_callback(const sensor_msgs::LaserScan scan)
@@ -51,6 +47,14 @@ class Chassis {
             }
         }
 
+        
+        
+        void vehicle_state_callback(const nav_msgs::Odometry::ConstPtr& state)
+        {
+            this->velocity = state->twist.twist.linear.x;
+
+        }
+
         bool check(hms_client::ping_pong::Request  &req,
                  hms_client::ping_pong::Response &res)
         {
@@ -63,35 +67,48 @@ class Chassis {
 
         void state_callback(const state_machine::StateOut::ConstPtr& in_state)
         {
-            if (in_state->CurrState == state_machine::StateOut::State_D_Approach && is_approach == false)
+            if (in_state->CurrState == state_machine::StateOut::State_D_Approach)
             {
                 double less_width = width / 1.5;
-                double less_distance = 0.6; // anything less than 0.4 gives out of range error, don't do it
-                update_ranges(less_width, less_distance);
+                update_ranges(less_width);
                 ROS_INFO( "Beginning Approach - Constraining 2D obstacle detection width");
+                is_p2p = false;
                 is_approach = true;
             }
-            else if (in_state->CurrState != state_machine::StateOut::State_D_Approach && is_approach == true)
+            else if (in_state->CurrState != state_machine::StateOut::State_P2P)
             {
-                update_ranges(width, total_distance);
+                update_ranges(width);
                 ROS_INFO( "Using original 2D obstacle detection width.");
                 is_approach = false;
+                is_p2p = true;
             }
             else {
+                is_approach = false;
+                is_p2p = false;
                 return;
             }
         }
 
-        void update_ranges(double new_width, double distance=1.0)
+        void update_ranges(double width)
         {
-            double angle = atan2(width, 2 * distance);
+            stopping_distance = (velocity * velocity * 0.5 / maximum_acceleration);
+            stopping_distance +=  + (buffer_time * velocity);
+            total_distance = stopping_distance + lidar_distance + safe_distance;
+
+            if (total_distance < 0.5) {
+                total_distance = 0.5;   // less than this will throw errors, out of range of scan beams
+            }
+            
+            double angle = atan2(width, 2 * total_distance);
 
             double start = (RANGE - angle) / INCREMENT;
             int s = int(start);
 
+            s = std::max(std::min(s, LASER_STEPS - 1), 0);
+
             // need to add code for blind spot ditances
             for (int i = s; i < LASER_STEPS - s; i++) {
-                range_array[i] = distance;
+                range_array[i] = total_distance;
             }
         }
 
@@ -99,21 +116,22 @@ class Chassis {
     private:
         bool hms_flag;
         bool is_approach = false;
+        bool is_p2p = false;
         double range_array[LASER_STEPS] = {0};
 
-        double width = 1.355;    // changed since 1.355 wasn not working correctly
-        double vel = 2.5;
-        double acc = 4; // assuming acc == deceleration
+        double width = 2.0;    // Wheelbase is 1.9m + some allowance
+        double velocity = 0.0;
+        double maximum_acceleration = 3.0; // assuming acc == deceleration (m/s^2)
 
         // distances are in meters
-        double total_distance = 5;      // to be overwritten in constructor
+        double total_distance = 10.0;
+        double stopping_distance = 0.0;
         double lidar_distance = 0.1;     // from the front
         double safe_distance = 0.3;
 
-        // times are in seconds
-        double sense_buffer = 1.0 / 40;    // since the lidar samples at 40 Hz
-        double comm_buffer = 0.025;
-        double safe_buffer = 0.1;
+        // buffer times are in seconds
+        // sensing (1/sampling rate), communication, safety
+        double buffer_time = (1.0 / 40) + 0.025 + 0.1;
 };
 
 
@@ -126,7 +144,7 @@ int main(int argc, char** argv)
 
     bot.lidar_sub = n.subscribe("scan", 1000, &Chassis::obstacle_detection_callback, &bot);
     bot.state_sub = n.subscribe("SM_output", 1000, &Chassis::state_callback, &bot);
-
+    bot.vehicle_state_sub = n.subscribe("/ground_truth/state", 1000, &Chassis::vehicle_state_callback, &bot);
     bot.hms_service = n.advertiseService("health_check_obstacle_2d", &Chassis::check, &bot);
 
     ros::Rate loop_rate(50);
