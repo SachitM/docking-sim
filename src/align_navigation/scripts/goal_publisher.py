@@ -311,9 +311,7 @@ def docking_execution():
             target_distance = math.sqrt(dx*dx + dy*dy)
             diff_angle = goal[2] - pix_bot_theta
             print("Pose_Error (Estimated) (cm,degree): = ", target_distance*100, diff_angle * 180/np.pi)
-            if dock_error < 0.05:
-                print("Dock_Error (Measured) (cm): = ", dock_error*100)
-            dock_error = 0
+            print("Dock_Error (Measured) (cm): = ", dock_error*100)
             # print(state)
             StateUpdateMsg.TransState = StateOut.State_Verify
             if target_distance > 0.1 or dock_error > 0.20:
