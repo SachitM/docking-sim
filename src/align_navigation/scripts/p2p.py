@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # license removed for brevity
 
-# Author: Rohan Rao
+# Author: Rohan Rao and Sachit Mahajan
 
 import rospy
 Path = 'src/align_navigation/scripts/PodLocationServer/'
 import sys
 sys.path.insert(1, Path)
-from PodServer import *
+# from PodServer import *
 import tf
 # Brings in the SimpleActionClient
 import actionlib
