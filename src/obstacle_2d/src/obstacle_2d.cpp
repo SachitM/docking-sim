@@ -98,9 +98,9 @@ class Chassis {
             stopping_distance +=  + (buffer_time * velocity);
             total_distance = stopping_distance + lidar_distance + safe_distance;
 
-            if (total_distance < 0.5) {
-                total_distance = 0.5;   // less than this will throw errors, out of range of scan beams
-            }
+            // if (total_distance < 0.5) {
+            //     total_distance = 0.5;   // less than this will throw errors, out of range of scan beams
+            // }
             
             double angle = atan2(width, 2 * total_distance);
 
@@ -124,13 +124,13 @@ class Chassis {
 
         double width = 2.0;    // Wheelbase is 1.9m + some allowance
         double velocity = 0.0;
-        double maximum_acceleration = 3.0; // assuming acc == deceleration (m/s^2)
+        double maximum_acceleration = 1.0;//3.0; // assuming acc == deceleration (m/s^2)
 
         // distances are in meters
         double total_distance = 10.0;
         double stopping_distance = 0.0;
         double lidar_distance = 0.1;     // from the front
-        double safe_distance = 0.3;
+        double safe_distance = 0.5;
 
         // buffer times are in seconds
         // sensing (1/sampling rate), communication, safety
