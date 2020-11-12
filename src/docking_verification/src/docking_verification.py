@@ -9,7 +9,7 @@ from sensor_msgs import point_cloud2 as pc2
 from sensor_msgs.msg import PointCloud2
 
 from geometry_msgs.msg import Point32
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Header
 from state_machine.msg import StateOut
 
 # define constants related to the pod and chassis design
