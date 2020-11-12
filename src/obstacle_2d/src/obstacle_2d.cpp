@@ -30,6 +30,9 @@ class Chassis {
 
         void obstacle_detection_callback(const sensor_msgs::LaserScan scan)
         {
+            if (is_approach != true && is_p2p != true) {
+                return;
+            }
             // iterating over all values since ideally all element in range should be non zero
             for (int i = 0; i < LASER_STEPS; i++) {
                 if (range_array[i] > scan.ranges[i]) {
@@ -75,7 +78,7 @@ class Chassis {
                 is_p2p = false;
                 is_approach = true;
             }
-            else if (in_state->CurrState != state_machine::StateOut::State_P2P)
+            else if (in_state->CurrState == state_machine::StateOut::State_P2P)
             {
                 update_ranges(width);
                 ROS_INFO( "Using original 2D obstacle detection width.");
