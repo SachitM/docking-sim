@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # license removed for brevity
 
-# Author: Rohan Rao
+# Author: Rohan Rao and Sachit Mahajan
 
 import rospy
 import tf
@@ -22,7 +22,7 @@ import tf
 Path = 'src/align_navigation/scripts/PodLocationServer/'
 import sys
 sys.path.insert(1, Path)
-from PodServer import *
+# from PodServer import *
 
 pi = math.pi
 
@@ -133,6 +133,8 @@ def undocking_execution():
             StateUpdateMsg.TransState = StateOut.State_U_Approach
             StateUpdateMsg.StateTransitionCond = 1
             sm_pub.publish(StateUpdateMsg)
+            rospy.wait_for_message("SM_output", StateOut)
+            rospy.wait_for_message("SM_output", StateOut)
         if EnableUnlock:
             lift_goal = Float64()
             lift_goal.data = 0.0
@@ -140,11 +142,12 @@ def undocking_execution():
             StateUpdateMsg.TransState = StateOut.State_Unlock
             StateUpdateMsg.StateTransitionCond = 1
             sm_pub.publish(StateUpdateMsg)
-            break
+            rospy.wait_for_message("SM_output", StateOut)
+            rospy.wait_for_message("SM_output", StateOut)
 
 if __name__ == '__main__':
 
-    rospy.init_node('undocking_client_py')
+    rospy.init_node('undocking_py')
     waypoints = np.zeros((2, 3))
     rate = rospy.Rate(0.25)
     rospy.Subscriber("/undocking_goal",
