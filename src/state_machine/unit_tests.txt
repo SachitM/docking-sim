@@ -1,0 +1,95 @@
+Unit Tests
+
+1. HMS Valid
+rostopic pub /HMS_Status std_msgs/String '{data: "Passed"}'
+
+2. HMS Invalid
+rostopic pub /HMS_Status std_msgs/String '{data: "Failed"}'
+
+3. Initialisation Message - Pick pod
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 12, OperationMode: 1}'
+
+4. Initialisation Message - drop pod
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 101, OperationMode: 2}'
+
+5. P2P Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 1, StateTransitionCond: 1, OperationMode: 1}'
+
+6. P2P Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 1, StateTransitionCond: 0, OperationMode: 1}'
+
+7. Identify Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 2, StateTransitionCond: 1, OperationMode: 1}'
+
+8. Identify Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 2, StateTransitionCond: 0, OperationMode: 1}'
+
+9. D_Approach Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 3, StateTransitionCond: 1, OperationMode: 1}'
+
+10. D_Approach Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 3, StateTransitionCond: 0, OperationMode: 1}'
+
+11. Verify Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 5, StateTransitionCond: 1, OperationMode: 1}'
+
+12. Verify Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 5, StateTransitionCond: 0, OperationMode: 1}'
+
+13. Retrace Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 6, StateTransitionCond: 1, OperationMode: 1}'
+
+14. Retrace Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 6, StateTransitionCond: 0, OperationMode: 1}'
+
+15. Lock Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 7, StateTransitionCond: 1, OperationMode: 1}'
+
+16. Lock Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 7, StateTransitionCond: 0, OperationMode: 1}'
+
+17. Unlock Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 8, StateTransitionCond: 1, OperationMode: 1}'
+
+18. Unlock Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 8, StateTransitionCond: 0, OperationMode: 0}'
+rostopic pub /SM_input state_machine/StateIn '{TransState: 8, StateTransitionCond: 0, OperationMode: 1}'
+rostopic pub /SM_input state_machine/StateIn '{TransState: 8, StateTransitionCond: 0, OperationMode: 2}'
+
+19. EHS Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 9, StateTransitionCond: 1, OperationMode: 0}'
+rostopic pub /SM_input state_machine/StateIn '{TransState: 9, StateTransitionCond: 1, OperationMode: 1}'
+rostopic pub /SM_input state_machine/StateIn '{TransState: 9, StateTransitionCond: 1, OperationMode: 2}'
+
+20. EHS Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 9, StateTransitionCond: 0, OperationMode: 0}'
+rostopic pub /SM_input state_machine/StateIn '{TransState: 9, StateTransitionCond: 0, OperationMode: 1}'
+rostopic pub /SM_input state_machine/StateIn '{TransState: 9, StateTransitionCond: 0, OperationMode: 2}'
+
+21. Idle Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 1, OperationMode: 0}'
+
+22. Idle Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 0, OperationMode: 1}'
+
+23. Locking successful User input
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 1, OperationMode: 0}'
+
+24. Locking unsuccessful User input
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 0, OperationMode: 2}'
+
+25. U_Approach Valid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 4, StateTransitionCond: 1, OperationMode: 2}'
+
+26. U_Approach Invalid
+rostopic pub /SM_input state_machine/StateIn '{TransState: 4, StateTransitionCond: 0, OperationMode: 2}'
+
+
+Initialisation Message - Pick pod
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 12, OperationMode: 1}'
+
+Initialisation Message - drop pod
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 1, OperationMode: 2}'
+
+Locking successful User input
+rostopic pub /SM_input state_machine/StateIn '{TransState: 0, StateTransitionCond: 1, OperationMode: 0}'

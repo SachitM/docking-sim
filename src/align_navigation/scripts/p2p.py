@@ -4,6 +4,10 @@
 # Author: Rohan Rao
 
 import rospy
+Path = 'src/align_navigation/scripts/PodLocationServer/'
+import sys
+sys.path.insert(1, Path)
+from PodServer import *
 import tf
 # Brings in the SimpleActionClient
 import actionlib
@@ -15,6 +19,8 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray, Pose, Twist
 from std_msgs.msg import Float64, Int8
 from angles import *
+from state_machine.msg import *
+
 
 import tf
 pi = math.pi
@@ -22,9 +28,9 @@ pi = math.pi
 last_goal = False
 target_waypoint = 0
 
-enable_p2p = True
+enable_p2p = False
 
-goal_tolerance = 0.75
+goal_tolerance = 0.8
 
 def vehicleStateCallback(msg):
     global pix_bot_center, pix_bot_theta
@@ -98,25 +104,28 @@ def is_close():
     global target_waypoint, pix_bot_center, pix_bot_theta, goal_tolerance
     centererr = np.sqrt((target_waypoint[0]-pix_bot_center.position.x)**2+(target_waypoint[1]-pix_bot_center.position.y)**2)
     thetaerr = shortest_angular_distance(pix_bot_theta,target_waypoint[2])
-    if(centererr < goal_tolerance and thetaerr < 0.25):
+    if(centererr < goal_tolerance and thetaerr < 0.35):
         return True
     else:
         return False
 
-def stateCallback(msg):
+def stateCallback(StateInfo):
     global enable_p2p, location_target
-    if(msg.data == 1):
-        enable_p2p = True
-    if(msg.data == 0):
-        enable_p2p = False
-    data = 12
-    if location_target != data:
-        location_target = data
+    enable_p2p = True if StateInfo.CurrState == StateOut.State_P2P else False
+    PodId = StateInfo.PodInfo
+    if enable_p2p:
+        if location_target != PodId:
+            location_target = PodId
+    else:
+        location_target = -1
+    
+    print('In p2p callback p2p flag ', enable_p2p, location_target)
 
 def move_to_goal(wp_array):
     global enable_p2p, target_waypoint, pix_bot_center, pix_bot_theta, last_goal
     total_wp = len(wp_array)
     i=0
+    last_goal = False
     while(i<total_wp):
         
         if enable_p2p == True:
@@ -131,30 +140,51 @@ def move_to_goal(wp_array):
         
         move_base_cancel_goal()
         # also last_goal flag
-        if enable_p2p == True:
+        if enable_p2p == True or last_goal == True:
             i+=1
         if i == total_wp-1:
             last_goal = True
 
 if __name__ == '__main__':
-    rospy.init_node('undocking_client_py')
-    location_target = 12
+    rospy.init_node('p2p_py')
+    location_target = -1
 
     pix_bot_center = Pose()
     pix_bot_theta = 0
 
     rospy.Subscriber(ODOM_INF, Odometry, vehicleStateCallback)
-    rospy.Subscriber("/state", Int8, stateCallback)
     rospy.wait_for_message(ODOM_INF, Odometry,5)
-
+    #rospy.Subscriber("/state", Int8, stateCallback)
+    rospy.Subscriber("SM_output", StateOut, stateCallback)
+    rospy.wait_for_message("SM_output", StateOut, 3)
+    print("[P2P] Started")
+    sm_pub = rospy.Publisher("SM_input", StateIn, queue_size=1)
+    last_loc_target = -1
     while not rospy.is_shutdown():
         if(location_target != -1 and enable_p2p == True):
             #From location_target read waypoints.npy
-            waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,30,np.pi/2]])
+            '''
+            Location, WaypointsFile = GetPodLocAndWaypointsFileName(Path + 'PickupPodLoc.json', str(location_target))
+            waypoints = np.load(WaypointsFile)
+            '''
+            print("Target ID:", location_target )
+            if location_target == 12:
+                waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,28,np.pi/2], [32.5,30,np.pi/2]])
+            elif location_target == 3:
+                waypoints = np.array([[32.5,38,np.pi/2], [32.5,40,np.pi/2], [25, 47, np.pi], [12.3,47, np.pi], [-10.87, 46.7, np.pi], [-24, 40, -np.pi/2], [-24, 31.5, -np.pi/2], [-50.7,28,-np.pi], [-51.7,28,-np.pi]])
+            else:
+                print("Unknown Goal Given")
+                #TODO: Send failure to SM node
+
             try: 
                 move_to_goal(waypoints)
                 print("Target Reached")
-                location_target = -1
+                StateUpdateMsg = StateIn()
+                StateUpdateMsg.TransState = StateOut.State_P2P
+                StateUpdateMsg.StateTransitionCond = 1
+                sm_pub.publish(StateUpdateMsg)
+                rospy.wait_for_message("SM_output", StateOut, 3)
+                rospy.wait_for_message("SM_output", StateOut, 3)
             except:
                 move_base_cancel_goal()
                 break
