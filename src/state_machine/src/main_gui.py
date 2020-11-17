@@ -150,7 +150,6 @@ class WidgetGallery(QDialog):
 
     def sendtextdata(self):
         text = self.textEdit.toPlainText()
-        print(text, self.which_callback)
         if not text.isnumeric():
             print("Invalid input!")
         elif int(text) > 100:
@@ -159,7 +158,6 @@ class WidgetGallery(QDialog):
             # publish this to the pod server or state machine
             if self.which_callback == 0:
                 #pickup
-                print('this is what i should be pub')
                 self.StateUpdate.StateTransitionCond = int(text)
                 self.StateUpdate.TransState = 0
                 self.StateUpdate.OperationMode = 1

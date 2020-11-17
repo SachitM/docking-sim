@@ -274,7 +274,6 @@ def docking_execution():
     StateUpdateMsg = StateIn()
     while not rospy.is_shutdown():
         global dock_error, last_goal, waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub, EnableApproach, EnableLock, EnableRetrace, EnableVerifyPose
-        #print(EnableLock, EnableRetrace, EnableVerifyPose, EnableApproach)
         if EnableApproach:
             last_goal = False
             rospy.wait_for_message("/waypoints_goal", PoseArray)
@@ -302,8 +301,6 @@ def docking_execution():
                             Float64,
                             dock_callback)
             rospy.wait_for_message("/dock_offset", Float64)
-            # state = "verifying_pose"
-            # print(state)
             rate.sleep()
             goal = waypoints[-1] + 0
             dx = goal[0] - pix_bot_center.position.x
@@ -312,7 +309,6 @@ def docking_execution():
             diff_angle = goal[2] - pix_bot_theta
             print("Pose_Error (Estimated) (cm,degree): = ", target_distance*100, diff_angle * 180/np.pi)
             print("Dock_Error (Measured) (cm): = ", dock_error*100)
-            # print(state)
             StateUpdateMsg.TransState = StateOut.State_Verify
             if target_distance > 0.1 or dock_error > 0.20:
                 print("[APPROACH]Error Too High Retracing")
@@ -347,10 +343,6 @@ def docking_execution():
             rospy.wait_for_message("SM_output", StateOut)
         else:
             pass
-         
-
-        # state = "finished"
-        # print(state)
 
 
 def StateMachineCb(StateInfo):
@@ -359,7 +351,6 @@ def StateMachineCb(StateInfo):
     EnableVerifyPose = True if StateInfo.CurrState == StateOut.State_Verify else False
     EnableRetrace = True if StateInfo.CurrState == StateOut.State_Retrace else False
     EnableLock = True if StateInfo.CurrState == StateOut.State_Lock else False
-    #print("Curr state, enabled ", StateInfo.CurrState, EnableApproach)
 
 if __name__ == '__main__':
 

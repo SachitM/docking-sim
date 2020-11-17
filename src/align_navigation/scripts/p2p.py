@@ -4,10 +4,6 @@
 # Author: Rohan Rao and Sachit Mahajan
 
 import rospy
-Path = 'src/align_navigation/scripts/PodLocationServer/'
-import sys
-sys.path.insert(1, Path)
-# from PodServer import *
 import tf
 # Brings in the SimpleActionClient
 import actionlib
@@ -119,7 +115,6 @@ def stateCallback(StateInfo):
     else:
         location_target = -1
     
-    print('In p2p callback p2p flag ', enable_p2p, location_target)
 
 def move_to_goal(wp_array):
     global enable_p2p, target_waypoint, pix_bot_center, pix_bot_theta, last_goal
@@ -162,11 +157,6 @@ if __name__ == '__main__':
     last_loc_target = -1
     while not rospy.is_shutdown():
         if(location_target != -1 and enable_p2p == True):
-            #From location_target read waypoints.npy
-            '''
-            Location, WaypointsFile = GetPodLocAndWaypointsFileName(Path + 'PickupPodLoc.json', str(location_target))
-            waypoints = np.load(WaypointsFile)
-            '''
             print("Target ID:", location_target )
             if location_target == 12:
                 waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,28,np.pi/2], [32.5,30,np.pi/2]])
