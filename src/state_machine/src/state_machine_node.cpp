@@ -16,6 +16,7 @@ class StateMachineNode{
 		~StateMachineNode(){
 		}
 		void OpPublisher();
+		std::string PrintTime();
 		
 	private:
 		uint prev_state = 0;
@@ -26,6 +27,7 @@ class StateMachineNode{
 		int curr_state_update = -1;
 		bool hms_active = false;
 		bool isPod      = false;
+		ros::Time begin;
 
 		ros::NodeHandle* node;
 		ros::Publisher output_pub;
@@ -48,6 +50,7 @@ class StateMachineNode{
 StateMachineNode::StateMachineNode(ros::NodeHandle *nh){
 
 	// initialise node vars
+	begin      = ros::Time::now();
 	node       = nh;
 	prev_state = state_machine::StateOut::State_Idle;
 	curr_state = state_machine::StateOut::State_Idle;
@@ -83,9 +86,22 @@ StateMachineNode::StateMachineNode(ros::NodeHandle *nh){
 	console_s[state_machine::StateOut::State_Lock] = "Dock with Pod";
 	console_s[state_machine::StateOut::State_Unlock] = "Undock with Pod";
 	console_s[state_machine::StateOut::State_EHS] = "Emergency Handling State";
+	
+	
+	ROS_INFO("[SM %s] Chassis Initialised in STANDBY MODE", PrintTime().c_str());
+	ROS_INFO("[SM %s] Waiting for HMS", PrintTime().c_str());		
+}
 
-	ROS_INFO("[SM] Chassis Initialised in STANDBY MODE");
-	ROS_INFO("[SM] Waiting for HMS");		
+/**
+ *  Print human readable time
+ */
+std::string StateMachineNode::PrintTime(){
+	int dur = (int) round((ros::Time::now()-begin).toSec());
+	int sec = dur%60;
+	int hr  = dur/3600;
+	int min = ((dur-sec)/60)%60;
+	std::string time_str = std::to_string(hr)+":"+std::to_string(min)+":"+std::to_string(sec);
+	return time_str;
 }
 
 /**
@@ -108,7 +124,7 @@ void StateMachineNode::OpPublisher(){
  * Print to console
  */
 void StateMachineNode::ConsoleOut(std::string action){
-	ROS_INFO("[SM] MODE: %s, CURRENT STATE: %s, LAST STATE: %s, UPDATE: %s", console_m[op_mode].c_str(), console_s[curr_state].c_str(), console_s[prev_state].c_str(), action.c_str());				
+	ROS_INFO("[SM %s] MODE: %s, CURRENT STATE: %s, LAST STATE: %s, UPDATE: %s", PrintTime().c_str(), console_m[op_mode].c_str(), console_s[curr_state].c_str(), console_s[prev_state].c_str(), action.c_str());				
 	return;
 }
 
@@ -121,9 +137,9 @@ void StateMachineNode::HMSCallback(const std_msgs::String::ConstPtr& msg){
 	std::string action = "-";
 
 	if (!hms_active){
-		ROS_INFO("[SM] HMS Active");
+		ROS_INFO("[SM %s] HMS Active",PrintTime().c_str());
 		hms_active = true;
-		ROS_INFO("[SM] Chassis Ready For Operation");
+		ROS_INFO("[SM %s] Chassis Ready For Operation",PrintTime().c_str());
 		action = "Starting Up";
 		ConsoleOut(action);
 	}	
@@ -198,7 +214,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 
 				if (state_machine::StateOut::OperationMode_DropOff==msg->OperationMode){
 					if (!isPod){
-						ROS_INFO("[SM] Error: Not docked to any pod, cannot drop off");
+						ROS_INFO("[SM %s] Error: Not docked to any pod, cannot drop off",PrintTime().c_str());
 						return;
 					}
 					op_mode = msg->OperationMode;
@@ -211,7 +227,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 				
 				if (state_machine::StateOut::OperationMode_Pickup==msg->OperationMode){
 					if (isPod){
-						ROS_INFO("[SM] Error: Already docked to pod, cannot pick up");
+						ROS_INFO("[SM %s] Error: Already docked to pod, cannot pick up", PrintTime().c_str());
 						return;
 					}
 					op_mode = msg->OperationMode;
@@ -224,7 +240,7 @@ void StateMachineNode::StateTransition(const state_machine::StateIn::ConstPtr& m
 				
 				if (3==msg->OperationMode){
 					// if (isPod){
-					// 	ROS_INFO("[SM] Error: Already docked to pod, cannot pick up");
+					// 	ROS_INFO("[SM %s] Error: Already docked to pod, cannot pick up",PrintTime().c_str());
 					// 	return;
 					// }
 					op_mode = state_machine::StateOut::OperationMode_Pickup;
