@@ -121,4 +121,4 @@ TebLocalPlannerROS:
  oscillation_v_eps: 0.1
  oscillation_omega_eps: 0.1
  oscillation_recovery_min_duration: 10
- oscillation_filter_duration: 10
+ oscillation_filter_duration: 25
