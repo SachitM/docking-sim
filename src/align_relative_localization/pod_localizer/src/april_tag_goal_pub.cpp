@@ -78,11 +78,11 @@ void aprilTagGoalPublisher::transformTagtoPodCenter(geometry_msgs::PoseStamped p
     tf::Transform transform_pod_center;
     if(is_left) {
         id = target_tags.first; 
-        transform_pod_center.setOrigin( tf::Vector3(0.75031,-1.1256,-0.437018) );
+        transform_pod_center.setOrigin( tf::Vector3(0.505,-1.01,0.47) );
     }
     else {
         id = target_tags.second;
-        transform_pod_center.setOrigin( tf::Vector3(-0.72656,-1.12573,-0.437018) );
+        transform_pod_center.setOrigin( tf::Vector3(-0.505,-1.101,0.47) );
     }
     transform_pod_center.setRotation( tf::createQuaternionFromRPY(0,0,0) );
     transform = transform * transform_pod_center ;
@@ -101,11 +101,11 @@ void aprilTagGoalPublisher::transformTagtoPodCenter(geometry_msgs::PoseStamped p
     tf::quaternionTFToMsg(tf::createQuaternionFromYaw(angle), goal_pose.pose.orientation);
 
     if(is_left) {
-        br.sendTransform(tf::StampedTransform(tag_tf, tag_tf.stamp_, "camera_link", "april_tf_left"));
+        br.sendTransform(tf::StampedTransform(tag_tf, tag_tf.stamp_, "camera", "april_tf_left"));
         pose_yaws_.first = angle;
     }
     else {
-        br.sendTransform(tf::StampedTransform(tag_tf, tag_tf.stamp_, "camera_link", "april_tf_right"));
+        br.sendTransform(tf::StampedTransform(tag_tf, tag_tf.stamp_, "camera", "april_tf_right"));
         pose_yaws_.second = angle;
     }
 
@@ -198,12 +198,13 @@ int main(int argc, char** argv) {
     ROS_INFO("aprilTag Localizer has started");
 
     //TODO: Change this to STATE MACHINE
-    // agp.target_tags = {1,2};
+    
     while (ros::ok())
 	{
+        agp.target_tags = {0,1};
         geometry_msgs::PoseStamped pod_center;
 		agp.tag_state_ = FOUND_NO_TAGS;
-
+        agp.enable_goal_publishing = true;
 		ros::spinOnce();
         //TODO: enable with sm
         if(agp.enable_goal_publishing) {

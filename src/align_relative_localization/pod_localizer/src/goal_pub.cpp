@@ -13,6 +13,8 @@ goal_publisher::goal_publisher(ros::NodeHandle *nodeH)
 	this->goal_pub = node->advertise<geometry_msgs::PoseStamped>("/pod_predicted_laser", 1);
 	this->prior_sub = node->subscribe("/pod_predicted_tag", 1, &goal_publisher::prior_cb, this);
 
+	// detected_legs_pub =node->advertise<sensor_msgs::LaserScan>("/pod_legs", 1);
+
 	// State machine output is this nodes input (for determining current state)
     this -> state_sub = node -> subscribe("SM_output", 10, &goal_publisher::StateMachineCb, this);
 
@@ -61,12 +63,28 @@ goal_pub_e goal_publisher::publish_goal()
 
 	goal_pub.publish(this->goal_pose);
 
+	tf::Stamped<tf::Transform> pod_tf;
+	tf::poseStampedMsgToTF(this->goal_pose, pod_tf);    
+	br.sendTransform(tf::StampedTransform(pod_tf, pod_tf.stamp_, "base_link", "pod"));
+
+
+	this->isval = false;
 	return status;
 }
 
 void goal_publisher::laser_data_cb(const sensor_msgs::LaserScanConstPtr& scan)
 {
+	if (this->isval) {
+		return;
+	}
+	static int first = 0;
 	this->laser_data = *scan;
+	if (!first++){
+		this->prior_set = true;
+		this->transformed_prior = true;
+		this->pod_prior_lidar_frame = {2.2, 0};
+	}
+	this->isval = true;
 }
 
 void goal_publisher::prior_cb(const geometry_msgs::PoseStamped& pose_msg)
@@ -96,8 +114,8 @@ goal_pub_e goal_publisher::get_legs(void)
 		try
 		{
 			this->prior_pose.header.frame_id = "/map";
-			this->listener.waitForTransform("/hokuyo", "/map", ros::Time(0), ros::Duration(1.0));
-			this->listener.transformPose("/hokuyo", this->prior_pose, this->prior_pose);
+			this->listener.waitForTransform("/laser", "/map", ros::Time(0), ros::Duration(1.0));
+			this->listener.transformPose("/laser", this->prior_pose, this->prior_pose);
 			this->pod_prior_lidar_frame = {this->prior_pose.pose.position.x, this->prior_pose.pose.position.y};
 			ROS_INFO("[GOAL_PUB] PRIOR (%f, %f)",this->pod_prior_lidar_frame.first, this->pod_prior_lidar_frame.second );
 			this->transformed_prior = true;
@@ -167,6 +185,8 @@ goal_pub_e goal_publisher::get_legs(void)
 
 		}
 	}
+	// sensor_msgs::LaserScan op_legs;
+	
 	ROS_INFO("[GOAL_PUB] Points Removed (%d)",k);
 
 	leg_indexes[no_of_leg_detected-1] = leg_indexes[no_of_leg_detected-1] + same_leg_count /2;
@@ -190,8 +210,6 @@ goal_pub_e goal_publisher::get_legs(void)
 	else if(no_of_leg_detected < 3)
 	{
 		//Ideally this should be done only when legs <2 not <=2, but this provides more stability
-		this->prior_set = false;
-		this->transformed_prior = false;
 		ROS_ERROR(" %d legs detected. ", no_of_leg_detected);
 		if(no_of_leg_detected == 2)
 		{	
@@ -231,6 +249,13 @@ goal_pub_e goal_publisher::get_legs(void)
 			status = GOAL_TWO_LEG_ESTIMATE;
 			return status;
 		}
+		ROS_ERROR("[GOAL_PUB] Prior UNSET");
+		ROS_ERROR("[GOAL_PUB] Prior UNSET");
+		ROS_ERROR("[GOAL_PUB] Prior UNSET");
+		ROS_ERROR("[GOAL_PUB] Prior UNSET");
+		ROS_ERROR("[GOAL_PUB] Prior UNSET");
+		this->prior_set = false;
+		this->transformed_prior = false;
 		status = GOAL_PUB_ERROR_LEG_COUNT_NOT_ENOUGH;
 	}
 
@@ -413,10 +438,10 @@ int main(int argc, char **argv)
 	while (ros::ok())
 	{
 		status = GOAL_PUB_SUCCESS;
-
+		gp.EnableGoalPub = true;	
 		ros::spinOnce();
 		// TODO: sm
-		if(gp.EnableGoalPub)
+		if(gp.EnableGoalPub && gp.isval)
 		{
 			if(GOAL_PUB_SUCCESS == status)
 			{

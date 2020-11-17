@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="namespace" default="align"/>
+  <param name ="/use_sim_time" value="false"/>
+  <node pkg="pod_localizer" type="yamltocaminfo.py" name="camera_info_publisher" output="screen"/>
+  <node pkg="tf" type="static_transform_publisher" name="map_broadcaster" args="0 0 0 0 0 0 map odom 100" />
+  <node pkg="tf" type="static_transform_publisher" name="odom_broadcaster" args="0 0 0 0 0 0 odom base_link 100" />
+  <node pkg="tf" type="static_transform_publisher" name="laser_broadcaster" args="0 0 0.3 0 0 0 base_link laser 100" />
+  <node pkg="tf" type="static_transform_publisher" name="cam_broadcaster" args="0 0 0.54 0 0 1.5708 base_link camera 100" />
+  <node pkg="tf" type="static_transform_publisher" name="lidar_broadcaster" args="0 0 0.65 0 0 0 base_link velodyne 100" />
+  <param name="/align/lidar_offset" type="double" value="0"/>
+  <param name="/align/camera_offset" type="double" value="0"/>
+  <include file="$(find pod_localizer)/launch/continuous_detection.launch"/>
+  <node pkg="pod_localizer" type="laser_pod_localizer" name="laser_pod_localizer" output="screen" launch-prefix="gnome-terminal --command"/>
+  <node pkg="pod_localizer" type="tag_pod_localizer" name="tag_pod_localizer" output="screen" launch-prefix="gnome-terminal --command"/>
+  <include file="$(find align_gazebo)/launch/waypoint_pub.launch"/>
+
+  <node pkg="docking_verification" type="docking_verification.py" name="verify_dock" output="screen"/>
+  
+  <node name="rviz" pkg="rviz" type="rviz" ns="$(arg namespace)" args="-d $(find align_description)/rviz/hardware.rviz">
+    </node>
+  <group ns="$(arg namespace)">
+  </group>
+</launch>

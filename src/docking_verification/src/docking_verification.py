@@ -13,10 +13,10 @@ from std_msgs.msg import Float64, Header
 from state_machine.msg import StateOut
 
 # define constants related to the pod and chassis design
-FRONT_LIDAR_DIST_FROM_CENTER = 1.1
-FRONT_LIDAR_HEIGHT = 0.7
-LENGTH_OF_POD_SHORT_SIDE = 0.95
-WIDTH_OF_POD_LONG_SIDE = 1.76
+FRONT_LIDAR_DIST_FROM_CENTER = 0.05 #1.1
+FRONT_LIDAR_HEIGHT = 0.65
+LENGTH_OF_POD_SHORT_SIDE = 0.9
+WIDTH_OF_POD_LONG_SIDE = 1.74
 HEIGHT_OF_UPPER_POD_LEG = 0.55
 
 # define a coordinate frame with the origin centred at the front LIDAR
@@ -26,12 +26,12 @@ right_lower_pod_leg_pos = np.array((-FRONT_LIDAR_DIST_FROM_CENTER-LENGTH_OF_POD_
 left_lower_pod_leg_pos = np.array((-FRONT_LIDAR_DIST_FROM_CENTER-LENGTH_OF_POD_SHORT_SIDE/2, -WIDTH_OF_POD_LONG_SIDE/2))
 
 # define a radius allowance to consider around each pod leg location
-Z_MIN = -0.3
-Z_MAX = 0.3
+Z_MIN = -0.2
+Z_MAX = 0.2
 POD_LEG_ESTIMATION_RADIUS_ALLOWANCE = 0.2
 
 # VISUALIZATION ON OR OFF
-VIS_MODE = 0
+VIS_MODE = 1
 
 class DockingVerification():
     """Check state, publish docking offset from pod."""
@@ -39,13 +39,13 @@ class DockingVerification():
         self.average_len = average_len
         self.moving_average = np.zeros(average_len)
         self.counter = 0
-        self.docking_state = False
+        self.docking_state = True
 
         self.publisher = rospy.Publisher('dock_offset', Float64, queue_size=10)
         self.testlidarpub = rospy.Publisher("filtered_pts", PointCloud2, queue_size=10)
         self.lidar_sub = rospy.Subscriber('SM_output', StateOut,
                                           self.state_listener)
-        self.lidar_sub = rospy.Subscriber("points_raw", PointCloud2,
+        self.lidar_sub = rospy.Subscriber("velodyne_points", PointCloud2,
                                           self.velodyne_points_callback)
 
     def velodyne_points_callback(self, point_cloud):
@@ -62,7 +62,7 @@ class DockingVerification():
         pcres = PointCloud2()
         header = Header()
         header.stamp = rospy.Time.now()
-        header.frame_id = 'velodyne_base_link'
+        header.frame_id = 'velodyne'
         
         for p in pc2.read_points(point_cloud, field_names=("x", "y", "z"), skip_nans=True):
             # check if the points are within the left upper leg
@@ -127,6 +127,7 @@ class DockingVerification():
             # get the mean offset
             meanX = (xposLU+xposLR+xposRU+xposLL)/4+FRONT_LIDAR_DIST_FROM_CENTER
             meanY = (yposLU+yposLR+yposRU+yposLL)/4
+            rospy.loginfo("Mean X[%f], MeanY[%f]",meanX, meanY)
             offset = np.sqrt(meanX**2 + meanY**2)
 
             self.moving_average[self.counter % self.average_len] = offset
