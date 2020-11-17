@@ -1,5 +1,5 @@
 {
-    "12": {"PodId": 12, "PodLocation": [32.5,35,90], "PodState": "ForDropoff", "FileName": "Waypoints1.npy"}, 
-    "3": {"PodId": 21, "PodLocation": [-52.7,28,-90], "PodState": "ForDropoff", "FileName": "Waypoints1.npy"}
+    "12": {"PodId": 12, "PodLocation": [32,7,-1.57], "PodState": "ForDropoff", "FileName": "Waypoints1.npy"}, 
+    "3": {"PodId": 21, "PodLocation": [40.5,31,3.14], "PodState": "ForDropoff", "FileName": "Waypoints2.npy"}
 }
 
