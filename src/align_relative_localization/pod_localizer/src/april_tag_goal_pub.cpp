@@ -78,11 +78,11 @@ void aprilTagGoalPublisher::transformTagtoPodCenter(geometry_msgs::PoseStamped p
     tf::Transform transform_pod_center;
     if(is_left) {
         id = target_tags.first; 
-        transform_pod_center.setOrigin( tf::Vector3(0.505,-1.01,0.47) );
+        transform_pod_center.setOrigin( tf::Vector3(0.505,-1.01,-0.47) );
     }
     else {
         id = target_tags.second;
-        transform_pod_center.setOrigin( tf::Vector3(-0.505,-1.101,0.47) );
+        transform_pod_center.setOrigin( tf::Vector3(-0.505,-1.01,-0.47) );
     }
     transform_pod_center.setRotation( tf::createQuaternionFromRPY(0,0,0) );
     transform = transform * transform_pod_center ;
@@ -91,14 +91,16 @@ void aprilTagGoalPublisher::transformTagtoPodCenter(geometry_msgs::PoseStamped p
     tag_tf.setRotation(transform.getRotation());
 
 
-    goal_pose.pose.position.x = tag_tf.getOrigin().x() + camera_offset;
-    goal_pose.pose.position.y = tag_tf.getOrigin().y();
-    goal_pose.pose.position.z = 0;
+    goal_pose.pose.position.x = tag_tf.getOrigin().x();
+    goal_pose.pose.position.y = tag_tf.getOrigin().z();
+    goal_pose.pose.position.z = tag_tf.getOrigin().z();
 
     float_t angle = M_PI/2 +  tf::getYaw(tag_tf.getRotation());
-    goal_pose.header.frame_id = "/base_link";
+    goal_pose.header.frame_id = "/camera";
     goal_pose.header.stamp = ros::Time(0);
     tf::quaternionTFToMsg(tf::createQuaternionFromYaw(angle), goal_pose.pose.orientation);
+
+    // ROS_INFO("[APRILTAG] ID %d, x %f y %f theta %f :", id, goal_pose.pose.position.x, goal_pose.pose.position.y);
 
     if(is_left) {
         br.sendTransform(tf::StampedTransform(tag_tf, tag_tf.stamp_, "camera", "april_tf_left"));
@@ -110,15 +112,15 @@ void aprilTagGoalPublisher::transformTagtoPodCenter(geometry_msgs::PoseStamped p
     }
 
     // Transform the Poses to World Frame
-    try {
-        listener.waitForTransform("/map", "/base_link", ros::Time(0), ros::Duration(1.0));
-        listener.transformPose("/map", goal_pose, goal_pose);
-    }
-    catch (tf::TransformException &ex) {
-        ROS_ERROR("%s",ex.what());
-        ros::Duration(1.0).sleep();
-        valid_ = false;
-    }
+    // try {
+    //     listener.waitForTransform("/base_link", "/camera", ros::Time(0), ros::Duration(1.0));
+    //     listener.transformPose("/base_link", goal_pose, goal_pose);
+    // }
+    // catch (tf::TransformException &ex) {
+    //     ROS_ERROR("%s",ex.what());
+    //     ros::Duration(1.0).sleep();
+    //     valid_ = false;
+    // }
 
     if(valid_) {	
         tf::Pose pose_tf;	
