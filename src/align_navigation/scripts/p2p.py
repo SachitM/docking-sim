@@ -158,10 +158,22 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         if(location_target != -1 and enable_p2p == True):
             print("Target ID:", location_target )
+            # if location_target == 12:
+            #     waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,28,np.pi/2], [32.5,30,np.pi/2]])
+            # elif location_target == 3:
+            #     waypoints = np.array([[32.5,38,np.pi/2], [32.5,40,np.pi/2], [25, 47, np.pi], [12.3,47, np.pi], [-10.87, 46.7, np.pi], [-24, 40, -np.pi/2], [-24, 31.5, -np.pi/2], [-50.7,28,-np.pi], [-51.7,28,-np.pi]])
+            # else:
+            #     print("Unknown Goal Given")
+            #     #TODO: Send failure to SM node
+
             if location_target == 12:
-                waypoints = np.array([[0,0,0],[10,0,0],[20,0,0], [25,0,0],[32.5,10,np.pi/2], [32.5,28,np.pi/2], [32.5,30,np.pi/2]])
+                waypoints = np.array([[0,0,0], [7,0,0], [16,0,0], [30,2,1.04], [34, 9, 1.57], [31.7, 25, 1.57], [32.5, 30, 1.57]])
             elif location_target == 3:
-                waypoints = np.array([[32.5,38,np.pi/2], [32.5,40,np.pi/2], [25, 47, np.pi], [12.3,47, np.pi], [-10.87, 46.7, np.pi], [-24, 40, -np.pi/2], [-24, 31.5, -np.pi/2], [-50.7,28,-np.pi], [-51.7,28,-np.pi]])
+                waypoints = np.array([[40.5, 31, 3.14], [35.3, 25, -1.57], [35, 13.2, -1.57], [29,2,-1.57], [24.5, -6.4, -1.57], [24, -11.15, -1.57]])
+            elif location_target == 21:
+                waypoints = np.array([[0,0,0], [15,0,0], [30, 0, 0], [35,0,0]])
+            elif location_target == 4:
+                waypoints = np.array([[32, 7, -1.57], [26.6, -1.5, -1.57], [23.5, -8.65, -1.57], [24, -11.15, -1.57]])
             else:
                 print("Unknown Goal Given")
                 #TODO: Send failure to SM node
