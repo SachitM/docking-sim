@@ -139,7 +139,7 @@ class Chassis {
         double total_distance = 10.0;
         double stopping_distance = 0.0;
         double lidar_distance = 0.1;     // from the front
-        double safe_distance = 0.5;
+        double safe_distance = 0.75;
 
         // buffer times are in seconds
         // sensing (1/sampling rate), communication, safety
