@@ -7,8 +7,8 @@
 #include "state_machine/StateOut.h"
 #include "tf/tf.h"
 
-// #define NO_OF_SAMPLES_LASER			896
-#define NO_OF_SAMPLES_LASER			726
+#define NO_OF_SAMPLES_LASER			896
+// #define NO_OF_SAMPLES_LASER			726
 #define LEG_RADIUS					0.02
 #define LENGTH_BIG_SIDE				1.74
 #define LENGTH_SHORT_SIDE			0.9
@@ -16,7 +16,7 @@
 #define MAX_RANGE_ALLOWED			4
 #define MIN_RANGE_ALLOWED			0.3
 #define SAMPLES_SKIPPED				100 //40 Corresponds to 10degrees
-#define CIRCLE_RADIUS				1.6
+#define CIRCLE_RADIUS				1.4
 
 //TODO Move to param server
 #define BASE_LINK_OFFSET_X			1.1 //+0.95

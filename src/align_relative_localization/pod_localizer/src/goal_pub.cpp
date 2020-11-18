@@ -9,7 +9,7 @@ goal_publisher::goal_publisher(ros::NodeHandle *nodeH)
 
 	this->node= nodeH;
 
-	this->laser_sub = node->subscribe("/scan", 1, &goal_publisher::laser_data_cb, this);
+	this->laser_sub = node->subscribe("/scan_16", 1, &goal_publisher::laser_data_cb, this);
 	this->goal_pub = node->advertise<geometry_msgs::PoseStamped>("/pod_predicted_laser", 1);
 	this->prior_sub = node->subscribe("/pod_predicted_tag", 1, &goal_publisher::prior_cb, this);
 
@@ -67,8 +67,6 @@ goal_pub_e goal_publisher::publish_goal()
 	tf::poseStampedMsgToTF(this->goal_pose, pod_tf);    
 	br.sendTransform(tf::StampedTransform(pod_tf, pod_tf.stamp_, "base_link", "pod"));
 
-
-	this->isval = false;
 	return status;
 }
 
@@ -79,11 +77,11 @@ void goal_publisher::laser_data_cb(const sensor_msgs::LaserScanConstPtr& scan)
 	}
 	static int first = 0;
 	this->laser_data = *scan;
-	if (!first++){
-		this->prior_set = true;
-		this->transformed_prior = true;
-		this->pod_prior_lidar_frame = {2.2, 0};
-	}
+	// if (!first++){
+	// 	this->prior_set = true;
+	// 	this->transformed_prior = true;
+	// 	this->pod_prior_lidar_frame = {2.2, 0};
+	// }
 	this->isval = true;
 }
 
@@ -173,6 +171,7 @@ goal_pub_e goal_publisher::get_legs(void)
 					leg_indexes[no_of_leg_detected-1] = leg_indexes[no_of_leg_detected-1] + same_leg_count /2;
 				}
 				same_leg_count = 1;
+				i += 10;
 				no_of_leg_detected++;
 			}
 
@@ -201,6 +200,11 @@ goal_pub_e goal_publisher::get_legs(void)
 		this->leg_points[i].x = (this->laser_data.ranges[leg_indexes[i]] + LEG_RADIUS)* cos(angle);
 		this->leg_points[i].y = (this->laser_data.ranges[leg_indexes[i]] + LEG_RADIUS)  * sin(angle);
 		ROS_INFO(" - Leg%d (%f,%f, %f)", i,this->leg_points[i].x, this->leg_points[i].y, angle*180 / M_PI);
+		if (no_of_leg_detected == 4)
+		{
+			if (this->leg_points[1].x < this->leg_points[3].x)
+			return GOAL_PUB_ERROR_LEG_COUNT_NOT_ENOUGH;
+		}
 	}
 
 	if(no_of_leg_detected == 3)
@@ -452,6 +456,7 @@ int main(int argc, char **argv)
 			{
 				status = gp.publish_goal();
 			}
+			gp.isval = false;
 		}
 
 		loop_rate.sleep();
