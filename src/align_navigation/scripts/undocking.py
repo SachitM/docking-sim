@@ -131,8 +131,8 @@ def StateMachineCb(StateInfo):
         # waypoints[1,0] = -53#Location[0] 
         # waypoints[1,1] = 28#Location[1]
         # waypoints[1,2] = -math.pi#np.deg2rad(Location[2])
-        waypoints[0,0] = Location[0] - 3 * np.cos(Location[2])
-        waypoints[0,1] = Location[1] - 3 * np.sin(Location[2])
+        waypoints[0,0] = Location[0] - 1 * np.cos(Location[2])
+        waypoints[0,1] = Location[1] - 1 * np.sin(Location[2])
         waypoints[0,2] = Location[2]
 
         waypoints[1,0] = Location[0] 

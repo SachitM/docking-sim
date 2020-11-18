@@ -166,14 +166,14 @@ if __name__ == '__main__':
             #     print("Unknown Goal Given")
             #     #TODO: Send failure to SM node
 
-            if location_target == 21:
+            if location_target == 12:
                 waypoints = np.array([[0,0,0], [7,0,0], [16,0,0], [30,2,1.04], [34, 9, 1.57], [31.7, 25, 1.57], [32.5, 30, 1.57]])
             elif location_target == 3:
-                waypoints = np.array([[40.5, 31, 3.14], [35.3, 25, -1.57], [35, 13.2, -1.57], [29,2,-1.57], [24.5, -6.4, -1.57], [24, -11.15, -1.57]])
-            elif location_target == 12:
+                waypoints = np.array([[40.5, 31, 3.14], [35.3, 25, -1.57], [35, 13.2, -1.57], [29,2,-1.57], [24.5, -6.4, -1.57], [24, -10.15, -1.57]])
+            elif location_target == 21:
                 waypoints = np.array([[0,0,0], [15,0,0], [30, 0, 0], [35,0,0]])
             elif location_target == 4:
-                waypoints = np.array([[32, 7, -1.57], [26.6, -1.5, -1.57], [23.5, -8.65, -1.57], [24, -11.15, -1.57]])
+                waypoints = np.array([[32, 7, -1.57], [26.6, -1.5, -1.57], [23.5, -8.65, -1.57], [24, -10.15, -1.57]])
             else:
                 print("Unknown Goal Given")
                 #TODO: Send failure to SM node
