@@ -279,8 +279,8 @@ def docking_execution():
             rospy.wait_for_message("/waypoints_goal", PoseArray)
             rospy.wait_for_message("/waypoints_goal", PoseArray)
             rospy.wait_for_message("/waypoints_goal", PoseArray)
-            go_to_goal(waypoints[0])
             last_goal = True
+            go_to_goal(waypoints[0])
             go_to_goal(waypoints[1])
             pursuitToWaypoint(waypoints[-3],0)
             pursuitToWaypoint(waypoints[-2],1)
@@ -301,6 +301,8 @@ def docking_execution():
                             Float64,
                             dock_callback)
             rospy.wait_for_message("/dock_offset", Float64)
+            rate.sleep()
+            rate.sleep()
             rate.sleep()
             goal = waypoints[-1] + 0
             dx = goal[0] - pix_bot_center.position.x
