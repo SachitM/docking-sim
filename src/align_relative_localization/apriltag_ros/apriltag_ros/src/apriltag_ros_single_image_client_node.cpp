@@ -32,7 +32,7 @@
 #include "apriltag_ros/common_functions.h"
 #include <apriltag_ros/AnalyzeSingleImage.h>
 
-bool getRosParameter (ros::NodeHandle& pnh, std::string name, double& param)
+bool getRosParameter(ros::NodeHandle& pnh, std::string name, double& param)
 {
   // Write parameter "name" from ROS Parameter Server into param
   // Return true if successful, false otherwise
@@ -49,36 +49,32 @@ bool getRosParameter (ros::NodeHandle& pnh, std::string name, double& param)
   }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "apriltag_ros_single_image_client");
 
   ros::NodeHandle nh;
   ros::NodeHandle pnh("~");
 
-  ros::ServiceClient client =
-      nh.serviceClient<apriltag_ros::AnalyzeSingleImage>(
-          "single_image_tag_detection");
+  ros::ServiceClient client = nh.serviceClient<apriltag_ros::AnalyzeSingleImage>("single_image_tag_detection");
 
   // Get the request parameters
   apriltag_ros::AnalyzeSingleImage service;
   service.request.full_path_where_to_get_image =
-      apriltag_ros::getAprilTagOption<std::string>(
-          pnh, "image_load_path", "");
+      apriltag_ros::getAprilTagOption<std::string>(pnh, "image_load_path", "");
   if (service.request.full_path_where_to_get_image.empty())
   {
     return 1;
   }
   service.request.full_path_where_to_save_image =
-      apriltag_ros::getAprilTagOption<std::string>(
-          pnh, "image_save_path", "");
+      apriltag_ros::getAprilTagOption<std::string>(pnh, "image_save_path", "");
   if (service.request.full_path_where_to_save_image.empty())
   {
     return 1;
   }
 
   // Replicate sensors_msgs/CameraInfo message (must be up-to-date with the
-  // analyzed image!)  
+  // analyzed image!)
   service.request.camera_info.distortion_model = "plumb_bob";
   double fx, fy, cx, cy;
   if (!getRosParameter(pnh, "fx", fx))
@@ -113,5 +109,5 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  return 0; // happy ending
+  return 0;  // happy ending
 }

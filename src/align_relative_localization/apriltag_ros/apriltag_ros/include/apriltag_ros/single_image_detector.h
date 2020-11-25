@@ -49,23 +49,22 @@
 
 namespace apriltag_ros
 {
-
 class SingleImageDetector
 {
- private:
+private:
   TagDetector tag_detector_;
   ros::ServiceServer single_image_analysis_service_;
 
   ros::Publisher tag_detections_publisher_;
-  
- public:
+
+public:
   SingleImageDetector(ros::NodeHandle& nh, ros::NodeHandle& pnh);
 
   // The function which provides the single image analysis service
   bool analyzeImage(apriltag_ros::AnalyzeSingleImage::Request& request,
-                     apriltag_ros::AnalyzeSingleImage::Response& response);
+                    apriltag_ros::AnalyzeSingleImage::Response& response);
 };
 
-} // namespace apriltag_ros
+}  // namespace apriltag_ros
 
-#endif // APRILTAG_ROS_SINGLE_IMAGE_DETECTOR_H
+#endif  // APRILTAG_ROS_SINGLE_IMAGE_DETECTOR_H

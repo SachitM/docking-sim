@@ -37,37 +37,30 @@ PLUGINLIB_EXPORT_CLASS(apriltag_ros::ContinuousDetector, nodelet::Nodelet);
 
 namespace apriltag_ros
 {
-void ContinuousDetector::onInit ()
+void ContinuousDetector::onInit()
 {
   ros::NodeHandle& nh = getNodeHandle();
   ros::NodeHandle& pnh = getPrivateNodeHandle();
 
   tag_detector_ = std::shared_ptr<TagDetector>(new TagDetector(pnh));
-  draw_tag_detections_image_ = getAprilTagOption<bool>(pnh, 
-      "publish_tag_detections_image", false);
-  it_ = std::shared_ptr<image_transport::ImageTransport>(
-      new image_transport::ImageTransport(nh));
+  draw_tag_detections_image_ = getAprilTagOption<bool>(pnh, "publish_tag_detections_image", false);
+  it_ = std::shared_ptr<image_transport::ImageTransport>(new image_transport::ImageTransport(nh));
 
-  camera_image_subscriber_ =
-      it_->subscribeCamera("image_rect", 1,
-                          &ContinuousDetector::imageCallback, this);
-  tag_detections_publisher_ =
-      nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
+  camera_image_subscriber_ = it_->subscribeCamera("image_rect", 1, &ContinuousDetector::imageCallback, this);
+  tag_detections_publisher_ = nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
   if (draw_tag_detections_image_)
   {
     tag_detections_image_publisher_ = it_->advertise("tag_detections_image", 1);
   }
 }
 
-void ContinuousDetector::imageCallback (
-    const sensor_msgs::ImageConstPtr& image_rect,
-    const sensor_msgs::CameraInfoConstPtr& camera_info)
+void ContinuousDetector::imageCallback(const sensor_msgs::ImageConstPtr& image_rect,
+                                       const sensor_msgs::CameraInfoConstPtr& camera_info)
 {
   // Lazy updates:
   // When there are no subscribers _and_ when tf is not published,
   // skip detection.
-  if (tag_detections_publisher_.getNumSubscribers() == 0 &&
-      tag_detections_image_publisher_.getNumSubscribers() == 0 &&
+  if (tag_detections_publisher_.getNumSubscribers() == 0 && tag_detections_image_publisher_.getNumSubscribers() == 0 &&
       !tag_detector_->get_publish_tf())
   {
     // ROS_INFO_STREAM("No subscribers and no tf publishing, skip processing.");
@@ -87,8 +80,7 @@ void ContinuousDetector::imageCallback (
   }
 
   // Publish detected tags in the image by AprilTag 2
-  tag_detections_publisher_.publish(
-      tag_detector_->detectTags(cv_image_,camera_info));
+  tag_detections_publisher_.publish(tag_detector_->detectTags(cv_image_, camera_info));
 
   // Publish the camera image overlaid by outlines of the detected tags and
   // their payload values
@@ -99,4 +91,4 @@ void ContinuousDetector::imageCallback (
   }
 }
 
-} // namespace apriltag_ros
+}  // namespace apriltag_ros

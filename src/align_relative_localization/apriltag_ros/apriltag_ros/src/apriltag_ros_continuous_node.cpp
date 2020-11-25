@@ -33,7 +33,7 @@
 
 #include <nodelet/loader.h>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "apriltag_ros");
 
@@ -41,9 +41,7 @@ int main(int argc, char **argv)
   nodelet::M_string remap(ros::names::getRemappings());
   nodelet::V_string nargv;
 
-  nodelet.load(ros::this_node::getName(),
-              "apriltag_ros/ContinuousDetector",
-              remap, nargv);
+  nodelet.load(ros::this_node::getName(), "apriltag_ros/ContinuousDetector", remap, nargv);
 
   ros::spin();
   return 0;

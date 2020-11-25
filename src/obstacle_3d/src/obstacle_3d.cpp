@@ -19,104 +19,105 @@ Author: Sanil Pande
 #include <hms_client/ping_pong.h>
 #include <state_machine/StateOut.h>
 
-
 using namespace std;
-class LidarDetect{
+class LidarDetect
+{
+public:
+  ros::Subscriber cluster_sub;  // get centroids of clusters
+  ros::ServiceServer hms_service;
+  ros::Subscriber state_sub;
 
-    public:
-        ros::Subscriber cluster_sub;    // get centroids of clusters
-        ros::ServiceServer hms_service;
-        ros::Subscriber state_sub;
+  LidarDetect()
+  {
+    double buffer_time = sense_buffer + comm_buffer + safe_buffer;
+    double stopping_distance = (vel * vel * 0.5 / acc) + (buffer_time * vel);
 
-        LidarDetect() {
-            double buffer_time = sense_buffer + comm_buffer + safe_buffer;
-            double stopping_distance = (vel * vel * 0.5 / acc) + (buffer_time * vel);
+    total_distance = stopping_distance + lidar_distance + safe_distance;
+  }
 
-            total_distance = stopping_distance + lidar_distance + safe_distance;
-        }
+  // add velocity callback
 
-        //add velocity callback
+  void clustering_callback(const autoware_msgs::Centroids& centroids)
+  {
+    if (is_approach == true)
+    {
+      return;
+    }
 
-        void clustering_callback(const autoware_msgs::Centroids &centroids){
+    double x, y;
+    for (auto point : centroids.points)
+    {
+      x = point.x;
+      y = point.y;
+      if ((std::abs(y) < width / 2) && (direction * x < total_distance) && (direction * x > lidar_distance))
+      {
+        ROS_INFO("Obstacle detected!");
+        hms_flag < 1;
+        return;
+      }
+    }
+    hms_flag = 0;
+    return;
+  }
 
-            if (is_approach == true) {
-                return;
-            }
+  bool check(hms_client::ping_pong::Request& req, hms_client::ping_pong::Response& res)
+  {
+    res.msg.header.stamp = ros::Time::now();
+    res.health = 1;
+    res.error_code = hms_flag ? 1 : 0;
+    hms_flag = false;
+    return true;
+  }
 
-            double x, y;
-            for (auto point : centroids.points){
-                x = point.x;
-                y = point.y;
-                if ((std::abs(y) < width / 2) && (direction * x < total_distance) && (direction * x > lidar_distance)) {
-                    ROS_INFO( "Obstacle detected!");
-                    hms_flag < 1;
-                    return;
-                }
-            }
-            hms_flag = 0;
-            return;
-        }
+  void state_callback(const state_machine::StateOut::ConstPtr& in_state)
+  {
+    if (in_state->CurrState == state_machine::StateOut::State_D_Approach)
+    {
+      is_approach = true;
+    }
+    else
+    {
+      is_approach = false;
+    }
+  }
 
-        bool check(hms_client::ping_pong::Request  &req,
-                 hms_client::ping_pong::Response &res)
-        {
-            res.msg.header.stamp = ros::Time::now();
-            res.health = 1;
-            res.error_code = hms_flag ? 1 : 0;
-            hms_flag = false;
-            return true;
-        }
+private:
+  bool hms_flag;
+  bool is_approach;
+  double width = 1.85;  // changed since 1.355 wasn not working correctly
+  double vel = 4;
+  double acc = 3;  // assuming acc == deceleration
 
-        void state_callback(const state_machine::StateOut::ConstPtr& in_state)
-        {
-            if (in_state->CurrState == state_machine::StateOut::State_D_Approach)
-            {
-                is_approach = true;
-            }
-            else
-            {
-                is_approach = false;
-            }
-        }
+  // distances are in meters
+  double total_distance = 5;    // to be overwritten in constructor
+  double lidar_distance = 0.1;  // from the front
+  double safe_distance = 0.3;
 
-    private:
-        bool hms_flag;
-        bool is_approach;
-        double width = 1.85;    // changed since 1.355 wasn not working correctly
-        double vel = 4;
-        double acc = 3; // assuming acc == deceleration
+  // times are in seconds
+  double sense_buffer = 1.0 / 40;  // since the lidar samples at 40 Hz
+  double comm_buffer = 0.025;
+  double safe_buffer = 0.1;
 
-        // distances are in meters
-        double total_distance = 5;      // to be overwritten in constructor
-        double lidar_distance = 0.1;     // from the front
-        double safe_distance = 0.3;
-
-        // times are in seconds
-        double sense_buffer = 1.0 / 40;    // since the lidar samples at 40 Hz
-        double comm_buffer = 0.025;
-        double safe_buffer = 0.1;
-
-        int direction = 1;  // forward, use direction callback to change
-
+  int direction = 1;  // forward, use direction callback to change
 };
 
-
-int main (int argc, char** argv)
+int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "obstacle_3d");
-    ros::NodeHandle n;
+  ros::init(argc, argv, "obstacle_3d");
+  ros::NodeHandle n;
 
-    LidarDetect lid;
+  LidarDetect lid;
 
-    lid.cluster_sub = n.subscribe("/cluster_centroids", 10, &LidarDetect::clustering_callback, &lid);
-    lid.state_sub = n.subscribe("SM_output", 1000, &LidarDetect::state_callback, &lid);
-    lid.hms_service = n.advertiseService("health_check_obstacle_3d", &LidarDetect::check, &lid);
+  lid.cluster_sub = n.subscribe("/cluster_centroids", 10, &LidarDetect::clustering_callback, &lid);
+  lid.state_sub = n.subscribe("SM_output", 1000, &LidarDetect::state_callback, &lid);
+  lid.hms_service = n.advertiseService("health_check_obstacle_3d", &LidarDetect::check, &lid);
 
-    ros::Rate loop_rate(50);
+  ros::Rate loop_rate(50);
 
-    while(ros::ok()){
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
-    return 0;
+  while (ros::ok())
+  {
+    ros::spinOnce();
+    loop_rate.sleep();
+  }
+  return 0;
 }
