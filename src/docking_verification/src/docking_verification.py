@@ -9,7 +9,7 @@ from sensor_msgs import point_cloud2 as pc2
 from sensor_msgs.msg import PointCloud2
 
 from geometry_msgs.msg import Point32
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Header
 from state_machine.msg import StateOut
 
 # define constants related to the pod and chassis design
@@ -28,7 +28,10 @@ left_lower_pod_leg_pos = np.array((-FRONT_LIDAR_DIST_FROM_CENTER-LENGTH_OF_POD_S
 # define a radius allowance to consider around each pod leg location
 Z_MIN = -0.3
 Z_MAX = 0.3
-POD_LEG_ESTIMATION_RADIUS_ALLOWANCE = 0.1 
+POD_LEG_ESTIMATION_RADIUS_ALLOWANCE = 0.2
+
+# VISUALIZATION ON OR OFF
+VIS_MODE = 0
 
 class DockingVerification():
     """Check state, publish docking offset from pod."""
@@ -39,6 +42,7 @@ class DockingVerification():
         self.docking_state = False
 
         self.publisher = rospy.Publisher('dock_offset', Float64, queue_size=10)
+        self.testlidarpub = rospy.Publisher("filtered_pts", PointCloud2, queue_size=10)
         self.lidar_sub = rospy.Subscriber('SM_output', StateOut,
                                           self.state_listener)
         self.lidar_sub = rospy.Subscriber("points_raw", PointCloud2,
@@ -50,10 +54,15 @@ class DockingVerification():
             return
 
         x, y, z = [], [], []
+        cloud_points = []
         left_upper = []
         right_upper = []
         left_lower = []
         right_lower = []
+        pcres = PointCloud2()
+        header = Header()
+        header.stamp = rospy.Time.now()
+        header.frame_id = 'velodyne_base_link'
         
         for p in pc2.read_points(point_cloud, field_names=("x", "y", "z"), skip_nans=True):
             # check if the points are within the left upper leg
@@ -78,38 +87,53 @@ class DockingVerification():
                 if(z>=Z_MIN and z<=Z_MAX):
                     right_lower.append((x,y,z))
                     cloud_points.append((x,y,z))
+        if VIS_MODE == 1:
+            cloud_points.append((right_upper_pod_leg_pos[0], right_upper_pod_leg_pos[1], 0.5))
+            cloud_points.append((left_upper_pod_leg_pos[0],left_upper_pod_leg_pos[1], 0.5))
+            cloud_points.append((right_lower_pod_leg_pos[0], right_lower_pod_leg_pos[1], 0.5))
+            cloud_points.append((left_lower_pod_leg_pos[0], left_lower_pod_leg_pos[1], 0.5))
+            scaled_polygon_pcl = pc2.create_cloud_xyz32(header, cloud_points)
+            self.testlidarpub.publish(scaled_polygon_pcl)
 
         left_upper = np.array(left_upper)
         right_upper = np.array(right_upper)
         left_lower = np.array(left_lower)
         right_lower = np.array(right_lower)
 
-        # fit the upper left pod leg
-        x, y, z = left_upper.T
-        xposLU, yposLU = x.mean(), y.mean()
+        if(len(left_lower)==0 or len(right_lower)==0 or len(left_upper)==0 or len(right_upper)==0):
+            meanX = 0
+            meanY = 0
+            offset = 0
 
-        # fit the upper right pod leg
-        x, y, z = right_upper.T
-        xposRU, yposRU = x.mean(), y.mean()
+            #lidar is assumed to be at front of chassis
+            self.publisher.publish(0)
+        else:
+            # fit the upper left pod leg
+            x, y, z = left_upper.T
+            xposLU, yposLU = x.mean(), y.mean()
 
-        # fit the lower left pod leg
-        x, y, z = left_lower.T
-        xposLL, yposLL = x.mean(), y.mean()
+            # fit the upper right pod leg
+            x, y, z = right_upper.T
+            xposRU, yposRU = x.mean(), y.mean()
 
-        # fit the lower right pod leg
-        x, y, z = right_lower.T
-        xposLR, yposLR = x.mean(), y.mean()
+            # fit the lower left pod leg
+            x, y, z = left_lower.T
+            xposLL, yposLL = x.mean(), y.mean()
 
-        # get the mean offset
-        meanX = (xposLU+xposLR+xposRU+xposLL)/4+FRONT_LIDAR_DIST_FROM_CENTER
-        meanY = (yposLU+yposLR+yposRU+yposLL)/4
-        offset = np.sqrt(meanX**2 + meanY**2)
+            # fit the lower right pod leg
+            x, y, z = right_lower.T
+            xposLR, yposLR = x.mean(), y.mean()
 
-        self.moving_average[self.counter % self.average_len] = offset
-        self.counter += 1
+            # get the mean offset
+            meanX = (xposLU+xposLR+xposRU+xposLL)/4+FRONT_LIDAR_DIST_FROM_CENTER
+            meanY = (yposLU+yposLR+yposRU+yposLL)/4
+            offset = np.sqrt(meanX**2 + meanY**2)
 
-        #lidar is assumed to be at front of chassis
-        self.publisher.publish(round(np.mean(self.moving_average), 4))
+            self.moving_average[self.counter % self.average_len] = offset
+            self.counter += 1
+
+            #lidar is assumed to be at front of chassis
+            self.publisher.publish(round(np.mean(self.moving_average), 4))
 
     def state_listener(self, state):
         """Listen to chassis state and update own state."""

@@ -220,14 +220,14 @@ int main(int argc, char **argv)
       std_msgs::String msg;
       msg.data = "Passed";
       hms_status_pub.publish(msg);
-      ROS_INFO("Printing here in hms status %s", msg.data.c_str());
+      ROS_INFO("[HMS] Status %s", msg.data.c_str());
     }
     else
     {
       std_msgs::String msg;
       msg.data = "Failed";
       hms_status_pub.publish(msg);
-      ROS_INFO("Printing here in hms status %s", msg.data.c_str());
+      ROS_INFO("[HMS] Status %s", msg.data.c_str());
     }
 
     loop_count += 1;

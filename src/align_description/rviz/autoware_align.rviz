@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Camera1
         - /PointCloud21
-        - /PointCloud21/Status1
         - /PointCloud22/Status1
       Splitter Ratio: 0.5
     Tree Height: 255
@@ -214,11 +213,7 @@ Visualization Manager:
       Marker Topic: /phz
       Name: MarkerArray
       Namespaces:
-        PHZ_groundtruth: true
-        PHZ_predicted: true
-        PHZ_start_location: true
-        pod_groundtruth_location: true
-        predicted_wp: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -234,14 +229,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        april_tag_frame_id_1:
-          Value: true
-        april_tag_frame_id_2:
-          Value: true
-        april_tf_1:
-          Value: true
-        april_tf_2:
-          Value: true
         base_body_link:
           Value: true
         base_link:
@@ -304,15 +291,8 @@ Visualization Manager:
                 wheel_right_rear_link:
                   {}
               camera_link:
-                april_tf_1:
-                  {}
-                april_tf_2:
-                  {}
                 camera_optical_link:
-                  april_tag_frame_id_1:
-                    {}
-                  april_tag_frame_id_2:
-                    {}
+                  {}
               hokuyo:
                 {}
               imu_link:
@@ -425,7 +405,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         steering_front_link:
           Alpha: 1
           Show Axes: false
@@ -505,25 +484,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.716087341308594
+      Distance: 86.29695129394531
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 32.06037139892578
-        Y: 32.504703521728516
-        Z: 17.948776245117188
+        X: 12.549558639526367
+        Y: 13.751692771911621
+        Z: 16.66693878173828
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.509796380996704
+      Pitch: 1.5547963380813599
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.590416431427002
+      Yaw: 4.720417499542236
     Saved: ~
 Window Geometry:
   Camera:
@@ -544,4 +523,4 @@ Window Geometry:
     collapsed: true
   Width: 808
   X: 728
-  Y: 143
+  Y: 113

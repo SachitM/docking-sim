@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # license removed for brevity
 
-# Author: Rohan Rao
+# Author: Rohan Rao and Sachit Mahajan
 
 import rospy
 import tf
@@ -118,10 +118,29 @@ def go_to_goal(goal):
         rospy.loginfo("[Undocking]: Navigation test finished.")
 
 def StateMachineCb(StateInfo):
-    global EnableApproachUndock, EnableUnlock, PodId
+    global EnableApproachUndock, EnableUnlock, PodId, waypoints
     EnableApproachUndock = True if StateInfo.CurrState == StateOut.State_U_Approach else False
     EnableUnlock = True if StateInfo.CurrState == StateOut.State_Unlock else False
     PodId = StateInfo.PodInfo
+    if EnableApproachUndock:
+        Location, _ = GetPodLocAndWaypointsFileName(Path + 'DropoffPodLoc.json', str(PodId))
+        # waypoints[0,0] = -52.7#Location[0] - 3 * np.sin(np.deg2rad(Location[2]))
+        # waypoints[0,1] = 28#Location[1] - 3 * np.cos(np.deg2rad(Location[2]))
+        # waypoints[0,2] = -math.pi#np.deg2rad(Location[2])
+
+        # waypoints[1,0] = -53#Location[0] 
+        # waypoints[1,1] = 28#Location[1]
+        # waypoints[1,2] = -math.pi#np.deg2rad(Location[2])
+        waypoints[0,0] = Location[0] - 1 * np.cos(Location[2])
+        waypoints[0,1] = Location[1] - 1 * np.sin(Location[2])
+        waypoints[0,2] = Location[2]
+
+        waypoints[1,0] = Location[0] 
+        waypoints[1,1] = Location[1]
+        waypoints[1,2] = Location[2]
+        
+
+
 
 def undocking_execution():
     global waypoints, pix_bot_center, pix_bot_theta, pix_bot_velocity, state, cmd_pub, sm_pub, EnableApproachUndock, EnableUnlock
@@ -133,6 +152,8 @@ def undocking_execution():
             StateUpdateMsg.TransState = StateOut.State_U_Approach
             StateUpdateMsg.StateTransitionCond = 1
             sm_pub.publish(StateUpdateMsg)
+            rospy.wait_for_message("SM_output", StateOut)
+            rospy.wait_for_message("SM_output", StateOut)
         if EnableUnlock:
             lift_goal = Float64()
             lift_goal.data = 0.0
@@ -140,26 +161,27 @@ def undocking_execution():
             StateUpdateMsg.TransState = StateOut.State_Unlock
             StateUpdateMsg.StateTransitionCond = 1
             sm_pub.publish(StateUpdateMsg)
-            break
+            rospy.wait_for_message("SM_output", StateOut)
+            rospy.wait_for_message("SM_output", StateOut)
 
 if __name__ == '__main__':
 
-    rospy.init_node('undocking_client_py')
+    rospy.init_node('undocking_py')
     waypoints = np.zeros((2, 3))
     rate = rospy.Rate(0.25)
     rospy.Subscriber("/undocking_goal",
                    PoseArray,
                    waypointCallback)
     rospy.Subscriber("SM_output", StateOut, StateMachineCb)
-    # Location, WaypointsFile = GetPodLocAndWaypointsFileName(Path + 'DropoffPodLoc.json', str(PodId))
+    # Location, _ = GetPodLocAndWaypointsFileName(Path + 'DropoffPodLoc.json', str(PodId))
     
-    waypoints[0,0] = -52.7#Location[0] - 3 * np.sin(np.deg2rad(Location[2]))[-51.7,28,-np.pi]
-    waypoints[0,1] = 28#Location[1] - 3 * np.cos(np.deg2rad(Location[2]))
-    waypoints[0,2] = -math.pi#np.deg2rad(Location[2])
+    # waypoints[0,0] = -52.7#Location[0] - 3 * np.sin(np.deg2rad(Location[2]))[-51.7,28,-np.pi]
+    # waypoints[0,1] = 28#Location[1] - 3 * np.cos(np.deg2rad(Location[2]))
+    # waypoints[0,2] = -math.pi#np.deg2rad(Location[2])
 
-    waypoints[1,0] = -53#Location[0] 
-    waypoints[1,1] = 28#Location[1]
-    waypoints[1,2] = -math.pi#np.deg2rad(Location[2])
+    # waypoints[1,0] = -53#Location[0] 
+    # waypoints[1,1] = 28#Location[1]
+    # waypoints[1,2] = -math.pi#np.deg2rad(Location[2])
 
     pix_bot_center = Pose()
     pix_bot_velocity = Twist()

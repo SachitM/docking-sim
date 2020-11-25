@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Author: Sachit Mahajan
+
 from common import *
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray, Pose, Twist

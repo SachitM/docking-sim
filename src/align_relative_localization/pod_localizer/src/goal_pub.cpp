@@ -378,13 +378,11 @@ void goal_publisher::extrapolate_the_fourth_point(void)
 
 void goal_publisher::StateMachineCb(const state_machine::StateOut::ConstPtr& InStateInfo)
 {
-    ROS_INFO("CALLBACK TRIGGERED for goal pub lidar");
+    
     // Enable goal pub if curr state is pod identification or approach
     if(InStateInfo -> CurrState == state_machine::StateOut::State_Identify || InStateInfo -> CurrState == state_machine::StateOut::State_D_Approach)
     {
         EnableGoalPub = true;
-
-        ROS_INFO("ENABLED");
     }
     else
     {

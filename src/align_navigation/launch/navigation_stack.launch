@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="align_navigation" name="p2p" type="p2p.py" output="screen"/>
+  <node pkg="align_navigation" name="goal_publisher" type="goal_publisher.py" output="screen"/> 
+  <node pkg="align_navigation" name="undocking" type="undocking.py" output="screen"/> 
+</launch>

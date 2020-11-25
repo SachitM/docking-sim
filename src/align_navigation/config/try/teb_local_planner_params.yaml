@@ -7,7 +7,7 @@ TebLocalPlannerROS:
   
  teb_autosize: True
  dt_ref: 1.0
- dt_hysteresis: 0.1
+ dt_hysteresis: 1.0
  max_samples: 500
  global_plan_overwrite_orientation: False  #for static
  allow_init_with_backwards_motion: True
@@ -46,7 +46,7 @@ TebLocalPlannerROS:
 
  # GoalTolerance
     
- xy_goal_tolerance: 0.1
+ xy_goal_tolerance: 0.2
  yaw_goal_tolerance: 0.2
  free_goal_vel: False
  complete_global_plan: True
@@ -121,4 +121,4 @@ TebLocalPlannerROS:
  oscillation_v_eps: 0.1
  oscillation_omega_eps: 0.1
  oscillation_recovery_min_duration: 10
- oscillation_filter_duration: 10
+ oscillation_filter_duration: 25
