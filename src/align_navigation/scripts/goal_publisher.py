@@ -302,8 +302,8 @@ def docking_execution():
                             dock_callback)
             rospy.wait_for_message("/dock_offset", Float64)
             rate.sleep()
-            rate.sleep()
-            rate.sleep()
+            #rate.sleep()
+            #rate.sleep()
             goal = waypoints[-1] + 0
             dx = goal[0] - pix_bot_center.position.x
             dy = goal[1] - pix_bot_center.position.y

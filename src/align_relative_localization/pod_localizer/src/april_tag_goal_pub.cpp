@@ -194,7 +194,6 @@ void aprilTagGoalPublisher::StateMachineCb(const state_machine::StateOut::ConstP
 {
   // Assume only the last two digits to be valid
   target_tags = { InStateInfo->PodInfo / 10, InStateInfo->PodInfo % 10 };
-  target_tags = { 1, 2 };
   // Enable goal pub if curr state is pod identification
   if (InStateInfo->CurrState == state_machine::StateOut::State_Identify ||
       InStateInfo->CurrState == state_machine::StateOut::State_D_Approach)
